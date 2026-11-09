@@ -1,0 +1,202 @@
+# Builds the release zip, release.json and the release notes, checks them,
+# and hands all three on as one artifact, "release". It runs once per run:
+# CI calls it on every push, the release workflow through CI with the tag.
+# Publishing happens elsewhere (publish.yml) and never builds or checks.
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: The release tag; empty on a push
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false # nothing here pushes
+          fetch-depth: 0 # the packager versions from history, the tag check needs main
+
+      # On a branch push the packager builds nothing when HEAD already carries
+      # a tag ("Found future tag"), leaving that to the tag's run. A release
+      # merge pushed together with its tag hits this, and the main CI goes red
+      # with no zip (SimpleConjureBar v1.0.1); every re-run of it would too. A
+      # run without a tag checks the branch, so it drops HEAD's tags in this
+      # checkout only.
+      - name: Build the branch, not a pending tag
+        if: inputs.tag == ''
+        run: git tag --points-at HEAD | xargs -r git tag -d
+
+      - name: Build the zip without publishing
+        uses: BigWigsMods/packager@e50a250f8705041e40f2fa1ddcb280a686d65aa0 # v2.6.1
+        with:
+          args: -d
+          pandoc: "false"
+
+      - name: Write release.json
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          zip=$(ls .release/*.zip)
+          [ "$(echo "$zip" | wc -l)" = 1 ] || { echo "expected one zip, found: $zip"; exit 1; }
+          if [ -n "$TAG" ]; then
+              version="$TAG"
+          else
+              version=$(basename "$zip" .zip)
+              version=${version#SmartGroupFilter-}
+              version=${version%-forever}
+          fi
+          bash .github/scripts/write-release-json.sh "$zip" "$version" .release/release.json
+
+      - name: Check the zip, release.json and, on a tag, the version
+        env:
+          TAG: ${{ inputs.tag }}
+        run: bash .github/scripts/check-package.sh .release/*.zip .release/release.json $TAG
+
+      # The checks must be able to refuse: a zip without its TOC, a release.json for the wrong
+      # flavor, a tag that is not the TOC's version, developer tools and a stray file.
+      - name: Control - the checks refuse a wrong package
+        run: |
+          zip=$(ls .release/*.zip)
+          bad="$RUNNER_TEMP/bad"
+          mkdir -p "$bad" && unzip -q "$zip" -d "$bad"
+          rm "$bad/SmartGroupFilter/SmartGroupFilter.toc"
+          (cd "$bad" && zip -q -r "$RUNNER_TEMP/$(basename "$zip")" SmartGroupFilter)
+          if bash .github/scripts/check-package.sh "$RUNNER_TEMP/$(basename "$zip")" .release/release.json; then
+              echo "the check accepted a zip without its TOC"; exit 1
+          fi
+          jq '.releases[0].metadata[0].flavor = "mainline"' .release/release.json > "$RUNNER_TEMP/release.json"
+          if bash .github/scripts/check-package.sh "$zip" "$RUNNER_TEMP/release.json"; then
+              echo "the check accepted a release.json without flavor forever"; exit 1
+          fi
+          if bash .github/scripts/check-package.sh "$zip" .release/release.json v0.0.0; then
+              echo "the check accepted a tag that is not the TOC's version"; exit 1
+          fi
+          # The report decoder stays out of the zip; a stand-in file proves it before it exists
+          withtools="$RUNNER_TEMP/withtools"
+          mkdir -p "$withtools" && unzip -q "$zip" -d "$withtools"
+          mkdir -p "$withtools/SmartGroupFilter/tools" && echo "-- decoder" > "$withtools/SmartGroupFilter/tools/decode-report.lua"
+          mkdir -p "$RUNNER_TEMP/withtools-zip"
+          (cd "$withtools" && zip -q -r "$RUNNER_TEMP/withtools-zip/$(basename "$zip")" SmartGroupFilter)
+          if bash .github/scripts/check-package.sh "$RUNNER_TEMP/withtools-zip/$(basename "$zip")" .release/release.json; then
+              echo "the check accepted a zip with tools/"; exit 1
+          fi
+          # Only the addon's own files ship: a stray file is refused too (SmartBlessingBar's ruleset plan
+          # 2026-10-24-review-code-fixes)
+          stray="$RUNNER_TEMP/stray"
+          mkdir -p "$stray" && unzip -q "$zip" -d "$stray"
+          echo "notes" > "$stray/SmartGroupFilter/notes.txt"
+          mkdir -p "$RUNNER_TEMP/stray-zip"
+          (cd "$stray" && zip -q -r "$RUNNER_TEMP/stray-zip/$(basename "$zip")" SmartGroupFilter)
+          if bash .github/scripts/check-package.sh "$RUNNER_TEMP/stray-zip/$(basename "$zip")" .release/release.json; then
+              echo "the check accepted a zip with a stray file"; exit 1
+          fi
+          echo "the checks refused all five wrong packages, as they must"
+
+      - name: A release's CHANGELOG entry is dated
+        if: inputs.tag != ''
+        run: |
+          version=$(grep -m1 -E '^## Version:' SmartGroupFilter/SmartGroupFilter.toc | sed -E 's/^## Version:[[:space:]]*//' | tr -d '\r[:space:]')
+          bash .github/scripts/check-changelog-heading.sh "$version" SmartGroupFilter/CHANGELOG.md
+
+      # A develop commit is never a merge in main, so the release workflow's
+      # first check must refuse it; on main, and on a release tag, it must pass.
+      - name: Tag check
+        run: |
+          if [ "$GITHUB_REF_NAME" = develop ]; then
+              if bash .github/scripts/check-release-ref.sh "$GITHUB_SHA"; then
+                  echo "the tag check accepted a develop commit"; exit 1
+              fi
+              echo "the tag check refused the develop commit, as it must"
+          else
+              bash .github/scripts/check-release-ref.sh "$GITHUB_SHA"
+          fi
+
+      - name: Release notes from the CHANGELOG
+        run: |
+          version=$(grep -m1 -E '^## Version:' SmartGroupFilter/SmartGroupFilter.toc | sed -E 's/^## Version:[[:space:]]*//' | tr -d '\r[:space:]')
+          awk -v v="## [$version]" 'index($0, v) == 1 { on = 1; next } on && /^## / { exit } on { print }' \
+              SmartGroupFilter/CHANGELOG.md > .release/notes.md
+          [ -s .release/notes.md ] || { echo "no CHANGELOG entry for $version"; exit 1; }
+
+      # The version rule on fixed lists, the interface mapping, and the check
+      # that no upload script can print a token - each able to go red.
+      - name: Upload controls
+        run: bash .github/scripts/test-upload-controls.sh
+
+      # The same rule through each site's script and data format: a list
+      # without Forever must fail, a version above all listed must fall back
+      # with the warning.
+      - name: Upload controls - site formats
+        run: |
+          zip=$(ls .release/*.zip)
+          notes=.release/notes.md
+          cf="$RUNNER_TEMP/cf.json"
+          wago="$RUNNER_TEMP/wago.json"
+          check_fallback() { # <site> <log>
+              grep -q "Forever 1.60.1" "$2" && grep -q WARNING "$2" \
+                  || { cat "$2"; echo "$1: 1.99.9 did not fall back to 1.60.1 with a warning"; exit 1; }
+          }
+          echo '[{"id":1,"gameVersionTypeID":517,"name":"11.2.5"}]' > "$cf"
+          if CF_VERSIONS_FILE="$cf" bash .github/scripts/upload-curseforge.sh --dry-run "$zip" "$notes"; then
+              echo "CurseForge: a list without Forever was accepted"; exit 1
+          fi
+          echo '[{"id":7,"gameVersionTypeID":88568,"name":"1.50.0"},{"id":8,"gameVersionTypeID":88568,"name":"1.60.1"},{"id":9,"gameVersionTypeID":517,"name":"11.2.5"}]' > "$cf"
+          CF_VERSIONS_FILE="$cf" GAME_VERSION=1.99.9 bash .github/scripts/upload-curseforge.sh --dry-run "$zip" "$notes" > "$RUNNER_TEMP/cf.log" 2>&1
+          check_fallback CurseForge "$RUNNER_TEMP/cf.log"
+          grep -q "(id 8)" "$RUNNER_TEMP/cf.log" || { cat "$RUNNER_TEMP/cf.log"; echo "CurseForge: wrong version id"; exit 1; }
+          echo '{"patches":{"retail":["11.2.5"]}}' > "$wago"
+          if WAGO_VERSIONS_FILE="$wago" bash .github/scripts/upload-wago.sh --dry-run "$zip" "$notes"; then
+              echo "Wago: a list without Forever was accepted"; exit 1
+          fi
+          echo '{"patches":{"forever":["1.50.0","1.60.1"],"retail":["11.2.5"]}}' > "$wago"
+          WAGO_VERSIONS_FILE="$wago" GAME_VERSION=1.99.9 bash .github/scripts/upload-wago.sh --dry-run "$zip" "$notes" > "$RUNNER_TEMP/wago.log" 2>&1
+          check_fallback Wago "$RUNNER_TEMP/wago.log"
+          echo "both sites refused a list without Forever and fell back with a warning, as they must"
+
+      # No upload token reaches CI (SmartBlessingBar's ruleset plan 2026-10-24-release-environment): both dry runs
+      # pass without one, and a real run without one stops before the network
+      - name: Upload controls - no token
+        env:
+          CF_API_TOKEN: ""
+          WAGO_API_TOKEN: ""
+        run: |
+          zip=$(ls .release/*.zip)
+          notes=.release/notes.md
+          wago="$RUNNER_TEMP/wago-list.json"
+          echo '{"patches":{"forever":["1.60.1"]}}' > "$wago"
+          bash .github/scripts/upload-curseforge.sh --dry-run "$zip" "$notes" > "$RUNNER_TEMP/cf-dry.log" 2>&1 \
+              || { cat "$RUNNER_TEMP/cf-dry.log"; echo "CurseForge: a dry run without a token failed"; exit 1; }
+          grep -q "from the TOC" "$RUNNER_TEMP/cf-dry.log" || { cat "$RUNNER_TEMP/cf-dry.log"; echo "CurseForge: no note on the TOC version"; exit 1; }
+          WAGO_VERSIONS_FILE="$wago" bash .github/scripts/upload-wago.sh --dry-run "$zip" "$notes" \
+              || { echo "Wago: a dry run without a token failed"; exit 1; }
+          for site in curseforge wago; do
+              if bash ".github/scripts/upload-$site.sh" "$zip" "$notes" > "$RUNNER_TEMP/$site-real.log" 2>&1; then
+                  echo "$site: a real run without a token passed"; exit 1
+              fi
+              grep -q "is not set" "$RUNNER_TEMP/$site-real.log" \
+                  || { cat "$RUNNER_TEMP/$site-real.log"; echo "$site: failed, but not for the missing token"; exit 1; }
+          done
+          echo "dry runs passed without tokens, real runs refused without them, as they must"
+
+      # upload-artifact skips hidden directories such as .release, so the three
+      # checked files move to a plain one rather than allowing hidden files.
+      - name: Collect the artifact
+        run: |
+          mkdir artifact
+          cp .release/*.zip .release/release.json .release/notes.md artifact/
+          ls -l artifact
+
+      # Everything checked above, as one artifact the publish jobs only send
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release
+          path: artifact/
+          if-no-files-found: error

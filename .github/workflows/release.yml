@@ -1,0 +1,46 @@
+# Publishes a release on a v* tag to GitHub (which WowUp offers to WoW Forever
+# clients), CurseForge and Wago. A published release reaches players at once
+# and cannot be called back (ruleset: releasing.md), so the tag check, the
+# tests, the build and every check run first; the publish jobs only send the
+# artifact those checks passed.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  # A tag created on GitHub never meets the pre-push hook; this is its check.
+  ref:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false # nothing here pushes
+          fetch-depth: 0
+      - name: Refuse a tag that is not a release merge in main
+        run: bash .github/scripts/check-release-ref.sh "$GITHUB_SHA"
+
+  # Tests, the one build with its checks against the tag, and the rehearsal
+  checks:
+    needs: ref
+    uses: ./.github/workflows/ci.yml
+    with:
+      tag: ${{ github.ref_name }}
+
+  # From here on the release is public, channel by channel
+  publish:
+    needs: checks
+    uses: ./.github/workflows/publish.yml
+    permissions:
+      contents: write # gh release create
+    with:
+      dry_run: false
+    # By name, not secrets: inherit. They live in the environment "release": GitHub
+    # resolves them for publish.yml's jobs in that environment only when passed here
+    secrets:
+      CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+      WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}

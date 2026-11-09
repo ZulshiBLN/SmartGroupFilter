@@ -1,0 +1,13 @@
+# BigWigs packager layout. The addon sits in SmartGroupFilter/, beside the
+# repository's README, LICENSE and tooling: the packager copies the checkout to
+# .release/SmartGroupFilter/, moves the addon's files up into that folder and
+# zips only it. Dotfiles are left out by the packager itself.
+package-as: SmartGroupFilter
+
+move-folders:
+  SmartGroupFilter/SmartGroupFilter: SmartGroupFilter
+
+ignore:
+  - tests
+  # the bug report decoder runs on a developer's machine, not in the game
+  - tools

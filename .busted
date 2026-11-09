@@ -1,0 +1,8 @@
+-- Specs live in tests/, helpers in tests/helpers/ (not specs, so not run).
+return {
+    default = {
+        ROOT = { "tests" },
+        pattern = "_spec",
+        lpath = "tests/helpers/?.lua",
+    },
+}

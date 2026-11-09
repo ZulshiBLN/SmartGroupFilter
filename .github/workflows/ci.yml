@@ -1,0 +1,80 @@
+# Runs the addon's checks on every push to develop and main - the whole tests
+# tree, as rules/testing.md requires. Actions are pinned to a commit: a moving
+# tag could change what runs here without a commit in this repository.
+name: CI
+
+on:
+  push:
+    branches: [develop, main]
+  # The release workflow runs these same checks before it publishes, with its
+  # tag. No upload token reaches them: the rehearsal runs without one (ruleset
+  # plan 2026-10-24-release-environment).
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false } # nothing here pushes
+
+      - uses: leafo/gh-actions-lua@6919171ccf181b826f44b9bca76307b577217377 # v13.0.0
+        with:
+          luaVersion: "5.1"
+
+      - uses: leafo/gh-actions-luarocks@35d062def313a7699a0d513e996bcf4352f05389 # v6.1.0
+
+      - name: Install luacheck and busted
+        run: |
+          luarocks install luacheck 1.2.0-1
+          luarocks install busted 2.3.0-1
+
+      - name: luacheck
+        run: luacheck .
+
+      - name: busted
+        run: busted
+
+      # A green suite proves nothing unless the same run can go red. A copy of
+      # the checkout gets one spec that must fail; if busted passes there, this
+      # run cannot see failures and is refused.
+      - name: Control - a failing spec turns busted red
+        run: |
+          control="$RUNNER_TEMP/control"
+          cp -r . "$control"
+          cat > "$control/tests/control_spec.lua" <<'EOF'
+          describe("CI control", function()
+              it("fails on purpose", function() assert.is_true(false) end)
+          end)
+          EOF
+          cd "$control"
+          if busted > control.log 2>&1; then
+              cat control.log
+              echo "busted passed with a failing spec - CI cannot see failures"
+              exit 1
+          fi
+          grep -q "fails on purpose" control.log || { cat control.log; echo "the control spec did not run"; exit 1; }
+          echo "busted failed on the control spec, as it must"
+
+  # The zip, release.json and notes, built and checked once per run. On a
+  # push nothing is published from here; the release workflow passes its tag.
+  build:
+    needs: test
+    uses: ./.github/workflows/build.yml
+    with:
+      tag: ${{ inputs.tag }}
+
+  # The whole publish chain in dry-run mode, before any tag exists: each
+  # channel's job takes the artifact and does everything but send it.
+  rehearsal:
+    needs: build
+    uses: ./.github/workflows/publish.yml
+    with:
+      dry_run: true

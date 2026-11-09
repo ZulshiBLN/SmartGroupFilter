@@ -1,0 +1,4 @@
+# Every text file is stored and checked out with LF, whatever core.autocrlf
+# says on the machine. The addon was written with LF; play/ and main/ must
+# hand the client the same bytes develop/ has.
+* text=auto eol=lf

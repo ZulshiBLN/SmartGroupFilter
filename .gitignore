@@ -1,0 +1,16 @@
+# Packager output
+.release/
+*.zip
+
+# Lua tooling
+luacov.*.out
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
