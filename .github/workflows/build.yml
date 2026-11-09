@@ -177,14 +177,17 @@ jobs:
           grep -q "from the TOC" "$RUNNER_TEMP/cf-dry.log" || { cat "$RUNNER_TEMP/cf-dry.log"; echo "CurseForge: no note on the TOC version"; exit 1; }
           WAGO_VERSIONS_FILE="$wago" bash .github/scripts/upload-wago.sh --dry-run "$zip" "$notes" \
               || { echo "Wago: a dry run without a token failed"; exit 1; }
+          # Before the store projects exist a real run stops at the missing ID instead, earlier
           for site in curseforge wago; do
               if bash ".github/scripts/upload-$site.sh" "$zip" "$notes" > "$RUNNER_TEMP/$site-real.log" 2>&1; then
                   echo "$site: a real run without a token passed"; exit 1
               fi
-              grep -q "is not set" "$RUNNER_TEMP/$site-real.log" \
-                  || { cat "$RUNNER_TEMP/$site-real.log"; echo "$site: failed, but not for the missing token"; exit 1; }
+              field=X-Curse-Project-ID; [ "$site" = wago ] && field=X-Wago-ID
+              want="is not set"; grep -q "^## $field:" SmartGroupFilter/SmartGroupFilter.toc || want="no.*$field"
+              grep -q "$want" "$RUNNER_TEMP/$site-real.log" \
+                  || { cat "$RUNNER_TEMP/$site-real.log"; echo "$site: failed, but not for '$want'"; exit 1; }
           done
-          echo "dry runs passed without tokens, real runs refused without them, as they must"
+          echo "dry runs passed without tokens, real runs refused, as they must"
 
       # upload-artifact skips hidden directories such as .release, so the three
       # checked files move to a plain one rather than allowing hidden files.

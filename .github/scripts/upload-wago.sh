@@ -25,7 +25,13 @@ if [ -z "$dry" ] && [ -n "${WAGO_VERSIONS_FILE:-}${GAME_VERSION:-}" ]; then
 fi
 
 project=$(toc_field X-Wago-ID)
-[[ "$project" =~ ^[A-Za-z0-9]+$ ]] || fail "no X-Wago-ID in the TOC"
+if ! [[ "$project" =~ ^[A-Za-z0-9]+$ ]]; then
+    # Until the store project exists a rehearsal checks everything else; a real upload stops
+    # here (Michel, 2026-11-09)
+    [ -n "$dry" ] || fail "no X-Wago-ID in the TOC"
+    echo "NOTE: no X-Wago-ID in the TOC yet - a dry run goes on, a release would stop here"
+    project="(none yet)"
+fi
 label="v$(toc_field Version)"
 target=${GAME_VERSION:-$(interface_to_version "$(toc_field Interface)")}
 
