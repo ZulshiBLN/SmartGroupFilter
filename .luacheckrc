@@ -26,6 +26,9 @@ globals = {
 -- own entry may be written. A new API joins this list with the code that uses it.
 read_globals = {
     "C_AddOns", "CreateFrame", "GetLocale",
+    -- Group Finder (Blizzard_LFGVanilla_Browse.lua, Forever 1.60.1)
+    "C_LFGList", "LFGBrowseFrame", "LFGBrowseUtil_SortSearchResults", "hooksecurefunc",
+    "GetMaxPlayerLevel", "issecretvalue",
     SlashCmdList = { fields = { SMARTGROUPFILTER = { read_only = false } } },
 }
 

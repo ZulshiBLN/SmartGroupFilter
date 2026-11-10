@@ -53,3 +53,58 @@ end
 function RUNSCRIPT(frame, name, ...)
     return frame.scripts[name](frame, ...)
 end
+
+---------------------------------------------------------------------------
+-- Group Finder, as the Forever client (1.60.1) shows it: Michel's dumps of 2026-11-10 and
+-- Blizzard_LFGVanilla_Browse.lua. STATE.results: id -> { info = GetSearchResultInfo's table,
+-- player = GetSearchResultPlayerInfo(id, 1)'s table }; STATE.order: the ids in list order.
+---------------------------------------------------------------------------
+STATE.results = {}
+STATE.order = {}
+STATE.activities = {}   -- activityID -> GetActivityInfoTable's table
+STATE.activeEntry = nil -- GetActiveEntryInfo's table while the player is listed
+STATE.maxLevel = 60
+STATE.secret = {}       -- values issecretvalue reports as secret
+
+function issecretvalue(v) return STATE.secret[v] == true end
+function GetMaxPlayerLevel() return STATE.maxLevel end
+
+C_LFGList = {
+    GetSearchResultInfo = function(id)
+        local r = STATE.results[id]
+        return r and r.info
+    end,
+    GetSearchResultPlayerInfo = function(id, i)
+        local r = STATE.results[id]
+        return r and i == 1 and r.player or nil
+    end,
+    GetActiveEntryInfo = function() return STATE.activeEntry end,
+    GetActivityInfoTable = function(id) return STATE.activities[id] end,
+}
+
+-- hooksecurefunc for a global function: the original runs first, then the hook
+function hooksecurefunc(name, hook)
+    local original = _G[name]
+    _G[name] = function(...)
+        local r = { original(...) }
+        hook(...)
+        return unpack(r)
+    end
+end
+
+-- Blizzard's sort: the mock keeps STATE.order as it is
+function LFGBrowseUtil_SortSearchResults(results) end
+
+LFGBrowseFrame = {
+    results = {},
+    shown = true,
+    ActivityDropdown = { selectedValues = {} },
+}
+function LFGBrowseFrame:IsShown() return self.shown end
+-- As Blizzard's: fresh results from the client, sorted, then drawn
+function LFGBrowseFrame:UpdateResultList()
+    local results = {}
+    for i, id in ipairs(STATE.order) do results[i] = id end
+    self.totalResults, self.results = #results, results
+    LFGBrowseUtil_SortSearchResults(self.results)
+end

@@ -4,8 +4,8 @@ A filter for the Group Finder in World of Warcraft: Forever. It docks beside Bli
 Looking For Group window and shortens its list to the single players you are looking for - by
 role, class and level - so you can build your own group without scrolling through all of it.
 
-**Status: in development.** Version 0.1.0 is the addon's frame: it loads in every client
-language and answers its chat command. The filter itself comes next.
+**Status: in development.** Version 0.1.0 filters the player list by the level range of the
+dungeon you are listed for; the panel with priority rows and Build Group comes next.
 
 ## Installation
 

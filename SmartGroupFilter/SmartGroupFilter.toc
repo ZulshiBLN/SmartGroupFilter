@@ -25,4 +25,5 @@ Locales.lua
 Data.lua
 Core.lua
 Logic.lua
+Filter.lua
 Main.lua
