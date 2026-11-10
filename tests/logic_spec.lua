@@ -106,6 +106,18 @@ describe("the target dungeon", function()
         assert.are.equal(801, ns.ChooseTarget(state(c), { 800, 801 }))
     end)
 
+    it("puts tank and healer places first: they are rare, damage dealers are not", function()
+        -- 801 would get two damage dealers, 800 a tank and a healer; then 802 a tank, a healer
+        -- and a damage dealer: as many rare places as 800 and more players
+        local c = { solo("War", "WARRIOR", 25, T), solo("Pri", "PRIEST", 25, H),
+            solo("Wlk", "WARLOCK", 25, D, 0, { 801 }), solo("Rog", "ROGUE", 25, D, 0, { 801 }) }
+        assert.are.equal(800, ns.ChooseTarget(state(c), { 801, 800 }))
+        c[#c + 1] = solo("Pal", "PALADIN", 25, T, 0, { 802 })
+        c[#c + 1] = solo("Dru", "DRUID", 25, H, 0, { 802 })
+        c[#c + 1] = solo("Hun", "HUNTER", 25, D, 0, { 802 })
+        assert.are.equal(802, ns.ChooseTarget(state(c), { 801, 800, 802 }))
+    end)
+
     it("goes to the listing's order on a tie", function()
         local c = { solo("War", "WARRIOR", 25, T), solo("Pal", "PALADIN", 25, T, 0, { 801 }) }
         assert.are.equal(800, ns.ChooseTarget(state(c), { 800, 801 }))

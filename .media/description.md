@@ -20,8 +20,8 @@ it invites the tank, the healer and the damage dealers you are missing.
 - **Nobody twice:** invited players keep their place for two minutes, and while they are in
   your group. Whoever declines, lets the invite run out or is already in a group is not asked
   again - the place goes to the next player.
-- **One dungeon at a time:** listed for several, it builds for the one with the most players
-  to invite and names it in the chat.
+- **One dungeon at a time:** listed for several, it builds for the one where it finds the most
+  tanks and healers - they are rare - and names it in the chat.
 - **Clear invites:** a player listed for several roles, no role or several dungeons gets a short
   English whisper with the invite - "Tank for Shadowfang Keep?".
 - **Always a fresh list:** is the list older than 30 seconds, the button refreshes it first.

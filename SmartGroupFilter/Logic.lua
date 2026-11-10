@@ -81,18 +81,24 @@ local function Better(a, b)
 end
 
 -- The dungeon Build Group builds for, of the own dungeons (activityIDs, the listing's order):
--- the one for which ChooseInvites would choose the most players; a tie goes to the earlier.
--- state as for ChooseInvites, without dungeons.
+-- the one for which ChooseInvites would fill the most tank and healer places - they are rare,
+-- damage dealers are not (Michel, 2026-11-11) - then the most players; a tie goes to the
+-- earlier. state as for ChooseInvites, without dungeons.
 function ns.ChooseTarget(state, dungeons)
     if #dungeons <= 1 then return dungeons[1] end
-    local best, most
+    local best, bestRare, bestAll
     for _, id in ipairs(dungeons) do
         local each = {}
         for k, v in pairs(state) do each[k] = v end
         each.dungeons = { id }
-        local chosen = ns.ChooseInvites(each)
-        local n = chosen and #chosen or 0
-        if not most or n > most then best, most = id, n end
+        local chosen = ns.ChooseInvites(each) or {}
+        local rare = 0
+        for _, c in ipairs(chosen) do
+            if c.role ~= "DAMAGER" then rare = rare + 1 end
+        end
+        if not best or rare > bestRare or (rare == bestRare and #chosen > bestAll) then
+            best, bestRare, bestAll = id, rare, #chosen
+        end
     end
     return best
 end

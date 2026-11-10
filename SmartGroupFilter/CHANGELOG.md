@@ -26,8 +26,8 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   a run-out invite or "already in a group" frees the place, and that player is not asked again.
   A list older than 30 seconds is refreshed first with the same button. The chat names each
   invite; the tooltip says why the button is greyed out.
-- Listed for several dungeons, Build Group builds for the one with the most players to invite
-  and names it in the chat; the group keeps it while it has members or pending invites.
+- Listed for several dungeons, Build Group builds for the one where it finds the most tanks and
+  healers, then the most players, and names it in the chat; the group keeps it while it has members or pending invites.
 - A player listed for several roles or none gets an English whisper with the invite, "Tank for
   Shadowfang Keep?"; one listed for one role but several dungeons gets "You want to join for
   Shadowfang Keep?".

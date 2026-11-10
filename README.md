@@ -26,8 +26,8 @@ builds your five-player group with one click.
   healer, three damage dealers, only from players listed for your dungeon. Each place takes the
   highest class in its row, then the highest level, then the longest wait; players without a
   role only fill what is left. Only free places are filled.
-  - **Several dungeons:** listed for more than one, it builds for the one with the most players
-    to invite and names it in the chat. The group keeps that dungeon while it has members or
+  - **Several dungeons:** listed for more than one, it builds for the one where it finds the
+    most tanks and healers - they are rare - then the most players, and names it in the chat. The group keeps that dungeon while it has members or
     pending invites.
   - **Ambiguous sign-ups:** a player listed for several roles or none gets an English whisper
     with the invite ("Tank for Shadowfang Keep?"); one listed for one role but several dungeons
