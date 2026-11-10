@@ -27,8 +27,6 @@ it invites the tank, the healer and the damage dealers you are missing.
 - **Always a fresh list:** is the list older than 30 seconds, the button refreshes it first.
 - **Not listed yet?** The button reads List Self and lights up Blizzard's eye tab, where you
   choose the dungeon, play style and role.
-- **See before you invite:** `/sgf test` shows in the chat whom Build Group would invite and
-  why - and why everyone else is left out. Nothing is sent.
 
 ## 🎯 Filter the players you need
 

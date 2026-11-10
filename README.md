@@ -55,7 +55,6 @@ Not published yet. Once it is, it will be on CurseForge and Wago, and WowUp will
 | `/sgf` or `/sgf help` | Lists the chat commands |
 | `/sgf minimap` | Hides or shows the minimap button |
 | `/sgf bug` | Opens the bug report: describe the bug, copy the code into a GitHub issue |
-| `/sgf test` | Shows whom Build Group would invite and why, and why every other single player is left out - sends nothing |
 
 ## Languages
 
@@ -101,6 +100,13 @@ This is not legal advice; it says how bug reports are handled.
   the contact above. You may also complain to the Swiss FDPIC or to the data protection
   authority of your EU country.
 - **Under 16** - ask a parent before you post a report.
+
+## Development
+
+A checkout of this repository has one more chat command, `/sgf test`: it shows whom Build
+Group would invite and why, the target dungeon and each whisper, and why every other single
+player is left out - sending nothing. It lives in `DevTest.lua`, which the release package
+leaves out (`#@do-not-package@` in the TOC, `ignore` in `.pkgmeta`). Specs: `busted`, `luacheck .`.
 
 ## License
 

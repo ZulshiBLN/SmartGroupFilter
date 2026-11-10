@@ -586,6 +586,18 @@ describe("Build Group", function()
             assert.truthy(out:find("War WARRIOR 26 (tank, waits 0s): dungeon not loaded yet", 1, true))
         end)
 
+        it("shows the target line and each invite's whisper, and sends none", function()
+            STATE.results[1].player.lfgRoles = { tank = true, dps = true }
+            LFGBrowseFrame:UpdateResultList()
+            SlashCmdList.SMARTGROUPFILTER("test")
+            local out = lines()
+            assert.truthy(out:find("A click would print: Building a group for Shadowfang Keep.", 1, true))
+            assert.truthy(out:find('row place 1\n      whisper: "Tank for Shadowfang Keep?"', 1, true))
+            assert.truthy(out:find("Pri - PRIEST 24, healer, waits 0s, row place 1\n      no whisper", 1, true))
+            assert.are.equal(0, #STATE.whispers)
+            assert.are.equal(0, #STATE.invites)
+        end)
+
         it("names the class limit and the places nobody fits", function()
             result(7, "Ini", "MAGE", 25, { dps = true })
             STATE.results[1] = nil

@@ -33,6 +33,9 @@ ReportCode.lua
 Logic.lua
 Filter.lua
 Build.lua
+#@do-not-package@
+DevTest.lua
+#@end-do-not-package@
 Settings.lua
 Report.lua
 Panel.lua

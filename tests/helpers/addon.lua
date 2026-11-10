@@ -13,11 +13,16 @@ function M.read(path)
     return text
 end
 
--- The Lua files of the TOC, in load order.
-function M.tocFiles()
-    local files = {}
+-- The Lua files of the TOC, in load order. release: as the packager leaves the TOC, without
+-- the lines between #@do-not-package@ and #@end-do-not-package@.
+function M.tocFiles(release)
+    local files, skip = {}, false
     for line in M.read(ADDON .. "/" .. ADDON .. ".toc"):gmatch("[^\r\n]+") do
-        if not line:match("^%s*#") and line:match("%S") then
+        if line:match("^#@do%-not%-package@") then
+            skip = release
+        elseif line:match("^#@end%-do%-not%-package@") then
+            skip = false
+        elseif not skip and not line:match("^%s*#") and line:match("%S") then
             files[#files + 1] = line:match("^%s*(.-)%s*$")
         end
     end
@@ -27,7 +32,8 @@ end
 -- A fresh mocked client with the addon loaded; `locale` is what GetLocale
 -- answers. `world` may set the saved variables `db` and `globalDB` as the
 -- client hands them over. They are set here, not in a spec: busted gives each
--- spec file its own globals, which the addon never sees.
+-- spec file its own globals, which the addon never sees. world.release loads only what a
+-- release package holds.
 -- Returns the addon's namespace.
 function M.load(locale, world)
     world = world or {}
@@ -55,7 +61,7 @@ function M.load(locale, world)
         M.store = store
     end
     local ns = {}
-    for _, file in ipairs(M.tocFiles()) do
+    for _, file in ipairs(M.tocFiles(world.release)) do
         local chunk = assert(loadstring(M.read(ADDON .. "/" .. file), "@" .. ADDON .. "/" .. file))
         if env then setfenv(chunk, env) end
         chunk(ADDON, ns)

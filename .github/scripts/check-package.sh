@@ -27,6 +27,10 @@ for file in README.md LICENSE CHANGELOG.md; do
     [ -f "$dir/$file" ] || fail "$file is missing"
 done
 
+# The development test never ships (DevTest.lua, Michel 2026-11-11)
+[ ! -e "$dir/DevTest.lua" ] || fail "DevTest.lua is in the zip; it is for development only"
+! grep -q "DevTest" "$toc" || fail "the packaged TOC still loads DevTest.lua"
+
 # Every file the TOC loads
 while IFS= read -r line; do
     line="${line%$'\r'}"
