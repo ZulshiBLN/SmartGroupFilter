@@ -24,4 +24,5 @@
 Locales.lua
 Data.lua
 Core.lua
+Logic.lua
 Main.lua
