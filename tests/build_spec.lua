@@ -598,6 +598,17 @@ describe("Build Group", function()
             assert.are.equal(0, #STATE.invites)
         end)
 
+        it("names how many dungeons a player listed for, when more than one", function()
+            STATE.results[4].info.activityIDs = { 800, 801 }
+            STATE.results[2].info.activityIDs = { 801, 800, 802 }
+            LFGBrowseFrame:UpdateResultList()
+            SlashCmdList.SMARTGROUPFILTER("test")
+            local out = lines()
+            assert.truthy(out:find("3. damager: Wlk - WARLOCK 25, damager, 2 dungeons, waits 0s", 1, true))
+            assert.truthy(out:find("War WARRIOR 26 (tank, 3 dungeons, waits 0s)", 1, true))
+            assert.truthy(out:find("1. tank: Pal - PALADIN 25, tank, waits 0s", 1, true))
+        end)
+
         it("names the class limit and the places nobody fits", function()
             result(7, "Ini", "MAGE", 25, { dps = true })
             STATE.results[1] = nil

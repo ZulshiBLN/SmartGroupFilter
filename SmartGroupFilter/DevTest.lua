@@ -22,6 +22,13 @@ local function RolesText(roles)
     return #out > 0 and table.concat(out, "+") or "no role"
 end
 
+-- The roles, and the dungeons when more than one: a single role then gets the dungeon whisper
+local function SignUp(e)
+    local text = RolesText(e and e.roles)
+    local n = e and e.activities and #e.activities or 0
+    return n > 1 and ("%s, %d dungeons"):format(text, n) or text
+end
+
 local function RowPlace(role, class)
     for i, c in ipairs(db.order[role]) do
         if c == class then return i end
@@ -140,7 +147,7 @@ function ns.DryRun()
                 if cand.name == c.name then e = cand end
             end
             print(("   %d. %s: %s - %s %d, %s, waits %ds, row place %d"):format(i, c.role:lower(), c.name,
-                c.class, c.level, RolesText(e and e.roles), e and e.age or 0, RowPlace(c.role, c.class) or 0))
+                c.class, c.level, SignUp(e), e and e.age or 0, RowPlace(c.role, c.class) or 0))
             local whisper = B.WhisperFor(c, state)
             print("      " .. (whisper and ('whisper: "' .. whisper .. '"') or "no whisper"))
         end
@@ -169,7 +176,7 @@ function ns.DryRun()
             if reason then
                 left = left + 1
                 print(("   - %s %s %s (%s, waits %ds): %s"):format(tostring(e.name), tostring(e.class),
-                    tostring(e.level), RolesText(e.roles), e.age or 0, reason))
+                    tostring(e.level), SignUp(e), e.age or 0, reason))
             end
         end
     end
