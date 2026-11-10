@@ -410,3 +410,8 @@ function Widget:IsVisible()
     end
     return true
 end
+
+-- Text width: 7 px a byte, enough to compare entries; font objects are kept
+function Widget:GetStringWidth() return #(self.text or "") * 7 end
+function Widget:SetFontObject(f) self.fontObject = f end
+function Widget:GetFontObject() return self.fontObject end

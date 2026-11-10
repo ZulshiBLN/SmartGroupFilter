@@ -200,7 +200,7 @@ function ns.CreateBuildButton(parent)
     button = CreateFrame("Button", "SmartGroupFilterBuildButton", parent,
         "SecureActionButtonTemplate, UIPanelButtonTemplate")
     button:SetSize(160, 24)
-    button:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", 14, 40)
+    button:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", 14, 30)
     button:SetText(L.BUILD_GROUP)
     -- The secure action on the mouse button's release, whatever the key-down setting
     button:RegisterForClicks("LeftButtonUp")

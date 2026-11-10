@@ -129,6 +129,14 @@ describe("the language choice", function()
         assert.are.equal("Reset Filter", panel.resetButton.text)
     end)
 
+    it("is as wide as its longest entry", function()
+        assert.is_true(panel.languageDropdown.width >= 180)
+        -- the mock measures 7 px a character: "简体中文 (Chinese S.)" is the longest entry
+        local longest = 0
+        for _, code in ipairs(ns.LOCALE_ORDER) do longest = math.max(longest, #ns.LOCALE_NAMES[code]) end
+        assert.are.equal(math.max(180, longest * 7 + 50), panel.languageDropdown.width)
+    end)
+
     it("is kept for the next login", function()
         ns = addon.load("enUS", { globalDB = { language = "deDE" } })
         FIRE("PLAYER_LOGIN")

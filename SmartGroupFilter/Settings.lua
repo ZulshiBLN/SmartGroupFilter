@@ -12,6 +12,7 @@ ns.OnDBReady(function(d) db = d end)
 
 local PAD = 14
 local DD_WIDTH = 180
+local DD_TEXT_PAD = 50 -- room beside the text: its inset and the arrow
 
 local panel
 local settingsNext = false -- open on the settings view the next time the panel shows
@@ -121,7 +122,22 @@ local function LanguageDropdown(view, anchor)
     local options = LanguageOptions()
     local ok, dd = pcall(CreateFrame, "DropdownButton", nil, view, "WowStyle1DropdownTemplate")
     if ok and dd and dd.SetupMenu then
-        dd:SetWidth(DD_WIDTH)
+        -- As wide as the longest entry in the dropdown's own font ("简体中文 (Chinese S.)" was
+        -- cut short at a fixed width), as SimpleConjureBar's dropdown does
+        local probe = view:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        probe:Hide()
+        local function Fit()
+            local font = dd.Text and dd.Text.GetFontObject and dd.Text:GetFontObject()
+            if font then probe:SetFontObject(font) end
+            local widest = 0
+            for _, opt in ipairs(options) do
+                probe:SetText(opt.text())
+                widest = math.max(widest, probe:GetStringWidth())
+            end
+            dd:SetWidth(math.max(DD_WIDTH, math.ceil(widest) + DD_TEXT_PAD))
+        end
+        Fit()
+        ns.OnLanguageChanged(Fit)
         dd:SetPoint("TOPLEFT", label, "BOTTOMLEFT", 0, -6)
         dd:SetupMenu(function(_, root)
             for _, opt in ipairs(options) do
