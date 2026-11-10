@@ -98,10 +98,10 @@ describe("the panel", function()
     it("shows and hides the panel with a fourth side tab, remembered, Blizzard's list while hidden", function()
         local tab = ns.tab
         assert.are.equal(LFGParentFrame, tab.parent) -- on every page of the window
-        assert.are.equal("LFGVanillaRightTabTemplate", tab.template) -- Blizzard's tabs' own
+        assert.are.equal("LargeSideTabButtonTemplate", tab.template)
         assert.are.same({ "TOPLEFT", LFGParentFrame.WhoListingTab, "BOTTOMLEFT", 0, -2 }, tab.points[1])
-        assert.are.equal("Interface\\AddOns\\SmartGroupFilter\\Media\\Logo", tab.Icon.textureFile)
-        assert.is_true(tab.fillToInterior) -- the icon covers the gold-rimmed background
+        assert.are.equal("Interface\\AddOns\\SmartGroupFilter\\Media\\Tab", tab.Icon.textureFile)
+        assert.are.equal(30, tab.Icon.width) -- the first look, Michel's choice
         tab.mouseUp(tab, "LeftButton", true)
         assert.is_false(panel.shown)
         assert.is_false(db.panelShown)

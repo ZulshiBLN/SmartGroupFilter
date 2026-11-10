@@ -67,5 +67,7 @@ D.HOLD_SECONDS = 120
 -- change; panelShown: the side tab's switch - a hidden panel leaves Blizzard's list as it is.
 D.OPTION_DEFAULTS = { filterOn = true, allowDouble = false, allowSameArmor = true, panelShown = true }
 
--- The project's logo, shipped as Media/Logo.tga: the panel's portrait and its side tab's icon
+-- The project's logo, shipped as Media/Logo.tga: the panel's portrait (cut to the medallion)
 D.LOGO = "Interface\\AddOns\\SmartGroupFilter\\Media\\Logo"
+-- The side tab's icon: the full logo with its own gold ring (Media/Tab.tga)
+D.TAB_ICON = "Interface\\AddOns\\SmartGroupFilter\\Media\\Tab"

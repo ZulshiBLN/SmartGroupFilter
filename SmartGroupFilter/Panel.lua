@@ -345,22 +345,14 @@ local function RefreshAll()
     UpdateCount(ns.Counts())
 end
 
--- The template of Blizzard's three side tabs (Mainline/Blizzard_LFGVanilla_ParentFrame.xml): its
--- fillToInterior gives the black edge; the plain LargeSideTabButtonTemplate has a golden one.
--- Its OnLoad sets a click that switches Blizzard's tabs - replaced below.
-local function TabTemplate()
-    local exists = C_XMLUtil and C_XMLUtil.GetTemplateInfo
-    if exists and exists("LFGVanillaRightTabTemplate") then return "LFGVanillaRightTabTemplate" end
-    return "LargeSideTabButtonTemplate"
-end
-
--- The fourth side tab, below Blizzard's three and made from the same template, with the logo.
--- Shown on every page of the window (a child of LFGParentFrame). On another page a click opens
--- the Group Browser with the panel; on the Group Browser it shows or hides the panel (Michel).
--- Never "checked": Blizzard draws the checked tab - the page you are on - with a gold edge, and
--- this tab is no page of its own.
+-- The fourth side tab, below Blizzard's three, from Blizzard's side tab template, with the full
+-- logo at 30 px - the look Michel chose, the first one shown in game (2026-11-10). The tab's rim
+-- is the template's own. Shown on every page of the window (a child of LFGParentFrame). On
+-- another page a click opens the Group Browser with the panel; on the Group Browser it shows or
+-- hides the panel (Michel). Never "checked": Blizzard draws the tab of the page you are on with
+-- a gold glow, and this tab is no page of its own.
 local function ToggleTab()
-    local tab = CreateFrame("Frame", "SmartGroupFilterTab", LFGParentFrame, TabTemplate())
+    local tab = CreateFrame("Frame", "SmartGroupFilterTab", LFGParentFrame, "LargeSideTabButtonTemplate")
     ns.tab = tab
     local who = LFGParentFrame.WhoListingTab
     if who then
@@ -368,10 +360,10 @@ local function ToggleTab()
     else
         tab:SetPoint("TOPLEFT", LFGParentFrame, "TOPRIGHT", 0, -200)
     end
-    -- As Blizzard's own tabs: the logo fills the tab's interior (50 px, masked to the tab's
-    -- shape; SidePanelTabButtonMixin). The tab's rim is the template's own and stays.
-    if tab.Icon then tab.Icon:SetTexture(D.LOGO) end
-    if tab.SetFillToInterior then tab:SetFillToInterior(true) end
+    if tab.Icon then
+        tab.Icon:SetTexture(D.TAB_ICON)
+        tab.Icon:SetSize(30, 30)
+    end
     tab.tooltipText = ns.ADDON_NAME
     local function Sync()
         if tab.SetChecked then tab:SetChecked(false) end
