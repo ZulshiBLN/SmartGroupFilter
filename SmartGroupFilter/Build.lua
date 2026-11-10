@@ -225,6 +225,32 @@ function ns.UpdateBuildButton()
 end
 
 
+-- What to whisper with the invite, or nil: listed for several roles or none - which role;
+-- for one role but several dungeons - which dungeon (Michel, 2026-11-11)
+local function WhisperText(c, entry, dungeon)
+    local roles = 0
+    for _, field in pairs(D.ROLE_FIELD) do
+        if entry and entry.roles and entry.roles[field] then roles = roles + 1 end
+    end
+    if roles ~= 1 then return D.WHISPER_ROLE:format(D.WHISPER_ROLE_NAMES[c.role], dungeon), "role" end
+    if entry and entry.activities and #entry.activities > 1 then
+        return D.WHISPER_DUNGEON:format(dungeon), "dungeon"
+    end
+end
+
+local function Whisper(c, state)
+    local entry
+    for _, e in ipairs(state.candidates) do
+        if e.name == c.name then entry = e end
+    end
+    local text, kind = WhisperText(c, entry, ns.DungeonName(state.target))
+    if not text then return end
+    local send = C_ChatInfo and C_ChatInfo.SendChatMessage or SendChatMessage
+    -- A failed whisper must never stop the invite: skip it and say so in the log only
+    local ok = pcall(send, text, "WHISPER", nil, c.name)
+    ns.Log(("whisper %s %s %s%s"):format(kind, c.role, tostring(state.target), ok and "" or " failed"))
+end
+
 -- The click: invite and hold the places. Called only from the button's OnClick.
 local function BuildGroup()
     local list, _, state = Plan()
@@ -236,6 +262,7 @@ local function BuildGroup()
     for i = 1, math.min(#list, D.INVITES_PER_CLICK) do
         local c = list[i]
         C_PartyInfo.InviteUnit(c.name)
+        Whisper(c, state)
         placed[c.name] = { role = c.role, class = c.class, level = c.level, ["until"] = now + D.HOLD_SECONDS }
         ns.Print(L.INVITED:format(c.name, ns.RoleName(c.role), c.level))
         ns.Log(("invite %s %s %s"):format(c.role, ns.SafeValue(c.class), tostring(c.level)))

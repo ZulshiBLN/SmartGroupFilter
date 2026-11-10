@@ -67,6 +67,13 @@ D.HOLD_SECONDS = 120
 -- (Michel, 2026-11-11)
 D.LIST_FRESH_SECONDS = 30
 
+-- The whisper to a player whose sign-up is ambiguous (ruleset plan 2026-11-11-build-dungeon).
+-- English always - the receiver's language is unknown - so not in Locales.lua; the dungeon's
+-- name comes from the client.
+D.WHISPER_ROLE = "%s for %s?"
+D.WHISPER_DUNGEON = "You want to join for %s?"
+D.WHISPER_ROLE_NAMES = { TANK = "Tank", HEALER = "Healer", DAMAGER = "Damage" }
+
 -- The panel's options and their defaults. panelShown: the side tab's switch - a hidden panel
 -- leaves Blizzard's list as it is. Reset Filter's "off" is not saved: it lasts until the next
 -- change in the panel or the next login, so the panel never shows a filter that is not applied.

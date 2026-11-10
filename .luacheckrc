@@ -33,7 +33,7 @@ read_globals = {
     "LFGParentFrame", "UIParent", "GameTooltip", "GetCursorPosition", "PixelUtil", "CreateColor",
 
     -- Build Group
-    "C_LFGListRoles", "C_PartyInfo", "GetNumGroupMembers", "IsInGroup", "UnitIsGroupLeader",
+    "C_LFGListRoles", "C_PartyInfo", "C_ChatInfo", "SendChatMessage", "GetNumGroupMembers", "IsInGroup", "UnitIsGroupLeader",
     "UnitIsGroupAssistant", "UnitName", "GetUnitName", "UnitFullName", "GetTime", "ERR_DECLINE_GROUP_S", "ERR_ALREADY_IN_GROUP_S",
     "InCombatLockdown", "Minimap", "LFDMicroButton",
     "LOCALIZED_CLASS_NAMES_MALE", "TANK", "HEALER", "DAMAGER",

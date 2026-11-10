@@ -22,6 +22,8 @@ it invites the tank, the healer and the damage dealers you are missing.
   again - the place goes to the next player.
 - **One dungeon at a time:** listed for several, it builds for the one with the most players
   to invite and names it in the chat.
+- **Clear invites:** a player listed for several roles, no role or several dungeons gets a short
+  English whisper with the invite - "Tank for Shadowfang Keep?".
 - **Always a fresh list:** is the list older than 30 seconds, the button refreshes it first.
 - **Not listed yet?** The button reads List Self and lights up Blizzard's eye tab, where you
   choose the dungeon, play style and role.
@@ -55,8 +57,8 @@ Korean and Chinese (simplified and traditional) - follows your client, or choose
 
 ## 🔒 Privacy
 
-- No addon messages, no chat messages to other players. All it sends are group invites and the
-  Group Finder's own search - each from your click.
+- No addon messages. All it sends are group invites, the Group Finder's own search and one
+  English whisper with an invite when a player's sign-up is ambiguous - each from your click.
 - Stores only your own settings.
 - Bug reports leave the game only when you copy the code and post it yourself.
 

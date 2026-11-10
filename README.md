@@ -32,7 +32,9 @@ builds your five-player group with one click.
   **Refresh List** first and clicks Blizzard's own refresh arrow. The chat names every invite;
   the button's tooltip says why it is greyed out. Listed for several dungeons, it builds for the
   one with the most players to invite and names it in the chat; the group keeps that dungeon
-  while it has members or pending invites.
+  while it has members or pending invites. A player listed for several roles or none gets an
+  English whisper with the invite ("Tank for Shadowfang Keep?"); one listed for one role but
+  several dungeons gets "You want to join for Shadowfang Keep?".
 - **Minimap button** - left-click opens or closes the Group Finder as Blizzard's button and key
   do; right-click opens the settings; drag it around the minimap. The AddOn menu entry opens the
   settings too.
@@ -60,8 +62,9 @@ gear in the panel lets you choose another one.
 
 ## Privacy and security
 
-- No addon messages and no chat messages to other players. All it sends are group invites and
-  the Group Finder's own search, each from your click.
+- No addon messages. All it sends are group invites, the Group Finder's own search and one
+  English whisper with an invite when a player's sign-up is ambiguous ("Tank for Shadowfang
+  Keep?") - each from your click.
 - No dynamic code.
 - Saved settings are validated at login (types and ranges), so damaged files cannot break the
   addon.

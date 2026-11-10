@@ -323,6 +323,12 @@ C_LFGListRoles = { GetRoles = function() return STATE.ownRoles end }
 STATE.invites = {}
 C_PartyInfo = { InviteUnit = function(name) STATE.invites[#STATE.invites + 1] = name end }
 
+-- Whispers sent: { text, chatType, target }
+STATE.whispers = {}
+C_ChatInfo = { SendChatMessage = function(text, chatType, _, target)
+    STATE.whispers[#STATE.whispers + 1] = { text = text, chatType = chatType, target = target }
+end }
+
 -- C_Timer.After queues; RUNTIMERS runs what is due, as the client's next frames would
 STATE.timers = {}
 C_Timer = {

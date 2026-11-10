@@ -172,6 +172,66 @@ describe("Build Group", function()
         end)
     end)
 
+    describe("the whisper", function()
+        local function whispers()
+            local out = {}
+            for i, w in ipairs(STATE.whispers) do out[i] = w.target .. ": " .. w.text end
+            return table.concat(out, " | ")
+        end
+
+        it("asks a player listed for several roles which one, by his full name", function()
+            STATE.results[1].player.name = "Pal Light"
+            STATE.results[1].player.lfgRoles = { tank = true, dps = true }
+            click()
+            assert.are.equal("Pal Light: Tank for Shadowfang Keep?", whispers())
+            assert.are.equal("WHISPER", STATE.whispers[1].chatType)
+        end)
+
+        it("asks a player with no role too", function()
+            STATE.results[3].player.lfgRoles = {}
+            click()
+            assert.are.equal("Pri: Healer for Shadowfang Keep?", whispers())
+        end)
+
+        it("asks a player with one role listed for several dungeons for the target", function()
+            STATE.results[4].info.activityIDs = { 801, 800 }
+            click()
+            assert.are.equal("Wlk: You want to join for Shadowfang Keep?", whispers())
+        end)
+
+        it("sends the role line alone to a player with several roles and dungeons", function()
+            STATE.results[5].player.lfgRoles = { dps = true, tank = true }
+            STATE.results[5].info.activityIDs = { 800, 801 }
+            click()
+            assert.are.equal("Rog: Damage for Shadowfang Keep?", whispers())
+        end)
+
+        it("sends nothing to a player with one role for one dungeon", function()
+            click()
+            assert.are.equal(4, #STATE.invites)
+            assert.are.equal(0, #STATE.whispers)
+        end)
+
+        it("invites even when the whisper fails", function()
+            STATE.results[1].player.lfgRoles = { tank = true, dps = true }
+            STATE.results[3].player.lfgRoles = {}
+            C_ChatInfo.SendChatMessage = function() error("No player named 'Pal'") end
+            click()
+            assert.are.equal("Pal Wlk Rog Pri", table.concat(STATE.invites, " ")) -- no role: last
+        end)
+
+        it("is sent from the click only", function()
+            STATE.results[1].player.lfgRoles = { tank = true, dps = true }
+            LFGBrowseFrame:UpdateResultList()
+            ns.UpdateBuildButton()
+            SlashCmdList.SMARTGROUPFILTER("test")
+            FIRE("GROUP_ROSTER_UPDATE")
+            STATE.time = STATE.time + 5
+            RUNSCRIPT(button, "OnUpdate", 1)
+            assert.are.equal(0, #STATE.whispers)
+        end)
+    end)
+
     it("chooses from the whole list, even while the Filter is reset", function()
         db.excluded.TANK.PALADIN = true
         ns.ResetFilter() -- exclusions gone, so the paladin may be chosen again

@@ -27,6 +27,9 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   refreshed first with the same button. The chat names each invite; the tooltip says why the
   button is greyed out. Listed for several dungeons, it builds for the one with the most players
   to invite and names it in the chat; the group keeps it while it has members or pending invites.
+  A player listed for several roles or none gets an English whisper with the invite, "Tank for
+  Shadowfang Keep?"; one listed for one role but several dungeons gets "You want to join for
+  Shadowfang Keep?".
 - Not listed yet? The same button reads List Self and lights up Blizzard's eye tab, where you
   choose the dungeon, play style and role; once Blizzard has listed you it reads Build Group.
 - A minimap button with the logo: left-click opens or closes the Group Finder, as Blizzard's
