@@ -32,16 +32,27 @@ local function Clean(v)
     return v
 end
 
--- The group without the player: { { name, class, level } }; names as the Group Finder writes
--- them, "Name" or "Name-Realm"
+-- A unit's name as the Group Finder writes it. WoW Forever gave characters surnames:
+-- UnitName says "Zulsha", the Group Finder and whispers need "Zulsha Vashtar", which
+-- GetUnitName(unit, true) gives (Michel's dump, 2026-11-11). Without it: name and realm.
+function ns.FullUnitName(unit)
+    if GetUnitName then
+        local full = Clean(GetUnitName(unit, true))
+        if full and full ~= "" then return full end
+    end
+    local name, realm = UnitName(unit)
+    name, realm = Clean(name), Clean(realm)
+    if name and realm and realm ~= "" then return name .. "-" .. realm end
+    return name
+end
+
+-- The group without the player: { { name, class, level } }, named as the Group Finder does
 local function Members()
     local list = {}
     for i = 1, math.max(0, GetNumGroupMembers() - 1) do
         local unit = "party" .. i
-        local name, realm = UnitName(unit)
-        name, realm = Clean(name), Clean(realm)
+        local name = ns.FullUnitName(unit)
         if name then
-            if realm and realm ~= "" then name = name .. "-" .. realm end
             local _, class = UnitClass(unit)
             list[#list + 1] = { name = name, class = Clean(class), level = Clean(UnitLevel(unit)) }
         end

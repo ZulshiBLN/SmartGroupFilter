@@ -46,6 +46,10 @@ function ns.KnownNames()
     for _, u in ipairs(units) do
         local name, realm = UnitName(u)
         Add(name); Add(realm)
+        -- WoW Forever's surnames: "Zulsha Vashtar" whole and its surname alone
+        local full = GetUnitName and GetUnitName(u, true)
+        Add(full)
+        if UnitFullName then Add((select(2, UnitFullName(u)))) end
         if not IsSecret(name) and not IsSecret(realm) and name and realm and realm ~= "" then
             Add(name .. "-" .. realm)
         end

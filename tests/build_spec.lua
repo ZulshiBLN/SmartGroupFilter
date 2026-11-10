@@ -124,6 +124,24 @@ describe("Build Group", function()
         assert.are.equal("Hun", table.concat(STATE.invites, " "))
     end)
 
+    it("knows an invited player with a surname once he joins (WoW Forever names)", function()
+        STATE.results[1].player.name = "Pal Lightbringer"
+        click()
+        assert.are.equal("Pal Lightbringer", STATE.invites[1])
+        STATE.party = { { name = "Pal Lightbringer", class = "PALADIN", level = 25 } }
+        FIRE("GROUP_ROSTER_UPDATE")
+        STATE.time = STATE.time + 500 -- far past the hold: only a joined player keeps his place
+        RUNTIMERS()
+        fresh()
+        local state = ns.ReportBuildState()
+        local joined = false
+        for _, p in ipairs(state.invited) do if p.role == "TANK" and p.joined then joined = true end end
+        assert.is_true(joined)
+        STATE.invites = {}
+        click()
+        for _, n in ipairs(STATE.invites) do assert.are_not.equal("War", n) end -- no second tank
+    end)
+
     it("frees a place when the player leaves the group", function()
         click()
         STATE.party = { { name = "Pal", class = "PALADIN", level = 25 } }

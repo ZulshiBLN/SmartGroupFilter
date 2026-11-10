@@ -289,9 +289,24 @@ function UnitLevel(unit)
     local u = Unit(unit or "player")
     return u and u.level
 end
+-- WoW Forever: a first name and a surname. UnitName gives the first name, GetUnitName(unit,
+-- true) both, UnitFullName the two apart (Michel's dump, 2026-11-11). A unit's name in STATE
+-- is the full one, "First Last".
+local function Split(full)
+    local first, last = (full or ""):match("^(%S+)%s+(.+)$")
+    return first or full, last
+end
 function UnitName(unit)
     local u = Unit(unit)
-    if u then return u.name or "Me", u.realm end
+    if u then return (Split(u.name or "Me")), u.realm end
+end
+function UnitFullName(unit)
+    local u = Unit(unit)
+    if u then return Split(u.name or "Me") end
+end
+function GetUnitName(unit)
+    local u = Unit(unit)
+    return u and (u.name or "Me")
 end
 function GetNumGroupMembers() return #STATE.party > 0 and #STATE.party + 1 or 0 end
 function IsInGroup() return #STATE.party > 0 end
