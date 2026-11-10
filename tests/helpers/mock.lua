@@ -37,7 +37,8 @@ local Widget = {}
 Widget.__index = Widget
 local function noop() end
 for _, m in ipairs({ "SetAutoFocus", "SetNumeric", "SetMaxLetters", "ClearFocus", "SetAllPoints",
-    "RegisterForClicks", "RegisterForDrag", "SetFrameStrata", "SetPortraitShown", "SetTextColor" }) do
+    "RegisterForClicks", "RegisterForDrag", "SetFrameStrata", "SetPortraitShown", "SetTextColor",
+    "SetMotionScriptsWhileDisabled" }) do
     Widget[m] = noop
 end
 function Widget:GetFrameStrata() return "MEDIUM" end
@@ -171,6 +172,13 @@ C_LFGList = {
         return r and i == 1 and r.player or nil
     end,
     GetActiveEntryInfo = function() return STATE.activeEntry end,
+    HasActiveEntryInfo = function() return STATE.activeEntry ~= nil end,
+    -- Blizzard's own filtered results, before SmartGroupFilter's filter: every id
+    GetFilteredSearchResults = function()
+        local ids = {}
+        for i, id in ipairs(STATE.order) do ids[i] = id end
+        return #ids, ids
+    end,
     GetActivityInfoTable = function(id) return STATE.activities[id] end,
 }
 
@@ -207,8 +215,39 @@ end
 
 -- The player: STATE.player = { class, level }
 STATE.player = { class = "MAGE", level = 25 }
-function UnitClass() return "Mage", STATE.player.class end
-function UnitLevel() return STATE.player.level end
+-- The group: STATE.party = { { name, class, level }, ... } without the player; STATE.leader
+STATE.party = {}
+STATE.leader = true
+local function Unit(unit)
+    if unit == "player" then return STATE.player end
+    local i = tonumber(unit:match("^party(%d)$"))
+    return i and STATE.party[i]
+end
+function UnitClass(unit)
+    local u = Unit(unit or "player")
+    if u then return u.class, u.class end
+end
+function UnitLevel(unit)
+    local u = Unit(unit or "player")
+    return u and u.level
+end
+function UnitName(unit)
+    local u = Unit(unit)
+    if u then return u.name or "Me", u.realm end
+end
+function GetNumGroupMembers() return #STATE.party > 0 and #STATE.party + 1 or 0 end
+function IsInGroup() return #STATE.party > 0 end
+function UnitIsGroupLeader() return STATE.leader end
+function UnitIsGroupAssistant() return false end
+
+STATE.time = 1000
+function GetTime() return STATE.time end
+
+-- The own roles (C_LFGListRoles) and the invites sent (C_PartyInfo)
+STATE.ownRoles = { tank = false, healer = false, dps = true }
+C_LFGListRoles = { GetRoles = function() return STATE.ownRoles end }
+STATE.invites = {}
+C_PartyInfo = { InviteUnit = function(name) STATE.invites[#STATE.invites + 1] = name end }
 
 -- C_Timer.After queues; RUNTIMERS runs what is due, as the client's next frames would
 STATE.timers = {}

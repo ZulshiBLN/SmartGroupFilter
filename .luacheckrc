@@ -32,6 +32,9 @@ read_globals = {
     -- The panel
     "LFGParentFrame", "UIParent", "GameTooltip", "GetCursorPosition", "PixelUtil", "CreateColor",
     "LFGParentFrameTab2_OnClick",
+    -- Build Group
+    "C_LFGListRoles", "C_PartyInfo", "GetNumGroupMembers", "IsInGroup", "UnitIsGroupLeader",
+    "UnitIsGroupAssistant", "UnitName", "GetTime",
     "LOCALIZED_CLASS_NAMES_MALE", "TANK", "HEALER", "DAMAGER",
     SlashCmdList = { fields = { SMARTGROUPFILTER = { read_only = false } } },
 }

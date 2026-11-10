@@ -26,5 +26,6 @@ Data.lua
 Core.lua
 Logic.lua
 Filter.lua
+Build.lua
 Panel.lua
 Main.lua

@@ -37,6 +37,14 @@ locales.enUS = {
     SAME_ARMOR = "Same armor class as you",
     TIP_TOGGLE = "Show or hide the panel",
     PRIORITIES = "Priorities",
+    BUILD_GROUP = "Build Group",
+    INVITE_NEXT = "Invite: %s (%s)",
+    INVITED = "Invited %s (%s, level %d).",
+    NEED_LISTING = "List yourself in the Group Finder first.",
+    NOT_LEADER = "Only the group leader or an assistant can invite.",
+    NO_OWN_ROLE = "Your listing has no role.",
+    GROUP_FULL = "Your group is full.",
+    NO_CANDIDATE = "No fitting player in the list.",
 }
 
 locales.deDE = {
@@ -68,6 +76,14 @@ locales.deDE = {
     SAME_ARMOR = "Gleiche Rüstungsklasse wie du",
     TIP_TOGGLE = "Panel ein- oder ausblenden",
     PRIORITIES = "Prioritäten",
+    BUILD_GROUP = "Gruppe bauen",
+    INVITE_NEXT = "Einladen: %s (%s)",
+    INVITED = "%s eingeladen (%s, Stufe %d).",
+    NEED_LISTING = "Trage dich zuerst in der Gruppensuche ein.",
+    NOT_LEADER = "Nur Gruppenleiter oder Assistenten können einladen.",
+    NO_OWN_ROLE = "Dein Eintrag hat keine Rolle.",
+    GROUP_FULL = "Deine Gruppe ist voll.",
+    NO_CANDIDATE = "Kein passender Spieler in der Liste.",
 }
 
 locales.frFR = {
@@ -99,6 +115,14 @@ locales.frFR = {
     SAME_ARMOR = "Même type d'armure que vous",
     TIP_TOGGLE = "Afficher ou masquer le panneau",
     PRIORITIES = "Priorités",
+    BUILD_GROUP = "Former le groupe",
+    INVITE_NEXT = "Inviter : %s (%s)",
+    INVITED = "%s invité (%s, niveau %d).",
+    NEED_LISTING = "Inscrivez-vous d'abord dans la recherche de groupe.",
+    NOT_LEADER = "Seul le chef de groupe ou un assistant peut inviter.",
+    NO_OWN_ROLE = "Votre inscription n'a pas de rôle.",
+    GROUP_FULL = "Votre groupe est complet.",
+    NO_CANDIDATE = "Aucun joueur adapté dans la liste.",
 }
 
 locales.esES = {
@@ -130,6 +154,14 @@ locales.esES = {
     SAME_ARMOR = "Mismo tipo de armadura que tú",
     TIP_TOGGLE = "Mostrar u ocultar el panel",
     PRIORITIES = "Prioridades",
+    BUILD_GROUP = "Formar grupo",
+    INVITE_NEXT = "Invitar: %s (%s)",
+    INVITED = "Invitado %s (%s, nivel %d).",
+    NEED_LISTING = "Primero apúntate en el buscador de grupos.",
+    NOT_LEADER = "Solo el líder del grupo o un asistente puede invitar.",
+    NO_OWN_ROLE = "Tu inscripción no tiene rol.",
+    GROUP_FULL = "Tu grupo está completo.",
+    NO_CANDIDATE = "Ningún jugador adecuado en la lista.",
 }
 
 -- esMX holds only what differs from esES
@@ -165,6 +197,14 @@ locales.itIT = {
     SAME_ARMOR = "Stesso tipo di armatura tuo",
     TIP_TOGGLE = "Mostra o nascondi il pannello",
     PRIORITIES = "Priorità",
+    BUILD_GROUP = "Forma gruppo",
+    INVITE_NEXT = "Invita: %s (%s)",
+    INVITED = "Invitato %s (%s, livello %d).",
+    NEED_LISTING = "Prima iscriviti alla ricerca gruppi.",
+    NOT_LEADER = "Solo il capogruppo o un assistente può invitare.",
+    NO_OWN_ROLE = "La tua iscrizione non ha un ruolo.",
+    GROUP_FULL = "Il tuo gruppo è al completo.",
+    NO_CANDIDATE = "Nessun giocatore adatto nell'elenco.",
 }
 
 locales.ptBR = {
@@ -196,6 +236,14 @@ locales.ptBR = {
     SAME_ARMOR = "Mesmo tipo de armadura que você",
     TIP_TOGGLE = "Mostrar ou ocultar o painel",
     PRIORITIES = "Prioridades",
+    BUILD_GROUP = "Montar grupo",
+    INVITE_NEXT = "Convidar: %s (%s)",
+    INVITED = "Convidado %s (%s, nível %d).",
+    NEED_LISTING = "Primeiro inscreva-se no localizador de grupos.",
+    NOT_LEADER = "Só o líder do grupo ou um assistente pode convidar.",
+    NO_OWN_ROLE = "Sua inscrição não tem função.",
+    GROUP_FULL = "Seu grupo está completo.",
+    NO_CANDIDATE = "Nenhum jogador adequado na lista.",
 }
 
 locales.ruRU = {
@@ -227,6 +275,14 @@ locales.ruRU = {
     SAME_ARMOR = "Тот же тип брони, что у вас",
     TIP_TOGGLE = "Показать или скрыть панель",
     PRIORITIES = "Приоритеты",
+    BUILD_GROUP = "Собрать группу",
+    INVITE_NEXT = "Пригласить: %s (%s)",
+    INVITED = "Приглашён %s (%s, уровень %d).",
+    NEED_LISTING = "Сначала запишитесь в поиск группы.",
+    NOT_LEADER = "Приглашать может только лидер группы или помощник.",
+    NO_OWN_ROLE = "В вашей записи не указана роль.",
+    GROUP_FULL = "Ваша группа заполнена.",
+    NO_CANDIDATE = "В списке нет подходящих игроков.",
 }
 
 locales.koKR = {
@@ -258,6 +314,14 @@ locales.koKR = {
     SAME_ARMOR = "나와 같은 방어구 유형",
     TIP_TOGGLE = "패널 표시 또는 숨기기",
     PRIORITIES = "우선순위",
+    BUILD_GROUP = "파티 구성",
+    INVITE_NEXT = "초대: %s (%s)",
+    INVITED = "%s 초대함 (%s, 레벨 %d).",
+    NEED_LISTING = "먼저 파티 찾기에 등록하세요.",
+    NOT_LEADER = "파티장이나 부파티장만 초대할 수 있습니다.",
+    NO_OWN_ROLE = "등록에 역할이 없습니다.",
+    GROUP_FULL = "파티가 가득 찼습니다.",
+    NO_CANDIDATE = "목록에 맞는 플레이어가 없습니다.",
 }
 
 locales.zhCN = {
@@ -289,6 +353,14 @@ locales.zhCN = {
     SAME_ARMOR = "与你相同的护甲类型",
     TIP_TOGGLE = "显示或隐藏面板",
     PRIORITIES = "优先级",
+    BUILD_GROUP = "组建队伍",
+    INVITE_NEXT = "邀请：%s（%s）",
+    INVITED = "已邀请 %s（%s，等级 %d）。",
+    NEED_LISTING = "请先在队伍查找器中登记。",
+    NOT_LEADER = "只有队长或助理可以邀请。",
+    NO_OWN_ROLE = "你的登记没有职责。",
+    GROUP_FULL = "你的队伍已满。",
+    NO_CANDIDATE = "列表中没有合适的玩家。",
 }
 
 locales.zhTW = {
@@ -320,6 +392,14 @@ locales.zhTW = {
     SAME_ARMOR = "與你相同的護甲類型",
     TIP_TOGGLE = "顯示或隱藏面板",
     PRIORITIES = "優先順序",
+    BUILD_GROUP = "組建隊伍",
+    INVITE_NEXT = "邀請：%s（%s）",
+    INVITED = "已邀請 %s（%s，等級 %d）。",
+    NEED_LISTING = "請先在隊伍搜尋器中登記。",
+    NOT_LEADER = "只有隊長或助理可以邀請。",
+    NO_OWN_ROLE = "你的登記沒有職責。",
+    GROUP_FULL = "你的隊伍已滿。",
+    NO_CANDIDATE = "列表中沒有合適的玩家。",
 }
 
 local client = GetLocale()
