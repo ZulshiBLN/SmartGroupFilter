@@ -29,8 +29,13 @@ builds your five-player group with one click.
   group; whoever declines, lets the invite run out or is already in a group is not asked again.
   Not listed yet, the button reads **List Self** and lights up Blizzard's eye tab, where you
   list yourself with dungeon, play style and role. When the list is older than 30 seconds it reads
-  **Refresh List** first and clicks Blizzard's own refresh arrow. The chat names every invite; the button's tooltip says why it is
-  greyed out.
+  **Refresh List** first and clicks Blizzard's own refresh arrow. The chat names every invite;
+  the button's tooltip says why it is greyed out.
+- **Minimap button** - left-click opens or closes the Group Finder as Blizzard's button and key
+  do; right-click opens the settings; drag it around the minimap. The AddOn menu entry opens the
+  settings too.
+- **Settings** - the gear left of Reset Filter switches the panel to the language, the minimap
+  button and the bug report, and back.
 
 ## Installation
 
@@ -58,8 +63,9 @@ gear in the panel lets you choose another one.
 - No dynamic code.
 - Saved settings are validated at login (types and ranges), so damaged files cannot break the
   addon.
-- No personal data is stored: only your choices. The names of invited players are kept in memory
-  until you log out or reload.
+- No personal data is stored: only your choices. The names of invited players and the names the
+  Group Finder showed are kept in memory until you log out or reload - the bug report needs them
+  to remove them.
 
 ## Data protection
 
@@ -68,6 +74,12 @@ This is not legal advice; it says how bug reports are handled.
 - **Who is responsible** - ZulshiBLN, the author of SmartGroupFilter, Switzerland. Contact
   through GitHub: an issue, or - for anything that should not be public - a private
   vulnerability report on this repository (*Security > Report a vulnerability*).
+- **What it holds** - the addon's and the client's version and language, your class and level
+  band, SmartGroupFilter's settings, your listing's activity IDs, the list's counts, the Build
+  Group button's state, invited players as role, class and level, SmartGroupFilter's errors and
+  last actions, and what you type. It removes your character, realm and guild, your group and
+  every name the Group Finder showed since your last login or reload; names it never saw can
+  remain, so write none. "Show content" shows the text before you copy it.
 - **Why** - you choose to send a report; it is used only to fix the bug you report (legitimate
   interest, GDPR Art. 6(1)(f); Swiss FADP). Nothing leaves the game unless you copy and post it.
 - **Who receives it** - GitHub, Inc. (USA) hosts the issue. It is public, and people who watch
