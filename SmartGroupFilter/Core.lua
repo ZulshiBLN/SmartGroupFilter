@@ -118,6 +118,12 @@ function ns.InitDB()
     if type(angle) ~= "number" or angle ~= angle or angle < 0 or angle > 360 then
         db.minimapAngle = D.MINIMAP_ANGLE
     end
+    local opacity = db.windowOpacity
+    if type(opacity) ~= "number" or opacity ~= opacity or opacity < 0 or opacity > 100 then
+        db.windowOpacity = D.WINDOW_OPACITY_TODAY
+    else
+        db.windowOpacity = math.floor(opacity + 0.5)
+    end
     if type(db.order) ~= "table" then db.order = {} end
     if type(db.excluded) ~= "table" then db.excluded = {} end
     for key in pairs(db.excluded) do

@@ -151,6 +151,18 @@ describe("the state snapshot", function()
         assert.is_truthy(text:find("state build mode=list reason=LIST_SELF_TIP", 1, true), text)
     end)
 
+    it("takes the window background whenever it shows, and names its value", function()
+        local ns, db = login()
+        db.windowOpacity = 80
+        local text = report(ns, "SETTINGS")
+        local f = SmartGroupFilterReport
+        assert.are.equal(f.Center, f.opacityTexture)
+        assert.are.same({ 0, 0, 0, 1 }, f.opacityLayer.color)
+        assert.are.equal(1, f.opacityTexture.alpha)
+        assert.are.equal(0.5, f.opacityLayer.alpha)
+        assert.is_truthy(text:match("%- Settings: ([^\n]*)"):find("windowOpacity=80", 1, true), text)
+    end)
+
     it("names the settings, the rows' order and their exclusions", function()
         local ns, db = login()
         db.excluded.DAMAGER.HUNTER = true
@@ -267,7 +279,11 @@ describe("the report window", function()
         local before = menu.generated
         ns.ApplyLanguage("deDE")
         assert.are.equal(before + 1, menu.generated)
-        assert.are.equal(ns.locales.deDE.REPORT_TITLE, SmartGroupFilterReport.children[1].text)
+        local titled = false
+        for _, child in ipairs(SmartGroupFilterReport.children) do
+            if child.text == ns.locales.deDE.REPORT_TITLE then titled = true end
+        end
+        assert.is_true(titled)
     end)
 
     it("offers the code selected for copying, and the content to read", function()

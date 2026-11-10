@@ -288,6 +288,15 @@ local function CreateWindow()
             tile = true, tileSize = 32, edgeSize = 32,
             insets = { left = 11, right = 12, top = 12, bottom = 11 },
         })
+        -- A black layer beneath the backdrop's middle, for the window background slider
+        if frame.Center then
+            local layer = frame:CreateTexture(nil, "BACKGROUND", nil, -8)
+            layer:SetColorTexture(0, 0, 0, 1)
+            layer:SetPoint("TOPLEFT", 11, -12) -- the backdrop's insets
+            layer:SetPoint("BOTTOMRIGHT", -12, 11)
+            frame.Center:SetDrawLayer("BACKGROUND", -7)
+            frame.opacityTexture, frame.opacityLayer = frame.Center, layer
+        end
     end
     table.insert(UISpecialFrames, "SmartGroupFilterReport") -- closes with Escape
 
@@ -458,6 +467,7 @@ function ns.OpenBugReport(docked)
         return
     end
     Place(docked)
+    ns.ApplyWindowOpacity(frame, db.windowOpacity)
     reopen = false
     frame.desc:SetText("")
     frame.details:SetText("")

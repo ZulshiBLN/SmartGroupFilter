@@ -14,7 +14,9 @@ local D = ns.D
 ---------------------------------------------------------------------------
 function ns.IsSafe(s)
     s = tostring(s)
-    if D.OPTION_DEFAULTS[s] ~= nil or s == "minimapAngle" then return true end -- a settings key
+    if D.OPTION_DEFAULTS[s] ~= nil or s == "minimapAngle" or s == "windowOpacity" then
+        return true -- a settings key
+    end
     for _, p in ipairs(D.REPORT_SAFE) do
         if s:find(p) then return true end
     end

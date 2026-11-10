@@ -69,6 +69,19 @@ end
 -- fading to both ends. Placed `gap` px below `anchor`, centred in the panel.
 local SEP_HEIGHT = 2
 local SEP_R, SEP_G, SEP_B = 1, 0.82, 0
+---------------------------------------------------------------------------
+-- Window background, invisible to solid (ruleset plan 2026-11-11-window-opacity, as the
+-- sisters do it). The dialog texture lets the game show through and never turns solid on its
+-- own: below D.WINDOW_OPACITY_TODAY it fades out, above it the black layer beneath fades in.
+-- window: the panel or the report, each with opacityTexture and opacityLayer.
+---------------------------------------------------------------------------
+function ns.ApplyWindowOpacity(window, value)
+    if not (window and window.opacityLayer) then return end
+    local today = D.WINDOW_OPACITY_TODAY
+    window.opacityTexture:SetAlpha(math.min(1, value / today))
+    window.opacityLayer:SetAlpha(math.max(0, (value - today) / (100 - today)))
+end
+
 local function Separator(parent, anchor, gap)
     local line = CreateFrame("Frame", nil, parent)
     line:SetSize(WIDTH - 2 * PAD, SEP_HEIGHT)
@@ -462,6 +475,13 @@ local function Create()
     bg:SetPoint("TOPLEFT", panel, "TOPLEFT", 2, -21)
     bg:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -2, 2)
     panel.background = bg
+    -- Beneath it a black layer, so the slider in the settings can make the panel solid
+    local layer = panel:CreateTexture(nil, "BACKGROUND", nil, 0)
+    layer:SetColorTexture(0, 0, 0, 1)
+    layer:SetPoint("TOPLEFT", panel, "TOPLEFT", 2, -21)
+    layer:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -2, 2)
+    panel.opacityTexture, panel.opacityLayer = bg, layer
+    ns.ApplyWindowOpacity(panel, db.windowOpacity)
     if panel.SetPortraitToAsset then panel:SetPortraitToAsset(D.LOGO) end
     -- The template places the portrait a little right of and below the ring's centre for this
     -- logo (Michel, in game): moved by D.PORTRAIT_NUDGE from wherever the template put it

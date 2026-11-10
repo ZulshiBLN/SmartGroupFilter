@@ -82,6 +82,11 @@ D.OPTION_DEFAULTS = { allowDouble = false, allowSameArmor = true, panelShown = t
 -- The minimap button's place on its circle, degrees; 225 = bottom left, as SimpleConjureBar
 D.MINIMAP_ANGLE = 225
 
+-- The panel's and the report's background (%), 0 invisible to 100 solid: 60 shows the dialog
+-- texture as it always was - the sisters matched it to a black square of 60 % in game (ruleset
+-- plan 2026-11-11-window-opacity). Not in OPTION_DEFAULTS: InitDB forces those to booleans.
+D.WINDOW_OPACITY_TODAY = 60
+
 -- The project's logo, shipped as Media/Logo.tga: the panel's portrait (cut to the medallion)
 D.LOGO = "Interface\\AddOns\\SmartGroupFilter\\Media\\Logo"
 -- The portrait's shift from the template's place, x and y in px: left and up (Michel, in game)
@@ -106,7 +111,7 @@ D.REPORT_AREAS = { "FILTER", "PRIORITIES", "BUILD", "PANEL", "MINIMAP", "SETTING
 
 -- The settings a report names, sorted: the options, the minimap's place and the schema
 -- version. The rows' order and exclusions are tables, reported apart.
-D.REPORT_SETTINGS = { "dbVersion", "minimapAngle" }
+D.REPORT_SETTINGS = { "dbVersion", "minimapAngle", "windowOpacity" }
 for key in pairs(D.OPTION_DEFAULTS) do D.REPORT_SETTINGS[#D.REPORT_SETTINGS + 1] = key end
 table.sort(D.REPORT_SETTINGS)
 

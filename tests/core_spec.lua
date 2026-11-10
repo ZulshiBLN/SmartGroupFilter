@@ -36,6 +36,35 @@ describe("the saved variables", function()
     end)
 end)
 
+describe("the window background", function()
+    local function opacity(saved)
+        login("enUS", { db = { dbVersion = 1, windowOpacity = saved } })
+        return SmartGroupFilterDB.windowOpacity
+    end
+
+    it("starts at today's look in a version-1 table without it", function()
+        login("enUS", { db = { dbVersion = 1, allowDouble = true } })
+        assert.are.equal(60, SmartGroupFilterDB.windowOpacity)
+        assert.are.equal(1, SmartGroupFilterDB.dbVersion)
+        assert.is_true(SmartGroupFilterDB.allowDouble)
+    end)
+
+    it("keeps a saved value over a login", function()
+        assert.are.equal(80, opacity(80))
+        assert.are.equal(0, opacity(0))
+        assert.are.equal(100, opacity(100))
+    end)
+
+    it("rounds a fraction and drops what is out of range or no number", function()
+        assert.are.equal(72, opacity(72.4))
+        assert.are.equal(73, opacity(72.6))
+        assert.are.equal(60, opacity(-1))
+        assert.are.equal(60, opacity(101))
+        assert.are.equal(60, opacity("80"))
+        assert.are.equal(60, opacity(0 / 0))
+    end)
+end)
+
 describe("the language", function()
     it("follows the client", function()
         local ns = login("deDE")

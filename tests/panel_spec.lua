@@ -299,3 +299,31 @@ describe("the panel", function()
         assert.are.equal("Heiler", panel.rows.HEALER.label.text)
     end)
 end)
+
+describe("the window background", function()
+    local CASES = { { 0, 0, 0 }, { 30, 0.5, 0 }, { 60, 1, 0 }, { 80, 1, 0.5 }, { 100, 1, 1 } }
+
+    it("lays a black layer beneath the dialog texture, inside the same edges", function()
+        local tex, layer = panel.opacityTexture, panel.opacityLayer
+        assert.are.equal(panel.background, tex)
+        assert.are.same({ 0, 0, 0, 1 }, layer.color)
+        assert.are.equal("BACKGROUND", layer.drawLayer)
+        assert.is_true(layer.sublevel < tex.sublevel)
+        assert.are.same(tex.points, layer.points)
+    end)
+
+    it("fades the texture out below 60 and the black layer in above", function()
+        for _, c in ipairs(CASES) do
+            ns.ApplyWindowOpacity(panel, c[1])
+            assert.are.equal(c[2], panel.opacityTexture.alpha, "texture at " .. c[1])
+            assert.are.equal(c[3], panel.opacityLayer.alpha, "layer at " .. c[1])
+        end
+    end)
+
+    it("shows the saved value from the login on", function()
+        ns = addon.load("enUS", { db = { dbVersion = 1, windowOpacity = 100 } })
+        FIRE("PLAYER_LOGIN")
+        assert.are.equal(1, ns.panel.opacityLayer.alpha)
+        assert.are.equal(1, ns.panel.opacityTexture.alpha)
+    end)
+end)

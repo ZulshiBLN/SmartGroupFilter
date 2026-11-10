@@ -97,10 +97,24 @@ function Widget:SetAtlas(a) self.atlas = a return true end
 function Widget:SetTexture(t) self.textureFile = t end
 function Widget:SetAlpha(a) self.alpha = a end
 function Widget:SetColorTexture(...) self.color = { ... } end
+function Widget:SetDrawLayer(layer, sublevel) self.drawLayer, self.sublevel = layer, sublevel end
+-- BackdropTemplate: the backdrop's middle is the texture Center, as the client names it
+function Widget:SetBackdrop(b)
+    self.backdrop = b
+    -- a part of the frame, not one of its children
+    if not self.Center then
+        self.Center = NewWidget("Texture")
+        self.Center.parent = self
+    end
+end
 function Widget:SetDesaturated(v) self.desaturated = v and true or false end
 function Widget:SetNumber(n) self.text = tostring(n) end
 function Widget:GetNumber() return tonumber(self.text) or 0 end
-function Widget:CreateTexture(name) return NewWidget("Texture", name, self) end
+function Widget:CreateTexture(name, layer, _, sublevel)
+    local t = NewWidget("Texture", name, self)
+    t.drawLayer, t.sublevel = layer, sublevel
+    return t
+end
 -- Animation groups: a flipbook records its cells and whether it plays
 function Widget:CreateAnimationGroup()
     local group = { playing = false, animations = {} }
