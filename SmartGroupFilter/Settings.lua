@@ -207,7 +207,7 @@ function ns.CreateSettingsView(p)
     bug:SetSize(160, 22)
     bug:SetPoint("TOPLEFT", check, "BOTTOMLEFT", 4, -16)
     ns.SetL(bug, "BTN_REPORT_BUG")
-    bug:SetScript("OnClick", function() ns.OpenBugReport() end)
+    bug:SetScript("OnClick", function() ns.OpenBugReport(true) end) -- docked to the panel
     panel.bugButton = bug
     local hint = view:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     hint:SetPoint("TOPLEFT", bug, "BOTTOMLEFT", 0, -6)

@@ -278,7 +278,7 @@ local function CreateWindow()
     frame:SetMovable(true)
     frame:EnableMouse(true)
     frame:RegisterForDrag("LeftButton")
-    frame:SetScript("OnDragStart", function(self) self:StartMoving() end)
+    frame:SetScript("OnDragStart", function(self) if not self.docked then self:StartMoving() end end)
     frame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
     if frame.SetBackdrop then
         frame:SetBackdrop({
@@ -427,13 +427,36 @@ local function CreateWindow()
     frame:Hide()
 end
 
--- /sgf bug and the settings' button. In combat nothing opens, and only /sgf bug says why.
-function ns.OpenBugReport()
+-- Docked right of the panel, as tall as it and not movable (the settings' button), or its own
+-- window in the middle of the screen (/sgf bug) - Michel, 2026-11-11
+local FREE_HEIGHT = 580
+local function Place(docked)
+    local panel = ns.panel
+    frame:ClearAllPoints()
+    if docked and panel and panel:IsVisible() then
+        frame.docked = true
+        frame:SetPoint("TOPLEFT", panel, "TOPRIGHT", 4, 0)
+        frame:SetHeight(panel:GetHeight())
+        if not frame.followsPanel then
+            frame.followsPanel = true
+            panel:HookScript("OnHide", function() if frame.docked then frame:Hide() end end)
+        end
+    else
+        frame.docked = false
+        frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+        frame:SetHeight(FREE_HEIGHT)
+    end
+end
+
+-- /sgf bug and the settings' button (docked). In combat nothing opens, and only /sgf bug says
+-- why.
+function ns.OpenBugReport(docked)
     if not frame then CreateWindow() end
     if InCombatLockdown() then
         if ns.fromCommand then ns.Print(L.REPORT_COMBAT) end
         return
     end
+    Place(docked)
     reopen = false
     frame.desc:SetText("")
     frame.details:SetText("")
