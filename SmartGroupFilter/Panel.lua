@@ -512,8 +512,8 @@ local function Create()
 
     -- The count in the bottom right corner (Michel), Reset Filter at the top right
     panel.count = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    -- level with the middle of the build button (Build.lua: 10 above the edge, 24 high)
-    panel.count:SetPoint("RIGHT", panel, "BOTTOMRIGHT", -14, 22)
+    -- level with the middle of the build button (Build.lua: 14 above the edge, 24 high)
+    panel.count:SetPoint("RIGHT", panel, "BOTTOMRIGHT", -14, 26)
     -- The filter view: every filter control is its child, so the settings view (Settings.lua)
     -- hides them in one; the protected build button sits on the panel itself
     local view = CreateFrame("Frame", nil, panel)

@@ -276,12 +276,13 @@ end
 
 -- A protected frame may be anchored to its parent, not to the panel's other controls ("Cannot
 -- anchor protected frames to regions", Michel's test 2026-11-11): bottom left of the panel,
--- as far from the left and bottom edges as Reset Filter from the right one (Michel)
+-- looking as far from the left and bottom edges as Reset Filter from the right one: 10, and
+-- 14 from the bottom, whose frame edge is drawn wider (Michel, in game)
 function ns.CreateBuildButton(parent)
     button = CreateFrame("Button", "SmartGroupFilterBuildButton", parent,
         "SecureActionButtonTemplate, UIPanelButtonTemplate")
     button:SetSize(160, 24)
-    button:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", 10, 10)
+    button:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", 10, 14)
     button:SetText(L.BUILD_GROUP)
     -- The secure action on the mouse button's release, whatever the key-down setting
     button:RegisterForClicks("LeftButtonUp")
