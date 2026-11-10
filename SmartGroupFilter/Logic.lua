@@ -3,9 +3,10 @@
 -- -IMPLEMENTATION "Definitions"). No frame and no client call: Filter.lua and Build.lua read
 -- the Group Finder and hand plain tables over.
 --
--- An entry: { numMembers, hasSelf, isDelisted, name, class, level, age, roles }, where class
--- is the classFilename, roles the player's lfgRoles ({ tank, healer, dps }) and any field may
--- be nil - a secret value arrives as nil.
+-- An entry: { numMembers, hasSelf, isDelisted, name, class, level, age, roles, activities },
+-- where class is the classFilename, roles the player's lfgRoles ({ tank, healer, dps }),
+-- activities the activityIDs he listed for, and any field may be nil - a secret value arrives
+-- as nil.
 
 local _, ns = ...
 local D = ns.D
@@ -29,6 +30,16 @@ local function Fits(entry, role, db)
     if not D.ROLE_CLASSES[role][class] or db.excluded[role][class] then return false end
     if HasRole(entry.roles) then return entry.roles[D.ROLE_FIELD[role]] and true or false end
     return true
+end
+
+-- Is the player listed for one of these dungeons (activityIDs)? Not while his are unknown.
+function ns.ListedFor(entry, dungeons)
+    for _, mine in ipairs(entry.activities or {}) do
+        for _, id in ipairs(dungeons) do
+            if mine == id then return true end
+        end
+    end
+    return false
 end
 
 local function Known(entry)
@@ -75,6 +86,7 @@ end
 --   placed          name -> { role, class, level, joined } - players SGF invited
 --   numGroupMembers GetNumGroupMembers(): 0 alone, else the group's size with the player
 --   candidates      entries from the Group Finder list
+--   dungeons        activityIDs: only players listed for one of them are candidates
 --   db, range
 -- Returns a list of { name, role, class, level }, nil and a table of what the choice started
 -- from ({ ownRole, free, waiting, open }); or nil and the reason.
@@ -112,7 +124,8 @@ function ns.ChooseInvites(state)
     local signed, unsigned = {}, {}
     for _, e in ipairs(state.candidates) do
         if IsSingle(e) and e.name and Known(e) and not state.placed[e.name]
-            and not inGroup[e.name] and ns.Passes(e, db, state.range) then
+            and not inGroup[e.name] and ns.ListedFor(e, state.dungeons)
+            and ns.Passes(e, db, state.range) then
             if HasRole(e.roles) then signed[#signed + 1] = e else unsigned[#unsigned + 1] = e end
         end
     end

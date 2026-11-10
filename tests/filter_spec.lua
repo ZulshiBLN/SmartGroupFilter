@@ -7,7 +7,8 @@ local ns, db
 
 -- A result as the client gives it; roles nil = signed up with none
 local function result(id, class, level, roles, over)
-    local info = { searchResultID = id, numMembers = 1, isDelisted = false, hasSelf = false, age = 0 }
+    local info = { searchResultID = id, numMembers = 1, isDelisted = false, hasSelf = false, age = 0,
+        activityIDs = { 800 } }
     for k, v in pairs(over or {}) do info[k] = v end
     STATE.results[id] = {
         info = info,
@@ -70,6 +71,15 @@ describe("the filter", function()
         STATE.secret[35] = true
         LFGBrowseFrame:UpdateResultList()
         assert.are.equal("1", shown())
+    end)
+
+    it("reads the dungeons a player listed for; a secret one makes them unknown", function()
+        result(1, "MAGE", 25, { dps = true }, { activityIDs = { 800, 801 } })
+        assert.are.same({ 800, 801 }, ns.ReadEntry(1).activities)
+        STATE.secret[801] = true
+        assert.is_nil(ns.ReadEntry(1).activities)
+        result(2, "MAGE", 25, { dps = true }, { activityIDs = false })
+        assert.is_nil(ns.ReadEntry(2).activities)
     end)
 
     it("counts the single players shown and all of them", function()

@@ -6,7 +6,7 @@ local ns, db, panel
 
 local function result(id, class, level, roles)
     STATE.results[id] = {
-        info = { numMembers = 1, isDelisted = false, hasSelf = false, age = 0 },
+        info = { numMembers = 1, isDelisted = false, hasSelf = false, age = 0, activityIDs = { 800 } },
         player = { name = "P" .. id, classFilename = class, level = level, lfgRoles = roles },
     }
     STATE.order[#STATE.order + 1] = id

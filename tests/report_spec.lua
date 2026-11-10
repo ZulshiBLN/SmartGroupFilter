@@ -28,7 +28,7 @@ end
 
 local function result(id, name, class, level, roles)
     STATE.results[id] = {
-        info = { numMembers = 1, isDelisted = false, hasSelf = false, age = 0 },
+        info = { numMembers = 1, isDelisted = false, hasSelf = false, age = 0, activityIDs = { 800 } },
         player = { name = name, classFilename = class, level = level, lfgRoles = roles or {} },
     }
     STATE.order[#STATE.order + 1] = id

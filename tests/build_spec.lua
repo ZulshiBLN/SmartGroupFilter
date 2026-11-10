@@ -7,7 +7,7 @@ local ns, db, button
 
 local function result(id, name, class, level, roles, age)
     STATE.results[id] = {
-        info = { numMembers = 1, isDelisted = false, hasSelf = false, age = age or 0 },
+        info = { numMembers = 1, isDelisted = false, hasSelf = false, age = age or 0, activityIDs = { 800 } },
         player = { name = name, classFilename = class, level = level, lfgRoles = roles or {} },
     }
     STATE.order[#STATE.order + 1] = id
@@ -54,6 +54,18 @@ describe("Build Group", function()
         assert.are.equal("Pal Pri Wlk Rog", table.concat(STATE.invites, " "))
         assert.is_true(said("Invited Pal (Tank, level 25)."))
         assert.is_true(said("Invited Rog (Damage, level 25)."))
+    end)
+
+    it("invites only players listed for your dungeon", function()
+        STATE.results[1].info.activityIDs = { 801 }
+        click()
+        assert.are.equal("War Pri Wlk Rog", table.concat(STATE.invites, " "))
+    end)
+
+    it("invites nobody whose dungeons are not loaded yet", function()
+        STATE.results[1].info.activityIDs = nil
+        click()
+        assert.are.equal("War", STATE.invites[1])
     end)
 
     it("chooses from the whole list, even while the Filter is reset", function()
@@ -398,6 +410,16 @@ describe("Build Group", function()
             assert.truthy(out:find("Old MAGE 35 (damager, waits 0s): level 35 outside 20-30", 1, true))
             assert.truthy(out:find("NoRole DRUID 25 (no role, waits 0s): tank/healer/damager places already filled", 1, true))
             assert.falsy(out:find("Left open", 1, true))
+        end)
+
+        it("names players listed for another dungeon and those not loaded yet", function()
+            STATE.results[1].info.activityIDs = { 801 }
+            STATE.results[2].info.activityIDs = nil
+            LFGBrowseFrame:UpdateResultList()
+            SlashCmdList.SMARTGROUPFILTER("test")
+            local out = lines()
+            assert.truthy(out:find("Pal PALADIN 25 (tank, waits 0s): not listed for your dungeon", 1, true))
+            assert.truthy(out:find("War WARRIOR 26 (tank, waits 0s): dungeon not loaded yet", 1, true))
         end)
 
         it("names the class limit and the places nobody fits", function()

@@ -14,7 +14,7 @@ it invites the tank, the healer and the damage dealers you are missing.
 ## ⚡ Build Group
 
 - **One click, a whole group:** one tank, one healer, three damage dealers around your own
-  role - only the places that are still free.
+  role - only the places that are still free, only players listed for one of your dungeons.
 - **Your priorities decide:** for each place the class highest in your row, then the highest
   level, then the longest wait. Players who signed up without a role only fill what is left.
 - **Nobody twice:** invited players keep their place for two minutes, and while they are in

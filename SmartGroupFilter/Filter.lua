@@ -31,12 +31,25 @@ function ns.SeenNames()
 end
 
 -- One search result as the plain entry Logic.lua reads, or nil when the client has none
+-- The dungeons a result is listed for, or nil while any of them is missing or secret
+function ns.ReadActivities(ids)
+    if type(ids) ~= "table" or #ids == 0 then return nil end
+    local list = {}
+    for i, v in ipairs(ids) do
+        v = Clean(v)
+        if type(v) ~= "number" then return nil end
+        list[i] = v
+    end
+    return list
+end
+
 function ns.ReadEntry(id)
     local info = C_LFGList.GetSearchResultInfo(id)
     if not info then return nil end
     local entry = {
         id = id, numMembers = info.numMembers, hasSelf = info.hasSelf,
         isDelisted = info.isDelisted, age = Clean(info.age),
+        activities = ns.ReadActivities(info.activityIDs),
     }
     if entry.numMembers == 1 then
         local p = C_LFGList.GetSearchResultPlayerInfo(id, 1)

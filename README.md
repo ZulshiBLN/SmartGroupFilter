@@ -23,7 +23,7 @@ builds your five-player group with one click.
   Groups and your own listing stay; delisted entries go. **Reset Filter** shows Blizzard's full
   list until your next change or login. The bottom right corner counts the players shown.
 - **Build Group** invites the players your group lacks around your own role: one tank, one
-  healer, three damage dealers. Each place takes the highest class in its row, then the highest
+  healer, three damage dealers, only from players listed for one of your dungeons. Each place takes the highest class in its row, then the highest
   level, then the longest wait; players without a role only fill what is left. Only free places
   are filled. Invited players keep their place for two minutes, and while they are in the
   group; whoever declines, lets the invite run out or is already in a group is not asked again.

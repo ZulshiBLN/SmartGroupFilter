@@ -15,11 +15,11 @@ before_each(function()
     db = SmartGroupFilterDB
 end)
 
--- A single player as Filter.lua hands him over
-local function solo(name, class, level, roles, age)
+-- A single player as Filter.lua hands him over, listed for dungeon 800 unless told otherwise
+local function solo(name, class, level, roles, age, activities)
     return {
         numMembers = 1, name = name, class = class, level = level, age = age or 0,
-        roles = roles or {},
+        roles = roles or {}, activities = activities or { 800 },
     }
 end
 
@@ -94,7 +94,7 @@ describe("the choice of invites", function()
     local function choose(candidates, over)
         local state = {
             own = ME, members = {}, placed = {}, numGroupMembers = 0,
-            candidates = candidates, db = db, range = RANGE,
+            candidates = candidates, db = db, range = RANGE, dungeons = { 800 },
         }
         for k, v in pairs(over or {}) do state[k] = v end
         return ns.ChooseInvites(state)
@@ -196,6 +196,19 @@ describe("the choice of invites", function()
         ns.ResetFilter()
         local list = choose({ solo("Pal19", "PALADIN", 19, T), solo("War", "WARRIOR", 25, T) })
         assert.are.equal("War:TANK", names(list))
+    end)
+
+    it("takes only players listed for one of the given dungeons", function()
+        local c = { solo("Pal", "PALADIN", 25, T, 0, { 801 }), solo("War", "WARRIOR", 25, T, 0, { 802, 800 }) }
+        assert.are.equal("War:TANK", names(choose(c)))
+        assert.are.equal("Pal:TANK", names(choose(c, { dungeons = { 800, 801 } })))
+        assert.are.equal("", names(choose(c, { dungeons = {} })))
+    end)
+
+    it("takes no player whose dungeons are not loaded yet", function()
+        local pal = solo("Pal", "PALADIN", 25, T)
+        pal.activities = nil
+        assert.are.equal("War:TANK", names(choose({ pal, solo("War", "WARRIOR", 25, T) })))
     end)
 
     it("never takes a candidate without name, class or level, or one already placed", function()

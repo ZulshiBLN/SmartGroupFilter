@@ -77,6 +77,12 @@ local function Prune(members)
     end
 end
 
+-- The dungeons of the own listing; Build Group invites only players listed for one of them
+local function OwnDungeons()
+    local entry = C_LFGList.GetActiveEntryInfo()
+    return ns.ReadActivities(entry and entry.activityIDs) or {}
+end
+
 local function Candidates()
     local list = {}
     local _, ids = C_LFGList.GetFilteredSearchResults()
@@ -106,7 +112,7 @@ local function Plan()
     local state = {
         own = { class = class, level = UnitLevel("player"), roles = C_LFGListRoles.GetRoles() },
         members = members, placed = placed, numGroupMembers = GetNumGroupMembers(),
-        candidates = Candidates(), db = db, range = ns.LevelRange(),
+        candidates = Candidates(), dungeons = OwnDungeons(), db = db, range = ns.LevelRange(),
     }
     local list, why, info = ns.ChooseInvites(state)
     if not list then return nil, why, state end
@@ -316,6 +322,8 @@ local function WhyNot(e, state, chosenNames, ownArmor, after)
     for _, m in ipairs(state.members) do
         if m.name == e.name then return "in your group" end
     end
+    if not e.activities then return "dungeon not loaded yet" end
+    if not ns.ListedFor(e, state.dungeons) then return "not listed for your dungeon" end
     local r = state.range
     if e.level < r.min or e.level > r.max then
         return ("level %d outside %d-%d"):format(e.level, r.min, r.max)
