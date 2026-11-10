@@ -20,14 +20,15 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   corner counts the players shown, and each row's header the players shown who signed up for
   its role - "Tank (3 listed)".
 - Build Group: one click invites the players your group lacks around your own role - one tank,
-  one healer, three damage dealers - only from players listed for one of your dungeons, by your rows, highest level first, then the longest wait,
-  players without a role last, only for free places. Invited players keep their place for two
-  minutes and while they are in the group; a decline, a run-out invite or "already in a group"
-  frees the place, and that player is not asked again. A list older than 30 seconds is
-  refreshed first with the same button. The chat names each invite; the tooltip says why the
-  button is greyed out. Listed for several dungeons, it builds for the one with the most players
-  to invite and names it in the chat; the group keeps it while it has members or pending invites.
-  A player listed for several roles or none gets an English whisper with the invite, "Tank for
+  one healer, three damage dealers - only from players listed for your dungeon, by your rows,
+  highest level first, then the longest wait, players without a role last, only for free places.
+  Invited players keep their place for two minutes and while they are in the group; a decline,
+  a run-out invite or "already in a group" frees the place, and that player is not asked again.
+  A list older than 30 seconds is refreshed first with the same button. The chat names each
+  invite; the tooltip says why the button is greyed out.
+- Listed for several dungeons, Build Group builds for the one with the most players to invite
+  and names it in the chat; the group keeps it while it has members or pending invites.
+- A player listed for several roles or none gets an English whisper with the invite, "Tank for
   Shadowfang Keep?"; one listed for one role but several dungeons gets "You want to join for
   Shadowfang Keep?".
 - Not listed yet? The same button reads List Self and lights up Blizzard's eye tab, where you

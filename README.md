@@ -23,18 +23,21 @@ builds your five-player group with one click.
   Groups and your own listing stay; delisted entries go. **Reset Filter** shows Blizzard's full
   list until your next change or login. The bottom right corner counts the players shown.
 - **Build Group** invites the players your group lacks around your own role: one tank, one
-  healer, three damage dealers, only from players listed for one of your dungeons. Each place takes the highest class in its row, then the highest
-  level, then the longest wait; players without a role only fill what is left. Only free places
-  are filled. Invited players keep their place for two minutes, and while they are in the
-  group; whoever declines, lets the invite run out or is already in a group is not asked again.
-  Not listed yet, the button reads **List Self** and lights up Blizzard's eye tab, where you
-  list yourself with dungeon, play style and role. When the list is older than 30 seconds it reads
-  **Refresh List** first and clicks Blizzard's own refresh arrow. The chat names every invite;
-  the button's tooltip says why it is greyed out. Listed for several dungeons, it builds for the
-  one with the most players to invite and names it in the chat; the group keeps that dungeon
-  while it has members or pending invites. A player listed for several roles or none gets an
-  English whisper with the invite ("Tank for Shadowfang Keep?"); one listed for one role but
-  several dungeons gets "You want to join for Shadowfang Keep?".
+  healer, three damage dealers, only from players listed for your dungeon. Each place takes the
+  highest class in its row, then the highest level, then the longest wait; players without a
+  role only fill what is left. Only free places are filled.
+  - **Several dungeons:** listed for more than one, it builds for the one with the most players
+    to invite and names it in the chat. The group keeps that dungeon while it has members or
+    pending invites.
+  - **Ambiguous sign-ups:** a player listed for several roles or none gets an English whisper
+    with the invite ("Tank for Shadowfang Keep?"); one listed for one role but several dungeons
+    gets "You want to join for Shadowfang Keep?".
+  - **Held places:** invited players keep their place for two minutes, and while they are in the
+    group; whoever declines, lets the invite run out or is already in a group is not asked again.
+  - **The button:** not listed yet, it reads **List Self** and lights up Blizzard's eye tab,
+    where you list yourself with dungeon, play style and role. When the list is older than 30
+    seconds it reads **Refresh List** first and clicks Blizzard's own refresh arrow. The chat
+    names every invite; the tooltip says why the button is greyed out.
 - **Minimap button** - left-click opens or closes the Group Finder as Blizzard's button and key
   do; right-click opens the settings; drag it around the minimap. The AddOn menu entry opens the
   settings too.
