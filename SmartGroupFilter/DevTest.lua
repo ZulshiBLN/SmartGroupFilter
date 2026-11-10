@@ -110,6 +110,19 @@ end
 function ns.DryRun()
     local list, why, state, info = B.Plan()
     ns.Print("Build Group test - nothing is sent.")
+    local asked, roles = B.Roles()
+    local function MemberRoles()
+        for _, m in ipairs(state.members) do
+            if asked and asked[m.name] then
+                print(("  %s: %s"):format(m.name, roles[m.name] and roles[m.name]:lower() or "no answer"))
+            end
+        end
+    end
+    if why == "ROLES_WAITING" then
+        print("  Would do nothing: " .. ns.BuildReason(why, state))
+        MemberRoles()
+        return
+    end
     if not state then
         print("  Would do nothing: " .. L[why])
         return
@@ -121,6 +134,7 @@ function ns.DryRun()
         print(("  Target dungeon: %s - %s."):format(ns.DungeonName(state.target),
             state.kept and "kept for your group" or "a click would choose it"))
     end
+    MemberRoles()
     local own, r = state.own, state.range
     print(("  You: %s %s, listed as %s."):format(tostring(own.class), tostring(own.level), RolesText(own.roles)))
     print(("  Level range %d-%d; double classes %s; same armor class %s."):format(r.min, r.max,

@@ -162,7 +162,7 @@ D.REPORT_SAFE = {
     "^%-?%d+%.?%d*$", "^true$", "^false$", "^nil$",
     "^build$", "^refresh$", "^list$", "^none$", "^filter$", "^settings$",
     "^NEED_LISTING$", "^NOT_LEADER$", "^NOT_LEADER_LIST$", "^NO_OWN_ROLE$", "^GROUP_FULL$",
-    "^NO_CANDIDATE$", "^LIST_OLD$", "^LIST_SELF_TIP$",
+    "^NO_CANDIDATE$", "^LIST_OLD$", "^LIST_SELF_TIP$", "^roles$", "^ROLES_WAITING$",
     "^%l%l%u%u$", "^auto$",                                 -- locale codes
 }
 for _, class in ipairs(D.DEFAULT_ORDER.DAMAGER) do D.REPORT_SAFE[#D.REPORT_SAFE + 1] = "^" .. class .. "$" end

@@ -155,6 +155,7 @@ describe("Build Group", function()
         it("is never stored by the button's look or by /sgf test", function()
             STATE.party = { { name = "Xan", class = "HUNTER", level = 25 } } -- a member SGF did not invite
             FIRE("GROUP_ROSTER_UPDATE")
+            FIRE("ROLE_CHANGED_INFORM", "Xan", "Me", "NONE", "DAMAGER") -- Check Roles answered
             SlashCmdList.SMARTGROUPFILTER("test")
             assert.truthy(line("Target dungeon: Shadowfang Keep - a click would choose it."))
             for id = 1, 6 do STATE.results[id].info.activityIDs = { 802 } end
@@ -743,5 +744,115 @@ describe("members' roles", function()
         join()
         assert.are.equal("not fixed", (roles()))
         assert.are.equal("", select(2, roles()))
+    end)
+end)
+
+-- The Check Roles button (ruleset plan 2026-11-11-roles-and-places, phase 3)
+describe("Check Roles", function()
+    local function join(...)
+        STATE.party = {}
+        for i, name in ipairs({ ... }) do STATE.party[i] = { name = name, class = "HUNTER", level = 25 } end
+        FIRE("GROUP_ROSTER_UPDATE")
+    end
+
+    local function chat()
+        return table.concat(CHAT, "\n")
+    end
+
+    before_each(function()
+        for i = #CHAT, 1, -1 do CHAT[i] = nil end
+    end)
+
+    it("is what the button offers while a member asked has not answered", function()
+        join("Fr", "Two")
+        assert.are.equal("Check Roles", button.text)
+        assert.are.equal("roles", button.mode)
+        assert.is_true(button:IsEnabled())
+        assert.are.equal("0 of 2 members chose a role - click to ask again.", button.reason)
+        assert.are.equal("ROLES_WAITING", button.reasonKey)
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "HEALER")
+        assert.are.equal("1 of 2 members chose a role - click to ask again.", button.reason)
+    end)
+
+    it("runs Blizzard's role check on a click, inviting nobody", function()
+        join("Fr")
+        click()
+        assert.are.equal(1, STATE.rolePolls)
+        assert.are.equal(0, #STATE.invites)
+        click() -- asks again
+        assert.are.equal(2, STATE.rolePolls)
+    end)
+
+    it("turns into Build Group once every member asked answered", function()
+        join("Fr")
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "TANK")
+        fresh()
+        assert.are.equal("Build Group", button.text)
+        click()
+        assert.are.equal("Pri Wlk Rog", table.concat(STATE.invites, " "))
+    end)
+
+    it("asks nothing in combat", function()
+        join("Fr")
+        STATE.combat = true
+        click()
+        assert.are.equal(0, STATE.rolePolls)
+        assert.truthy(chat():find("Not in combat.", 1, true))
+    end)
+
+    it("comes after a full group, the listing and the leader, before Refresh List", function()
+        join("Fr")
+        STATE.time = STATE.time + 100 -- the list is old: still Check Roles first
+        ns.UpdateBuildButton()
+        assert.are.equal("Check Roles", button.text)
+        STATE.leader = false
+        ns.UpdateBuildButton()
+        assert.are.equal("NOT_LEADER", button.reasonKey)
+        STATE.leader = true
+        STATE.activeEntry = nil
+        ns.UpdateBuildButton()
+        assert.are.equal("List Self", button.text)
+        STATE.activeEntry = { activityIDs = { 800 } }
+        join("Fr", "A", "B", "C")
+        assert.are.equal("GROUP_FULL", button.reasonKey)
+    end)
+
+    it("never comes back for a decline, a run-out invite or a member joining without SGF", function()
+        click() -- alone: nobody to ask
+        join("Pal")
+        FIRE("CHAT_MSG_SYSTEM", "Rog declines your group invitation.")
+        STATE.time = STATE.time + 121
+        RUNTIMERS()
+        join("Pal", "Stranger")
+        fresh()
+        assert.are_not.equal("Check Roles", button.text)
+    end)
+
+    it("comes again in a new group after the player was alone", function()
+        join("Fr")
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "TANK")
+        join()
+        join("Other")
+        assert.are.equal("Check Roles", button.text)
+    end)
+
+    it("puts the roles in the report as counts, never names", function()
+        join("Fr", "Two")
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "TANK")
+        local state = ns.ReportBuildState()
+        assert.are.equal(2, state.asked)
+        assert.are.equal(1, state.known)
+        assert.are.equal("roles", ns.SafeValue("roles"))
+        assert.are.equal("ROLES_WAITING", ns.SafeValue("ROLES_WAITING"))
+    end)
+
+    it("is shown by /sgf test with each member asked", function()
+        join("Fr", "Two")
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "TANK")
+        SlashCmdList.SMARTGROUPFILTER("test")
+        local out = chat()
+        assert.truthy(out:find("Would do nothing: 1 of 2 members chose a role - click to ask again.", 1, true))
+        assert.truthy(out:find("Fr: tank", 1, true))
+        assert.truthy(out:find("Two: no answer", 1, true))
     end)
 end)

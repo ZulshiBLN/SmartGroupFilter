@@ -20,6 +20,8 @@ it invites the tank, the healer and the damage dealers you are missing.
 - **Your priorities decide:** among equal fills, each place takes the class highest in your row,
   then the highest level, then the longest wait. Players who signed up without a role only fill
   what is left.
+- **Friends already with you?** The button reads Check Roles and asks them with Blizzard's role
+  check first - their roles count, nobody's role is invited twice.
 - **Nobody twice:** invited players keep their place for two minutes, and while they are in
   your group. Whoever declines, lets the invite run out or is already in a group is not asked
   again - the place goes to the next player.

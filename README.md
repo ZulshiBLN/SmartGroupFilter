@@ -34,6 +34,9 @@ builds your five-player group with one click.
   - **Ambiguous sign-ups:** a player listed for several roles or none gets an English whisper
     with the invite ("Tank for Shadowfang Keep?"); one listed for one role but several dungeons
     gets "You want to join for Shadowfang Keep?".
+  - **A group of friends first:** already in a group before your first Build Group, the button
+    reads **Check Roles** and runs Blizzard's role check; once every member chose a role it
+    reads Build Group, and their roles count. Asked once - until you are alone again.
   - **Held places:** invited players keep their place for two minutes, and while they are in the
     group; whoever declines, lets the invite run out or is already in a group is not asked again.
   - **The button:** not listed yet, it reads **List Self** and lights up Blizzard's eye tab,
@@ -86,7 +89,7 @@ This is not legal advice; it says how bug reports are handled.
   vulnerability report on this repository (*Security > Report a vulnerability*).
 - **What it holds** - the addon's and the client's version and language, your class and level
   band, SmartGroupFilter's settings, your listing's activity IDs, the list's counts, the Build
-  Group button's state, invited players as role, class and level, SmartGroupFilter's errors and
+  Group button's state, invited players as role, class and level, how many members chose a role, SmartGroupFilter's errors and
   last actions, and what you type. It removes your character, realm and guild, your group and
   every name the Group Finder showed since your last login or reload; names it never saw can
   remain, so write none. "Show content" shows the text before you copy it.

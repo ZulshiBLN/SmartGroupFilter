@@ -337,6 +337,13 @@ C_LFGListRoles = { GetRoles = function() return STATE.ownRoles end }
 STATE.invites = {}
 C_PartyInfo = { InviteUnit = function(name) STATE.invites[#STATE.invites + 1] = name end }
 
+-- Blizzard's role check: counted; its answer as the client gave it to the leader (Michel's test)
+STATE.rolePolls, STATE.rolePollOk = 0, true
+function InitiateRolePoll()
+    STATE.rolePolls = STATE.rolePolls + 1
+    return STATE.rolePollOk
+end
+
 -- Whispers sent: { text, chatType, target }
 STATE.whispers = {}
 C_ChatInfo = { SendChatMessage = function(text, chatType, _, target)

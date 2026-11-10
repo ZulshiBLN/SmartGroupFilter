@@ -152,6 +152,24 @@ local function OnRoleChanged(changed, newRole)
     ns.UpdateBuildButton()
 end
 
+-- How many members asked are still in the group, and how many of them answered
+local function RoleCounts(members)
+    local n, known = 0, 0
+    for _, m in ipairs(members) do
+        if asked and asked[m.name] then
+            n = n + 1
+            if memberRoles[m.name] then known = known + 1 end
+        end
+    end
+    return n, known
+end
+
+-- The text of a reason key; the role check's names how many answered
+function ns.BuildReason(why, state)
+    if why == "ROLES_WAITING" then return L.ROLES_WAITING:format(state.known, state.asked) end
+    return L[why]
+end
+
 local function Candidates()
     local list = {}
     local _, ids = C_LFGList.GetFilteredSearchResults()
@@ -179,6 +197,11 @@ local function Plan()
         return nil, "NOT_LEADER"
     end
     if #members > 0 then FixAsked(members) end
+    -- Check Roles: Build Group waits until every member asked has chosen a role (Michel)
+    local rolesAsked, rolesKnown = RoleCounts(members)
+    if rolesKnown < rolesAsked then
+        return nil, "ROLES_WAITING", { members = members, asked = rolesAsked, known = rolesKnown }
+    end
     local _, class = UnitClass("player")
     local state = {
         own = { class = class, level = UnitLevel("player"), roles = C_LFGListRoles.GetRoles() },
@@ -243,13 +266,21 @@ end
 
 function ns.UpdateBuildButton()
     if not button or InCombatLockdown() then return end
-    local list, why = Plan()
+    local list, why, state = Plan()
     -- Not listed: List Self points at Blizzard's eye tab; listing stays Blizzard's (Michel)
     if why == "NEED_LISTING" then
         SetMode("list")
         button.reason, button.reasonKey = L.LIST_SELF_TIP, "LIST_SELF_TIP"
         button:SetEnabled(true)
         button:SetText(L.LIST_SELF)
+        return
+    end
+    -- A ready-made group is asked for its roles first: Blizzard's role check, from the click
+    if why == "ROLES_WAITING" then
+        SetMode("roles")
+        button.reason, button.reasonKey = ns.BuildReason(why, state), why
+        button:SetEnabled(true)
+        button:SetText(L.CHECK_ROLES)
         return
     end
     -- Fresh results may bring a candidate the old ones lack; nothing else a search changes
@@ -299,6 +330,13 @@ local function Whisper(c, state)
     ns.Log(("whisper %s %s %s%s"):format(kind, c.role, tostring(state.target), ok and "" or " failed"))
 end
 
+-- Blizzard's role check: every member gets its role window when the leader asks (Michel's test,
+-- 2026-11-11). From the button's click only (ruleset K5); never in combat.
+local function AskRoles()
+    if InCombatLockdown() then return ns.Print(L.NOT_IN_COMBAT) end
+    ns.Log("role check " .. tostring(InitiateRolePoll()))
+end
+
 -- The click: invite and hold the places. Called only from the button's OnClick.
 local function BuildGroup()
     local list, _, state = Plan()
@@ -340,6 +378,9 @@ function ns.CreateBuildButton(parent)
         ns.Log("click build button mode=" .. ns.SafeValue(button.mode))
         if button.mode == "build" then
             BuildGroup()
+        elseif button.mode == "roles" then
+            AskRoles()
+            ns.UpdateBuildButton()
         else
             if button.mode == "list" and ns.PointToListing then ns.PointToListing() end
             ns.UpdateBuildButton()
@@ -381,6 +422,7 @@ end
 function ns.ReportBuildState()
     local state = { invited = {}, declined = 0 }
     state.target = KeptTarget(OwnDungeons(), Members())
+    state.asked, state.known = RoleCounts(Members())
     if button then
         state.mode, state.reasonKey, state.enabled = button.mode, button.reasonKey, button:IsEnabled()
     end

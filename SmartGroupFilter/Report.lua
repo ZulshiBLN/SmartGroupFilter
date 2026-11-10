@@ -31,9 +31,9 @@ end
 function ns.StateSnapshot()
     local lines = {}
     local build = ns.ReportBuildState()
-    lines[#lines + 1] = ("build mode=%s reason=%s enabled=%s declined=%d target=%s"):format(
+    lines[#lines + 1] = ("build mode=%s reason=%s enabled=%s declined=%d target=%s roles asked=%d known=%d"):format(
         SV(build.mode or "none"), SV(build.reasonKey or "none"), SV(build.enabled), build.declined,
-        SV(build.target or "none"))
+        SV(build.target or "none"), build.asked, build.known)
     for _, p in ipairs(build.invited) do
         lines[#lines + 1] = ("invited %s %s %s joined=%s"):format(SV(p.role), SV(p.class), SV(p.level), SV(p.joined))
     end
