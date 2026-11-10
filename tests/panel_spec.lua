@@ -243,6 +243,17 @@ describe("the panel", function()
         assert.is_false(db.allowSameArmor)
     end)
 
+    it("parts its sections with headers and gold lines: range | priorities | options", function()
+        assert.are.equal("Level range", panel.rangeHeader.text)
+        assert.are.equal("Priorities", panel.prioHeader.text)
+        local first, second = panel.separators[1], panel.separators[2]
+        assert.are.same({ "TOP", panel.slider, "BOTTOM", 0, -12 }, first.points[2])
+        assert.are.same({ "TOPLEFT", first, "BOTTOMLEFT", 0, -12 }, panel.prioHeader.points[1])
+        assert.are.same({ "TOP", panel.rows.DAMAGER, "BOTTOM", 0, -12 }, second.points[2])
+        assert.are.same({ "TOPLEFT", second, "BOTTOMLEFT", -4, -10 }, panel.doubleCheck.points[1])
+        assert.are.equal(2, #first.children) -- the two halves of the line
+    end)
+
     it("follows a language switch", function()
         assert.are.equal("Allow double classes", panel.doubleCheck.label.text)
         ns.ApplyLanguage("deDE")

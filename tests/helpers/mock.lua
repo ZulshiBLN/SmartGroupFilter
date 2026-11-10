@@ -37,7 +37,7 @@ local Widget = {}
 Widget.__index = Widget
 local function noop() end
 for _, m in ipairs({ "SetAutoFocus", "SetNumeric", "SetMaxLetters", "ClearFocus", "SetAllPoints",
-    "RegisterForClicks", "RegisterForDrag", "SetFrameStrata", "SetPortraitShown" }) do
+    "RegisterForClicks", "RegisterForDrag", "SetFrameStrata", "SetPortraitShown", "SetTextColor" }) do
     Widget[m] = noop
 end
 function Widget:GetFrameStrata() return "MEDIUM" end

@@ -49,6 +49,50 @@ local function Check(parent, key, getter, setter)
     return cb
 end
 
+-- A section header as in SimpleConjureBar's settings (UI.AddHeader): a Blizzard font object a
+-- bit larger than body text, in Blizzard gold
+local HEADER_FONT
+local function Header(parent, key)
+    HEADER_FONT = HEADER_FONT or (_G.GameFontNormalMed3 and "GameFontNormalMed3")
+        or (_G.GameFontNormalMed2 and "GameFontNormalMed2") or "GameFontNormal"
+    local h = parent:CreateFontString(nil, "OVERLAY", HEADER_FONT)
+    h:SetTextColor(1, 0.82, 0)
+    ns.SetL(h, key)
+    return h
+end
+
+-- A gold line as in SimpleConjureBar's settings (UI.AddSeparator): 2 px, strong in the middle,
+-- fading to both ends. Placed `gap` px below `anchor`, centred in the panel.
+local SEP_HEIGHT = 2
+local SEP_R, SEP_G, SEP_B = 1, 0.82, 0
+local function Separator(parent, anchor, gap)
+    local line = CreateFrame("Frame", nil, parent)
+    line:SetSize(WIDTH - 2 * PAD, SEP_HEIGHT)
+    line:SetPoint("LEFT", parent, "LEFT", PAD, 0)
+    line:SetPoint("TOP", anchor, "BOTTOM", 0, -gap)
+    local half = math.floor((WIDTH - 2 * PAD) * 0.45)
+    local left, right = line:CreateTexture(nil, "ARTWORK"), line:CreateTexture(nil, "ARTWORK")
+    for _, tex in ipairs({ left, right }) do
+        tex:SetColorTexture(1, 1, 1, 1)
+        if tex.SetSnapToPixelGrid then tex:SetSnapToPixelGrid(true) end
+        if tex.SetTexelSnappingBias then tex:SetTexelSnappingBias(0) end
+        if PixelUtil then PixelUtil.SetSize(tex, half, SEP_HEIGHT) else tex:SetSize(half, SEP_HEIGHT) end
+    end
+    left:SetPoint("RIGHT", line, "CENTER", 0, 0)
+    right:SetPoint("LEFT", line, "CENTER", 0, 0)
+    local gradientOk = false
+    if CreateColor then
+        local edge, mid = CreateColor(SEP_R, SEP_G, SEP_B, 0), CreateColor(SEP_R, SEP_G, SEP_B, 0.9)
+        gradientOk = pcall(left.SetGradient, left, "HORIZONTAL", edge, mid)
+            and pcall(right.SetGradient, right, "HORIZONTAL", mid, edge)
+    end
+    if not gradientOk then -- older clients: a plain line
+        left:SetColorTexture(SEP_R, SEP_G, SEP_B, 0.75)
+        right:SetColorTexture(SEP_R, SEP_G, SEP_B, 0.75)
+    end
+    return line
+end
+
 -- An atlas from Blizzard's art; a plain colour when this client lacks it (SetAtlas answers false)
 local function Art(tex, atlas, r, g, b, a)
     if not tex:SetAtlas(atlas) then tex:SetColorTexture(r, g, b, a) end
@@ -256,10 +300,10 @@ local function Icon(row)
     return icon
 end
 
-local function Row(parent, role, anchor)
+local function Row(parent, role, anchor, gap)
     local label = parent:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     ns.SetL(label, ROLE_TEXT[role])
-    label:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -14)
+    label:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, gap)
     local row = CreateFrame("Frame", nil, parent)
     row.role = role
     row.label = label
@@ -373,7 +417,8 @@ local function Create()
         RefreshAll()
     end)
 
-    local rangeLabel = Label(panel, "LEVEL_RANGE")
+    local rangeLabel = Header(panel, "LEVEL_RANGE")
+    panel.rangeHeader = rangeLabel
     rangeLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", PAD, -70)
     panel.fromBox = LevelBox(panel, true)
     panel.fromBox:SetPoint("TOPLEFT", rangeLabel, "BOTTOMLEFT", 6, -6)
@@ -395,17 +440,24 @@ local function Create()
     Art(bar, "Minimal_SliderBar_Left", 0.4, 0.4, 0.4, 1)
     slider.handles = { Handle(slider, 1), Handle(slider, 2) }
 
+    -- Gold line, then the priority section under its header (Michel, after SCB and SBB)
+    panel.separators = { Separator(panel, slider, 12) }
+    panel.prioHeader = Header(panel, "PRIORITIES")
+    panel.prioHeader:SetPoint("TOPLEFT", panel.separators[1], "BOTTOMLEFT", 0, -12)
+
     panel.rows = {}
-    local anchor = slider
-    for _, role in ipairs(D.ROLES) do
-        local row = Row(panel, role, anchor)
+    local anchor = panel.prioHeader
+    for i, role in ipairs(D.ROLES) do
+        local row = Row(panel, role, anchor, i == 1 and -8 or -14)
         panel.rows[role] = row
         anchor = row
     end
 
+    -- Gold line, then the two options - no header
+    panel.separators[2] = Separator(panel, anchor, 12)
     panel.doubleCheck = Check(panel, "ALLOW_DOUBLE",
         function() return db.allowDouble end, function(v) db.allowDouble = v end)
-    panel.doubleCheck:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", -4, -14)
+    panel.doubleCheck:SetPoint("TOPLEFT", panel.separators[2], "BOTTOMLEFT", -4, -10)
     panel.armorCheck = Check(panel, "ALLOW_ARMOR",
         function() return db.allowSameArmor end, function(v) db.allowSameArmor = v end)
     panel.armorCheck:SetPoint("TOPLEFT", panel.doubleCheck, "BOTTOMLEFT", 0, -2)

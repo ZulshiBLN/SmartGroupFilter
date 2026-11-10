@@ -36,6 +36,7 @@ locales.enUS = {
     RESET_FILTER = "Reset Filter",
     SAME_ARMOR = "Same armor class as you",
     TIP_TOGGLE = "Show or hide the panel",
+    PRIORITIES = "Priorities",
 }
 
 locales.deDE = {
@@ -66,6 +67,7 @@ locales.deDE = {
     RESET_FILTER = "Filter zurücksetzen",
     SAME_ARMOR = "Gleiche Rüstungsklasse wie du",
     TIP_TOGGLE = "Panel ein- oder ausblenden",
+    PRIORITIES = "Prioritäten",
 }
 
 locales.frFR = {
@@ -96,6 +98,7 @@ locales.frFR = {
     RESET_FILTER = "Réinitialiser le filtre",
     SAME_ARMOR = "Même type d'armure que vous",
     TIP_TOGGLE = "Afficher ou masquer le panneau",
+    PRIORITIES = "Priorités",
 }
 
 locales.esES = {
@@ -126,6 +129,7 @@ locales.esES = {
     RESET_FILTER = "Restablecer filtro",
     SAME_ARMOR = "Mismo tipo de armadura que tú",
     TIP_TOGGLE = "Mostrar u ocultar el panel",
+    PRIORITIES = "Prioridades",
 }
 
 -- esMX holds only what differs from esES
@@ -160,6 +164,7 @@ locales.itIT = {
     RESET_FILTER = "Azzera filtro",
     SAME_ARMOR = "Stesso tipo di armatura tuo",
     TIP_TOGGLE = "Mostra o nascondi il pannello",
+    PRIORITIES = "Priorità",
 }
 
 locales.ptBR = {
@@ -190,6 +195,7 @@ locales.ptBR = {
     RESET_FILTER = "Redefinir filtro",
     SAME_ARMOR = "Mesmo tipo de armadura que você",
     TIP_TOGGLE = "Mostrar ou ocultar o painel",
+    PRIORITIES = "Prioridades",
 }
 
 locales.ruRU = {
@@ -220,6 +226,7 @@ locales.ruRU = {
     RESET_FILTER = "Сбросить фильтр",
     SAME_ARMOR = "Тот же тип брони, что у вас",
     TIP_TOGGLE = "Показать или скрыть панель",
+    PRIORITIES = "Приоритеты",
 }
 
 locales.koKR = {
@@ -250,6 +257,7 @@ locales.koKR = {
     RESET_FILTER = "필터 초기화",
     SAME_ARMOR = "나와 같은 방어구 유형",
     TIP_TOGGLE = "패널 표시 또는 숨기기",
+    PRIORITIES = "우선순위",
 }
 
 locales.zhCN = {
@@ -280,6 +288,7 @@ locales.zhCN = {
     RESET_FILTER = "重置过滤",
     SAME_ARMOR = "与你相同的护甲类型",
     TIP_TOGGLE = "显示或隐藏面板",
+    PRIORITIES = "优先级",
 }
 
 locales.zhTW = {
@@ -310,6 +319,7 @@ locales.zhTW = {
     RESET_FILTER = "重置過濾",
     SAME_ARMOR = "與你相同的護甲類型",
     TIP_TOGGLE = "顯示或隱藏面板",
+    PRIORITIES = "優先順序",
 }
 
 local client = GetLocale()
