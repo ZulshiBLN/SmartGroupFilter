@@ -134,6 +134,27 @@ local function Create()
     Apply()
 end
 
+---------------------------------------------------------------------------
+-- Addon compartment (plan, phase 2). Blizzard's menu calls these as addon code - no secure
+-- click is possible there, so the entry opens SGF's settings, as the right-click does.
+-- The TOC names the three globals (ruleset code.md allows exactly these).
+---------------------------------------------------------------------------
+function SmartGroupFilter_OnCompartmentClick()
+    if ns.OpenSettings then ns.OpenSettings() end
+end
+
+function SmartGroupFilter_OnCompartmentEnter(_, menuButton)
+    GameTooltip:SetOwner(menuButton, "ANCHOR_RIGHT")
+    GameTooltip:AddLine("SmartGroupFilter |cffffffffv" .. ns.VERSION .. "|r")
+    GameTooltip:AddLine(L.COMPARTMENT_CLICK, 0, 1, 0)
+    GameTooltip:AddLine(L.COMPARTMENT_HINT, 1, 1, 1, true)
+    GameTooltip:Show()
+end
+
+function SmartGroupFilter_OnCompartmentLeave()
+    GameTooltip:Hide()
+end
+
 local events = CreateFrame("Frame")
 events:RegisterEvent("PLAYER_ENTERING_WORLD")
 events:RegisterEvent("PLAYER_REGEN_DISABLED")

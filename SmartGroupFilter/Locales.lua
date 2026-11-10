@@ -58,6 +58,8 @@ locales.enUS = {
     CMD_MINIMAP = "Show or hide the minimap button",
     MINIMAP_SHOWN = "Minimap button shown.",
     MINIMAP_HIDDEN = "Minimap button hidden. %s brings it back.",
+    COMPARTMENT_CLICK = "Click: SmartGroupFilter settings",
+    COMPARTMENT_HINT = "The minimap button or Blizzard's own button opens the Group Finder.",
 }
 
 locales.deDE = {
@@ -110,6 +112,8 @@ locales.deDE = {
     CMD_MINIMAP = "Minimap-Button ein- oder ausblenden",
     MINIMAP_SHOWN = "Minimap-Button eingeblendet.",
     MINIMAP_HIDDEN = "Minimap-Button ausgeblendet. %s holt ihn zurück.",
+    COMPARTMENT_CLICK = "Klick: SmartGroupFilter-Einstellungen",
+    COMPARTMENT_HINT = "Die Gruppensuche öffnet der Minimap-Button oder Blizzards eigener Knopf.",
 }
 
 locales.frFR = {
@@ -162,6 +166,8 @@ locales.frFR = {
     CMD_MINIMAP = "Afficher ou masquer le bouton de la minicarte",
     MINIMAP_SHOWN = "Bouton de la minicarte affiché.",
     MINIMAP_HIDDEN = "Bouton de la minicarte masqué. %s le fait revenir.",
+    COMPARTMENT_CLICK = "Clic : paramètres de SmartGroupFilter",
+    COMPARTMENT_HINT = "Le bouton de la minicarte ou celui de Blizzard ouvre la recherche de groupe.",
 }
 
 locales.esES = {
@@ -214,6 +220,8 @@ locales.esES = {
     CMD_MINIMAP = "Mostrar u ocultar el botón del minimapa",
     MINIMAP_SHOWN = "Botón del minimapa visible.",
     MINIMAP_HIDDEN = "Botón del minimapa oculto. %s lo recupera.",
+    COMPARTMENT_CLICK = "Clic: ajustes de SmartGroupFilter",
+    COMPARTMENT_HINT = "El botón del minimapa o el propio de Blizzard abre el buscador de grupos.",
 }
 
 -- esMX holds only what differs from esES
@@ -270,6 +278,8 @@ locales.itIT = {
     CMD_MINIMAP = "Mostra o nascondi il pulsante della minimappa",
     MINIMAP_SHOWN = "Pulsante della minimappa mostrato.",
     MINIMAP_HIDDEN = "Pulsante della minimappa nascosto. %s lo riporta.",
+    COMPARTMENT_CLICK = "Clic: impostazioni di SmartGroupFilter",
+    COMPARTMENT_HINT = "Il pulsante della minimappa o quello di Blizzard apre la ricerca gruppi.",
 }
 
 locales.ptBR = {
@@ -322,6 +332,8 @@ locales.ptBR = {
     CMD_MINIMAP = "Mostrar ou ocultar o botão do minimapa",
     MINIMAP_SHOWN = "Botão do minimapa exibido.",
     MINIMAP_HIDDEN = "Botão do minimapa oculto. %s o traz de volta.",
+    COMPARTMENT_CLICK = "Clique: configurações do SmartGroupFilter",
+    COMPARTMENT_HINT = "O botão do minimapa ou o da própria Blizzard abre o localizador de grupos.",
 }
 
 locales.ruRU = {
@@ -374,6 +386,8 @@ locales.ruRU = {
     CMD_MINIMAP = "Показать или скрыть кнопку у миникарты",
     MINIMAP_SHOWN = "Кнопка у миникарты показана.",
     MINIMAP_HIDDEN = "Кнопка у миникарты скрыта. %s вернёт её.",
+    COMPARTMENT_CLICK = "Щелчок: настройки SmartGroupFilter",
+    COMPARTMENT_HINT = "Поиск группы открывает кнопка у миникарты или кнопка Blizzard.",
 }
 
 locales.koKR = {
@@ -426,6 +440,8 @@ locales.koKR = {
     CMD_MINIMAP = "미니맵 버튼 표시 또는 숨기기",
     MINIMAP_SHOWN = "미니맵 버튼을 표시합니다.",
     MINIMAP_HIDDEN = "미니맵 버튼을 숨겼습니다. %s 입력 시 다시 표시됩니다.",
+    COMPARTMENT_CLICK = "클릭: SmartGroupFilter 설정",
+    COMPARTMENT_HINT = "파티 찾기는 미니맵 버튼이나 Blizzard 버튼으로 엽니다.",
 }
 
 locales.zhCN = {
@@ -478,6 +494,8 @@ locales.zhCN = {
     CMD_MINIMAP = "显示或隐藏小地图按钮",
     MINIMAP_SHOWN = "已显示小地图按钮。",
     MINIMAP_HIDDEN = "已隐藏小地图按钮。输入 %s 可恢复。",
+    COMPARTMENT_CLICK = "点击：SmartGroupFilter 设置",
+    COMPARTMENT_HINT = "队伍查找器可用小地图按钮或暴雪自带的按钮打开。",
 }
 
 locales.zhTW = {
@@ -530,6 +548,8 @@ locales.zhTW = {
     CMD_MINIMAP = "顯示或隱藏小地圖按鈕",
     MINIMAP_SHOWN = "已顯示小地圖按鈕。",
     MINIMAP_HIDDEN = "已隱藏小地圖按鈕。輸入 %s 可恢復。",
+    COMPARTMENT_CLICK = "點擊：SmartGroupFilter 設定",
+    COMPARTMENT_HINT = "隊伍搜尋器可用小地圖按鈕或暴雪內建的按鈕開啟。",
 }
 
 local client = GetLocale()

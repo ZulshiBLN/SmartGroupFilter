@@ -18,6 +18,9 @@
 ## X-Curse-Project-ID: 1795082
 ## X-Wago-ID: YK9xql6L
 ## Category: Group Finder
+## AddonCompartmentFunc: SmartGroupFilter_OnCompartmentClick
+## AddonCompartmentFuncOnEnter: SmartGroupFilter_OnCompartmentEnter
+## AddonCompartmentFuncOnLeave: SmartGroupFilter_OnCompartmentLeave
 ## SavedVariables: SmartGroupFilterGlobalDB
 ## SavedVariablesPerCharacter: SmartGroupFilterDB
 
