@@ -1,32 +1,46 @@
 # SmartGroupFilter
 
-**Find the players for your group - without scrolling through the whole list.**
+**Your dungeon group in one click - without scrolling through the whole list.**
 Built for **WoW Forever**. Works for every class.
 
 > 🚧 **In development.** The first release is on its way.
 
-SmartGroupFilter docks a filter panel beside Blizzard's own Group Finder window. Pick the
-roles, classes and levels you need, and the list shows only the single players who match -
-so you can build your own group in seconds.
+SmartGroupFilter docks a panel beside Blizzard's own Group Finder window. It shortens the
+player list to the single players who fit your group - and with one click on **Build Group**
+it invites the tank, the healer and the damage dealers you are missing.
 
 ---
 
+## ⚡ Build Group
+
+- **One click, a whole group:** one tank, one healer, three damage dealers around your own
+  role - only the places that are still free.
+- **Your priorities decide:** for each place the class highest in your row, then the highest
+  level, then the longest wait. Players who signed up without a role only fill what is left.
+- **Nobody twice:** invited players keep their place for two minutes, and while they are in
+  your group. Whoever declines, lets the invite run out or is already in a group is not asked
+  again - the place goes to the next player.
+- **Always a fresh list:** is the list older than 30 seconds, the button refreshes it first.
+- **See before you invite:** `/sgf test` shows in the chat whom Build Group would invite and
+  why - and why everyone else is left out. Nothing is sent.
+
 ## 🎯 Filter the players you need
 
-- **Role:** tank, healer, damage - any mix. Players who signed up for several roles show up
-  for each of them: a paladin listed as tank and healer appears when you look for a healer.
-  Players who signed up without a role are shown too.
-- **Class:** choose the classes you want. The list offers only the classes that can fill the
-  roles you picked.
-- **Level:** set a minimum and a maximum.
-- **Groups stay as they are:** the filter only touches single players; group listings remain
-  in the list.
-- **No dead entries:** delisted entries are always hidden.
+- **Priorities:** one row of class icons per role - drag to reorder, right-click to exclude a
+  class from a role. Each row shows how many players are listed for it.
+- **Level range:** two fields and a slider, starting at the dungeon you are listed for.
+- **Double classes:** one player per class in your group, or up to two.
+- **Armor class:** leave out players who wear your armor - by class and level, as hunters,
+  shamans, warriors and paladins change armor at 40.
+- **Groups stay as they are:** the filter only touches single players. Delisted entries are
+  always hidden.
+- **Reset Filter** brings back Blizzard's full list.
 
 ## 🧭 Right where you need it
 
-- The panel sits beside the Group Finder window, in Blizzard's own look.
-- Your filter is saved per character.
+- The panel sits beside the Group Finder window, in Blizzard's own look; a side tab with the
+  SmartGroupFilter logo shows and hides it.
+- Your priorities and options are saved per character.
 - Minimap button and an entry in the AddOn menu.
 - Chat command: `/sgf`
 
@@ -37,7 +51,8 @@ Korean and Chinese (simplified and traditional) - follows your client, or choose
 
 ## 🔒 Privacy
 
-- No network traffic, no addon messages, no chat messages to other players.
+- No addon messages, no chat messages to other players. All it sends are group invites and the
+  Group Finder's own search - each from your click.
 - Stores only your own settings.
 - Bug reports leave the game only when you copy the code and post it yourself.
 
