@@ -307,6 +307,9 @@ local function Row(parent, role, anchor, gap)
     local row = CreateFrame("Frame", nil, parent)
     row.role = role
     row.label = label
+    -- The players shown for this role, small and white beside the header
+    row.count = parent:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.count:SetPoint("LEFT", label, "RIGHT", 4, 0)
     local n = #db.order[role]
     row:SetSize(PER_LINE * SLOT, math.ceil(n / PER_LINE) * SLOT)
     row:SetPoint("TOPLEFT", label, "BOTTOMLEFT", 0, -4)
@@ -340,6 +343,10 @@ end
 
 local function UpdateCount(shown, total)
     panel.count:SetText(L.SHOWN_COUNT:format(shown, total))
+    local counts = ns.RoleCounts()
+    for role, row in pairs(panel.rows) do
+        row.count:SetText(L.ROLE_COUNT:format(counts[role] or 0))
+    end
 end
 
 local function RefreshAll()

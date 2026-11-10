@@ -54,6 +54,17 @@ describe("the panel", function()
         assert.are.same({ "TOPLEFT", LFGParentFrame, "TOPRIGHT", 4, 0 }, panel.points[#panel.points])
     end)
 
+    it("counts the players shown for each role beside its header", function()
+        assert.are.equal("(1 listed)", panel.rows.TANK.count.text)
+        assert.are.equal("(0 listed)", panel.rows.HEALER.count.text)
+        assert.are.equal("(1 listed)", panel.rows.DAMAGER.count.text) -- the level 35 mage is hidden
+        result(4, "DRUID", 25, { tank = true, dps = true })
+        result(5, "ROGUE", 25, {})
+        LFGBrowseFrame:UpdateResultList()
+        assert.are.equal("(2 listed)", panel.rows.TANK.count.text) -- both roles count
+        assert.are.equal("(2 listed)", panel.rows.DAMAGER.count.text) -- no role counts nowhere
+    end)
+
     it("counts the single players shown", function()
         assert.are.equal("2 of 3 players", panel.count.text)
         assert.are.same({ "BOTTOMRIGHT", panel, "BOTTOMRIGHT", -14, 12 }, panel.count.points[1])

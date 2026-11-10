@@ -103,11 +103,18 @@ end
 -- The hook
 ---------------------------------------------------------------------------
 local shownCount, totalCount = 0, 0
+local roleCounts = { TANK = 0, HEALER = 0, DAMAGER = 0 }
 local listeners = {}
 
 -- fn(shown, total) runs after every filtering: single players kept and all single players
 function ns.OnListFiltered(fn)
     listeners[#listeners + 1] = fn
+end
+
+-- Single players shown, by the roles they signed up for (one with several counts for each;
+-- one with none for none) - shown beside the rows' headers (Michel, 2026-11-11)
+function ns.RoleCounts()
+    return roleCounts
 end
 
 function ns.Counts()
@@ -134,6 +141,7 @@ local function Filter(results)
     local active = ns.FilterActive()
     local range, ownArmor = ns.LevelRange(), ns.OwnArmor()
     local shown, total = 0, 0
+    local counts = { TANK = 0, HEALER = 0, DAMAGER = 0 }
     for i = #results, 1, -1 do
         local entry = ns.ReadEntry(results[i])
         local single = IsSingle(entry)
@@ -142,9 +150,12 @@ local function Filter(results)
             table.remove(results, i)
         elseif single then
             shown = shown + 1
+            for role, field in pairs(ns.D.ROLE_FIELD) do
+                if entry.roles and entry.roles[field] then counts[role] = counts[role] + 1 end
+            end
         end
     end
-    shownCount, totalCount = shown, total
+    shownCount, totalCount, roleCounts = shown, total, counts
     for _, fn in ipairs(listeners) do fn(shown, total) end
 end
 

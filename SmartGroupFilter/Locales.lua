@@ -48,6 +48,7 @@ locales.enUS = {
     CMD_TEST = "Show whom Build Group would invite, and why - sends nothing",
     REFRESH_LIST = "Refresh List",
     LIST_OLD = "The list is older than %d seconds: refresh it first.",
+    ROLE_COUNT = "(%d listed)",
 }
 
 locales.deDE = {
@@ -90,6 +91,7 @@ locales.deDE = {
     CMD_TEST = "Zeigen, wen Build Group einladen würde und warum - verschickt nichts",
     REFRESH_LIST = "Liste aktualisieren",
     LIST_OLD = "Die Liste ist älter als %d Sekunden: zuerst aktualisieren.",
+    ROLE_COUNT = "(%d eingetragen)",
 }
 
 locales.frFR = {
@@ -132,6 +134,7 @@ locales.frFR = {
     CMD_TEST = "Montrer qui Build Group inviterait et pourquoi - n'envoie rien",
     REFRESH_LIST = "Actualiser la liste",
     LIST_OLD = "La liste date de plus de %d secondes : actualisez-la d'abord.",
+    ROLE_COUNT = "(%d inscrits)",
 }
 
 locales.esES = {
@@ -174,6 +177,7 @@ locales.esES = {
     CMD_TEST = "Mostrar a quién invitaría Build Group y por qué - no envía nada",
     REFRESH_LIST = "Actualizar lista",
     LIST_OLD = "La lista tiene más de %d segundos: actualízala primero.",
+    ROLE_COUNT = "(%d apuntados)",
 }
 
 -- esMX holds only what differs from esES
@@ -220,6 +224,7 @@ locales.itIT = {
     CMD_TEST = "Mostra chi inviterebbe Build Group e perché - non invia nulla",
     REFRESH_LIST = "Aggiorna elenco",
     LIST_OLD = "L'elenco ha più di %d secondi: aggiornalo prima.",
+    ROLE_COUNT = "(%d iscritti)",
 }
 
 locales.ptBR = {
@@ -262,6 +267,7 @@ locales.ptBR = {
     CMD_TEST = "Mostrar quem o Build Group convidaria e por quê - não envia nada",
     REFRESH_LIST = "Atualizar lista",
     LIST_OLD = "A lista tem mais de %d segundos: atualize-a primeiro.",
+    ROLE_COUNT = "(%d inscritos)",
 }
 
 locales.ruRU = {
@@ -304,6 +310,7 @@ locales.ruRU = {
     CMD_TEST = "Показать, кого пригласил бы Build Group и почему - ничего не отправляет",
     REFRESH_LIST = "Обновить список",
     LIST_OLD = "Списку больше %d секунд: сначала обновите его.",
+    ROLE_COUNT = "(записались: %d)",
 }
 
 locales.koKR = {
@@ -346,6 +353,7 @@ locales.koKR = {
     CMD_TEST = "Build Group이 누구를 왜 초대할지 표시 - 아무것도 보내지 않음",
     REFRESH_LIST = "목록 새로고침",
     LIST_OLD = "목록이 %d초 넘게 지났습니다. 먼저 새로고침하세요.",
+    ROLE_COUNT = "(%d명 등록)",
 }
 
 locales.zhCN = {
@@ -388,6 +396,7 @@ locales.zhCN = {
     CMD_TEST = "显示 Build Group 会邀请谁及原因 - 不发送任何内容",
     REFRESH_LIST = "刷新列表",
     LIST_OLD = "列表已超过%d秒：请先刷新。",
+    ROLE_COUNT = "（%d 人登记）",
 }
 
 locales.zhTW = {
@@ -430,6 +439,7 @@ locales.zhTW = {
     CMD_TEST = "顯示 Build Group 會邀請誰及原因 - 不傳送任何內容",
     REFRESH_LIST = "重新整理列表",
     LIST_OLD = "列表已超過%d秒：請先重新整理。",
+    ROLE_COUNT = "（%d 人登記）",
 }
 
 local client = GetLocale()
