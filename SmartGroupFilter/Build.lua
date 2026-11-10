@@ -104,9 +104,32 @@ end
 
 local button
 
+-- Two steps on one button (Michel, 2026-11-11): results older than D.LIST_FRESH_SECONDS are
+-- searched anew first - the search needs a click of its own, and the invites must come from
+-- a click too (ruleset K5), so one click cannot search and then invite.
+local lastResults -- GetTime() when the last search results arrived
+
+local function ListAge()
+    return lastResults and (GetTime() - lastResults) or nil
+end
+
+local function ListFresh()
+    local age = ListAge()
+    return age ~= nil and age <= D.LIST_FRESH_SECONDS
+end
+
 function ns.UpdateBuildButton()
     if not button then return end
     local list, why = Plan()
+    -- Fresh results may bring a candidate the old ones lack; nothing else a search changes
+    if not ListFresh() and (list or why == "NO_CANDIDATE") then
+        button.mode = "refresh"
+        button.reason = L.LIST_OLD:format(D.LIST_FRESH_SECONDS)
+        button:SetEnabled(not (LFGBrowseFrame and LFGBrowseFrame.searching))
+        button:SetText(L.REFRESH_LIST)
+        return
+    end
+    button.mode = "build"
     button.reason = why and L[why] or nil
     button:SetEnabled(list ~= nil)
     if list and D.INVITES_PER_CLICK == 1 then
@@ -114,6 +137,12 @@ function ns.UpdateBuildButton()
     else
         button:SetText(L.BUILD_GROUP)
     end
+end
+
+-- The refresh click: Blizzard's own search, with the Group Finder's own filters
+local function RefreshList()
+    if LFGBrowse_DoSearch then LFGBrowse_DoSearch() end
+    ns.UpdateBuildButton()
 end
 
 -- The click: invite and hold the places. Called only from the button's OnClick.
@@ -138,11 +167,13 @@ function ns.CreateBuildButton(parent, anchor)
     button:SetSize(160, 24)
     button:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 4, -12)
     button:SetText(L.BUILD_GROUP)
-    button:SetScript("OnClick", BuildGroup)
+    button:SetScript("OnClick", function()
+        if button.mode == "refresh" then RefreshList() else BuildGroup() end
+    end)
     button:SetMotionScriptsWhileDisabled(true)
     button:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:AddLine(L.BUILD_GROUP)
+        GameTooltip:AddLine(self:GetText())
         if self.reason then GameTooltip:AddLine(self.reason, 1, 0.2, 0.2) end
         GameTooltip:Show()
     end)
@@ -245,6 +276,9 @@ function ns.DryRun()
         print("  Would do nothing: " .. L[why])
         return
     end
+    local age = ListAge()
+    print(age and ("  List from %ds ago%s."):format(math.floor(age), ListFresh() and "" or " - older than "
+        .. D.LIST_FRESH_SECONDS .. "s, the button refreshes it first") or "  No search results yet.")
     local own, r = state.own, state.range
     print(("  You: %s %s, listed as %s."):format(tostring(own.class), tostring(own.level), RolesText(own.roles)))
     print(("  Level range %d-%d; double classes %s; same armor class %s."):format(r.min, r.max,
@@ -304,15 +338,21 @@ end
 -- An active decline: the client's system message ERR_DECLINE_GROUP_S ("%s declines your group
 -- invitation.", in the client's language). The place opens at once, and the player is not
 -- invited again this session (Michel, 2026-11-10).
-local declinePattern
+-- ERR_ALREADY_IN_GROUP_S ("%s is already in a group.") counts the same: he cannot come.
+local declinePatterns
+local function Pattern(format)
+    if type(format) ~= "string" then return nil end
+    local escaped = format:gsub("[%(%)%.%+%-%*%?%[%]%^%$]", "%%%0")
+    return "^" .. escaped:gsub("%%s", "(.+)") .. "$"
+end
+
 local function DeclinedName(msg)
     if type(msg) ~= "string" or (issecretvalue and issecretvalue(msg)) then return nil end
-    if not declinePattern then
-        if type(ERR_DECLINE_GROUP_S) ~= "string" then return nil end
-        local escaped = ERR_DECLINE_GROUP_S:gsub("[%(%)%.%+%-%*%?%[%]%^%$]", "%%%0")
-        declinePattern = "^" .. escaped:gsub("%%s", "(.+)") .. "$"
+    declinePatterns = declinePatterns or { Pattern(ERR_DECLINE_GROUP_S), Pattern(ERR_ALREADY_IN_GROUP_S) }
+    for _, pattern in pairs(declinePatterns) do
+        local name = msg:match(pattern)
+        if name then return name end
     end
-    return msg:match(declinePattern)
 end
 
 -- The system message names the player with or without his realm
@@ -335,7 +375,14 @@ local events = CreateFrame("Frame")
 events:RegisterEvent("GROUP_ROSTER_UPDATE")
 events:RegisterEvent("LFG_LIST_ACTIVE_ENTRY_UPDATE")
 events:RegisterEvent("CHAT_MSG_SYSTEM")
+events:RegisterEvent("LFG_LIST_SEARCH_RESULTS_RECEIVED")
+events:RegisterEvent("LFG_LIST_SEARCH_FAILED") -- the button is clickable again
 events:SetScript("OnEvent", function(_, event, msg)
+    if event == "LFG_LIST_SEARCH_RESULTS_RECEIVED" then
+        lastResults = GetTime()
+        -- The button turns back into Refresh List once these results grow old
+        C_Timer.After(D.LIST_FRESH_SECONDS + 0.1, ns.UpdateBuildButton)
+    end
     if not button then return end
     if event == "CHAT_MSG_SYSTEM" then
         local name = DeclinedName(msg)

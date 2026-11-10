@@ -63,6 +63,10 @@ D.MAX_SAME_CLASS = { [false] = 1, [true] = 2 }
 -- How long an invited player keeps his place before he joins, in seconds
 D.HOLD_SECONDS = 120
 
+-- Search results older than this, in seconds, are searched anew before Build Group invites
+-- (Michel, 2026-11-11)
+D.LIST_FRESH_SECONDS = 30
+
 -- The panel's options and their defaults. filterOn: off after Reset Filter until the next
 -- change; panelShown: the side tab's switch - a hidden panel leaves Blizzard's list as it is.
 D.OPTION_DEFAULTS = { filterOn = true, allowDouble = false, allowSameArmor = true, panelShown = true }

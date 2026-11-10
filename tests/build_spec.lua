@@ -24,6 +24,12 @@ local function click()
     RUNSCRIPT(button, "OnClick", "LeftButton")
 end
 
+-- Fresh search results, as a search's answer brings them
+local function fresh()
+    LFGBrowseFrame.searching = false
+    FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
+end
+
 before_each(function()
     ns = addon.load("enUS")
     FIRE("PLAYER_LOGIN")
@@ -38,6 +44,7 @@ before_each(function()
     result(5, "Rog", "ROGUE", 25, { dps = true })
     result(6, "Hun", "HUNTER", 25, { dps = true })
     LFGBrowseFrame:UpdateResultList()
+    fresh()
 end)
 
 describe("Build Group", function()
@@ -71,6 +78,7 @@ describe("Build Group", function()
         FIRE("GROUP_ROSTER_UPDATE")
         STATE.time = STATE.time + 121 -- Rog never came
         RUNTIMERS()
+        fresh()
         STATE.invites = {}
         click()
         assert.are.equal("Hun", table.concat(STATE.invites, " ")) -- a damage dealer, not a tank
@@ -108,6 +116,7 @@ describe("Build Group", function()
         FIRE("GROUP_ROSTER_UPDATE")
         STATE.time = STATE.time + 500
         RUNTIMERS()
+        fresh()
         STATE.invites = {}
         click()
         -- Pal keeps the tank place: War is not invited. Pri, Wlk and Rog let their invites run
@@ -123,9 +132,66 @@ describe("Build Group", function()
         FIRE("GROUP_ROSTER_UPDATE")
         STATE.time = STATE.time + 500
         RUNTIMERS()
+        fresh()
         STATE.invites = {}
         click()
         assert.are.equal("Pal", STATE.invites[1])
+    end)
+
+    describe("in two steps", function()
+        it("refreshes a list older than 30 seconds first, and invites from the fresh one", function()
+            STATE.time = STATE.time + 31
+            ns.UpdateBuildButton()
+            assert.are.equal("Refresh List", button.text)
+            assert.are.equal("The list is older than 30 seconds: refresh it first.", button.reason)
+            click()
+            assert.are.equal(1, STATE.searches)
+            assert.are.equal(0, #STATE.invites)
+            assert.is_false(button:IsEnabled()) -- searching
+            fresh()
+            assert.are.equal("Build Group", button.text)
+            assert.is_true(button:IsEnabled())
+            click()
+            assert.are.equal(4, #STATE.invites)
+        end)
+
+        it("turns back into Refresh List when the results grow old", function()
+            assert.are.equal("Build Group", button.text)
+            STATE.time = STATE.time + 31
+            RUNTIMERS()
+            assert.are.equal("Refresh List", button.text)
+        end)
+
+        it("offers a refresh when no player fits an old list, not when the group is full", function()
+            STATE.order = {}
+            LFGBrowseFrame:UpdateResultList()
+            STATE.time = STATE.time + 31
+            ns.UpdateBuildButton()
+            assert.are.equal("Refresh List", button.text)
+            STATE.party = { { name = "A", class = "HUNTER", level = 25 }, { name = "B", class = "ROGUE", level = 25 },
+                { name = "C", class = "PRIEST", level = 25 }, { name = "D", class = "PALADIN", level = 25 } }
+            ns.UpdateBuildButton()
+            assert.are.equal("Build Group", button.text)
+            assert.are.equal("Your group is full.", button.reason)
+        end)
+
+        it("shows the list's age in /sgf test", function()
+            STATE.time = STATE.time + 12
+            for i = #CHAT, 1, -1 do CHAT[i] = nil end
+            SlashCmdList.SMARTGROUPFILTER("test")
+            assert.is_true(said("List from 12s ago."))
+            STATE.time = STATE.time + 30
+            SlashCmdList.SMARTGROUPFILTER("test")
+            assert.is_true(said("List from 42s ago - older than 30s, the button refreshes it first."))
+        end)
+    end)
+
+    it("treats a player already in another group like a decline", function()
+        click()
+        FIRE("CHAT_MSG_SYSTEM", "Rog is already in a group.")
+        STATE.invites = {}
+        click()
+        assert.are.equal("Hun", table.concat(STATE.invites, " "))
     end)
 
     it("is disabled without an own listing, and says why", function()

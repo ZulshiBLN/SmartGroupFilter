@@ -46,6 +46,8 @@ locales.enUS = {
     GROUP_FULL = "Your group is full.",
     NO_CANDIDATE = "No fitting player in the list.",
     CMD_TEST = "Show whom Build Group would invite, and why - sends nothing",
+    REFRESH_LIST = "Refresh List",
+    LIST_OLD = "The list is older than %d seconds: refresh it first.",
 }
 
 locales.deDE = {
@@ -86,6 +88,8 @@ locales.deDE = {
     GROUP_FULL = "Deine Gruppe ist voll.",
     NO_CANDIDATE = "Kein passender Spieler in der Liste.",
     CMD_TEST = "Zeigen, wen Build Group einladen würde und warum - verschickt nichts",
+    REFRESH_LIST = "Liste aktualisieren",
+    LIST_OLD = "Die Liste ist älter als %d Sekunden: zuerst aktualisieren.",
 }
 
 locales.frFR = {
@@ -126,6 +130,8 @@ locales.frFR = {
     GROUP_FULL = "Votre groupe est complet.",
     NO_CANDIDATE = "Aucun joueur adapté dans la liste.",
     CMD_TEST = "Montrer qui Build Group inviterait et pourquoi - n'envoie rien",
+    REFRESH_LIST = "Actualiser la liste",
+    LIST_OLD = "La liste date de plus de %d secondes : actualisez-la d'abord.",
 }
 
 locales.esES = {
@@ -166,6 +172,8 @@ locales.esES = {
     GROUP_FULL = "Tu grupo está completo.",
     NO_CANDIDATE = "Ningún jugador adecuado en la lista.",
     CMD_TEST = "Mostrar a quién invitaría Build Group y por qué - no envía nada",
+    REFRESH_LIST = "Actualizar lista",
+    LIST_OLD = "La lista tiene más de %d segundos: actualízala primero.",
 }
 
 -- esMX holds only what differs from esES
@@ -210,6 +218,8 @@ locales.itIT = {
     GROUP_FULL = "Il tuo gruppo è al completo.",
     NO_CANDIDATE = "Nessun giocatore adatto nell'elenco.",
     CMD_TEST = "Mostra chi inviterebbe Build Group e perché - non invia nulla",
+    REFRESH_LIST = "Aggiorna elenco",
+    LIST_OLD = "L'elenco ha più di %d secondi: aggiornalo prima.",
 }
 
 locales.ptBR = {
@@ -250,6 +260,8 @@ locales.ptBR = {
     GROUP_FULL = "Seu grupo está completo.",
     NO_CANDIDATE = "Nenhum jogador adequado na lista.",
     CMD_TEST = "Mostrar quem o Build Group convidaria e por quê - não envia nada",
+    REFRESH_LIST = "Atualizar lista",
+    LIST_OLD = "A lista tem mais de %d segundos: atualize-a primeiro.",
 }
 
 locales.ruRU = {
@@ -290,6 +302,8 @@ locales.ruRU = {
     GROUP_FULL = "Ваша группа заполнена.",
     NO_CANDIDATE = "В списке нет подходящих игроков.",
     CMD_TEST = "Показать, кого пригласил бы Build Group и почему - ничего не отправляет",
+    REFRESH_LIST = "Обновить список",
+    LIST_OLD = "Списку больше %d секунд: сначала обновите его.",
 }
 
 locales.koKR = {
@@ -330,6 +344,8 @@ locales.koKR = {
     GROUP_FULL = "파티가 가득 찼습니다.",
     NO_CANDIDATE = "목록에 맞는 플레이어가 없습니다.",
     CMD_TEST = "Build Group이 누구를 왜 초대할지 표시 - 아무것도 보내지 않음",
+    REFRESH_LIST = "목록 새로고침",
+    LIST_OLD = "목록이 %d초 넘게 지났습니다. 먼저 새로고침하세요.",
 }
 
 locales.zhCN = {
@@ -370,6 +386,8 @@ locales.zhCN = {
     GROUP_FULL = "你的队伍已满。",
     NO_CANDIDATE = "列表中没有合适的玩家。",
     CMD_TEST = "显示 Build Group 会邀请谁及原因 - 不发送任何内容",
+    REFRESH_LIST = "刷新列表",
+    LIST_OLD = "列表已超过%d秒：请先刷新。",
 }
 
 locales.zhTW = {
@@ -410,6 +428,8 @@ locales.zhTW = {
     GROUP_FULL = "你的隊伍已滿。",
     NO_CANDIDATE = "列表中沒有合適的玩家。",
     CMD_TEST = "顯示 Build Group 會邀請誰及原因 - 不傳送任何內容",
+    REFRESH_LIST = "重新整理列表",
+    LIST_OLD = "列表已超過%d秒：請先重新整理。",
 }
 
 local client = GetLocale()

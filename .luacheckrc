@@ -34,7 +34,8 @@ read_globals = {
     "LFGParentFrameTab2_OnClick",
     -- Build Group
     "C_LFGListRoles", "C_PartyInfo", "GetNumGroupMembers", "IsInGroup", "UnitIsGroupLeader",
-    "UnitIsGroupAssistant", "UnitName", "GetTime", "ERR_DECLINE_GROUP_S",
+    "UnitIsGroupAssistant", "UnitName", "GetTime", "ERR_DECLINE_GROUP_S", "ERR_ALREADY_IN_GROUP_S",
+    "LFGBrowse_DoSearch",
     "LOCALIZED_CLASS_NAMES_MALE", "TANK", "HEALER", "DAMAGER",
     SlashCmdList = { fields = { SMARTGROUPFILTER = { read_only = false } } },
 }

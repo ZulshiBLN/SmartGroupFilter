@@ -278,3 +278,12 @@ function LFGParentFrameTab2_OnClick()
     LFGBrowseFrame.shown = true
 end
 ERR_DECLINE_GROUP_S = "%s declines your group invitation."
+ERR_ALREADY_IN_GROUP_S = "%s is already in a group."
+
+-- Blizzard's search from the Group Finder (Blizzard_LFGVanilla_Browse.lua): results arrive
+-- later with LFG_LIST_SEARCH_RESULTS_RECEIVED, which a spec fires
+STATE.searches = 0
+function LFGBrowse_DoSearch()
+    STATE.searches = STATE.searches + 1
+    LFGBrowseFrame.searching = true
+end

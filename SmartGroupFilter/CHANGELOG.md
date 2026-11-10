@@ -29,3 +29,6 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   greyed out.
 - `/sgf test` shows in the chat whom Build Group would invite and why, and why every other
   single player is left out - without sending a single invite.
+- Build Group works in two steps when the list is older than 30 seconds: the first click
+  refreshes it, the next invites from the fresh results. A player who is already in another
+  group counts like a decline.
