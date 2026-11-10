@@ -1,17 +1,17 @@
 ## Interface: 16001
 ## Title: SmartGroupFilter
-## IconTexture: Interface\Icons\INV_Misc_GroupNeedMore
-## Notes: Filter for the Group Finder: shows only the single players with the roles, classes and levels you choose
-## Notes-deDE: Filter für die Gruppensuche: zeigt nur die Einzelspieler mit den gewählten Rollen, Klassen und Stufen
-## Notes-frFR: Filtre pour la recherche de groupe : n'affiche que les joueurs seuls avec les rôles, classes et niveaux choisis
-## Notes-esES: Filtro para el buscador de grupos: muestra solo a los jugadores sueltos con los roles, clases y niveles elegidos
-## Notes-esMX: Filtro para el buscador de grupos: muestra solo a los jugadores sueltos con los roles, clases y niveles elegidos
-## Notes-itIT: Filtro per la ricerca gruppi: mostra solo i giocatori singoli con i ruoli, le classi e i livelli scelti
-## Notes-ptBR: Filtro para o localizador de grupos: mostra só os jogadores avulsos com as funções, classes e níveis escolhidos
-## Notes-ruRU: Фильтр для поиска группы: показывает только одиночных игроков с выбранными ролями, классами и уровнями
-## Notes-koKR: 파티 찾기 필터: 선택한 역할, 직업, 레벨의 개인 플레이어만 표시
-## Notes-zhCN: 队伍查找器过滤：只显示所选职责、职业和等级的单人玩家
-## Notes-zhTW: 隊伍搜尋器過濾：只顯示所選職責、職業和等級的單人玩家
+## IconTexture: Interface\AddOns\SmartGroupFilter\Media\Tab
+## Notes: Group Finder helper: shows only the single players you need and builds your group with one click
+## Notes-deDE: Helfer für die Gruppensuche: zeigt nur die Einzelspieler, die du brauchst, und baut deine Gruppe mit einem Klick
+## Notes-frFR: Aide pour la recherche de groupe : n'affiche que les joueurs seuls dont vous avez besoin et forme votre groupe en un clic
+## Notes-esES: Ayuda para el buscador de grupos: muestra solo a los jugadores sueltos que necesitas y forma tu grupo con un clic
+## Notes-esMX: Ayuda para el buscador de grupos: muestra solo a los jugadores sueltos que necesitas y forma tu grupo con un clic
+## Notes-itIT: Aiuto per la ricerca gruppi: mostra solo i giocatori singoli che ti servono e forma il tuo gruppo con un clic
+## Notes-ptBR: Ajuda para o localizador de grupos: mostra só os jogadores avulsos de que você precisa e monta seu grupo com um clique
+## Notes-ruRU: Помощник поиска группы: показывает только нужных одиночных игроков и собирает группу одним щелчком
+## Notes-koKR: 파티 찾기 도우미: 필요한 개인 플레이어만 표시하고 클릭 한 번으로 파티를 구성
+## Notes-zhCN: 队伍查找器助手：只显示你需要的单人玩家，一键组建队伍
+## Notes-zhTW: 隊伍搜尋器助手：只顯示你需要的單人玩家，一鍵組建隊伍
 ## Author: ZulshiBLN
 ## Version: 0.1.0
 ## X-License: MIT
