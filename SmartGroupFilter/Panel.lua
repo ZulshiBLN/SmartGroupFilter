@@ -345,12 +345,12 @@ local function RefreshAll()
     UpdateCount(ns.Counts())
 end
 
--- The fourth side tab, below Blizzard's three, from Blizzard's side tab template, with the full
--- logo at 30 px - the look Michel chose, the first one shown in game (2026-11-10). The tab's rim
--- is the template's own. Shown on every page of the window (a child of LFGParentFrame). On
--- another page a click opens the Group Browser with the panel; on the Group Browser it shows or
--- hides the panel (Michel). Never "checked": Blizzard draws the tab of the page you are on with
--- a gold glow, and this tab is no page of its own.
+-- The fourth side tab, below Blizzard's three, from Blizzard's side tab template. The full logo
+-- fills the tab as Blizzard's icons do (SetFillToInterior: 50 px, masked to the tab's shape);
+-- the rim is the template's own. Highlighted (Blizzard's "checked" glow) while the panel is
+-- visible (Michel, 2026-11-10). Shown on every page of the window (a child of LFGParentFrame).
+-- On another page a click opens the Group Browser with the panel; on the Group Browser it shows
+-- or hides the panel.
 local function ToggleTab()
     local tab = CreateFrame("Frame", "SmartGroupFilterTab", LFGParentFrame, "LargeSideTabButtonTemplate")
     ns.tab = tab
@@ -360,14 +360,12 @@ local function ToggleTab()
     else
         tab:SetPoint("TOPLEFT", LFGParentFrame, "TOPRIGHT", 0, -200)
     end
-    if tab.Icon then
-        tab.Icon:SetTexture(D.TAB_ICON)
-        tab.Icon:SetSize(30, 30)
-    end
+    if tab.Icon then tab.Icon:SetTexture(D.TAB_ICON) end
+    if tab.SetFillToInterior then tab:SetFillToInterior(true) end
     tab.tooltipText = ns.ADDON_NAME
     local function Sync()
-        if tab.SetChecked then tab:SetChecked(false) end
         panel:SetShown(db.panelShown)
+        if tab.SetChecked then tab:SetChecked(db.panelShown and LFGBrowseFrame:IsShown()) end
     end
     local function Toggle()
         if LFGBrowseFrame:IsShown() then
@@ -394,6 +392,9 @@ local function ToggleTab()
         GameTooltip:Show()
     end)
     tab:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    -- The glow follows the page: off on the other pages, back on the Group Browser
+    LFGBrowseFrame:HookScript("OnShow", Sync)
+    LFGBrowseFrame:HookScript("OnHide", Sync)
     Sync()
 end
 

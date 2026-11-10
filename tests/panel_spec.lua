@@ -101,7 +101,8 @@ describe("the panel", function()
         assert.are.equal("LargeSideTabButtonTemplate", tab.template)
         assert.are.same({ "TOPLEFT", LFGParentFrame.WhoListingTab, "BOTTOMLEFT", 0, -2 }, tab.points[1])
         assert.are.equal("Interface\\AddOns\\SmartGroupFilter\\Media\\Tab", tab.Icon.textureFile)
-        assert.are.equal(30, tab.Icon.width) -- the first look, Michel's choice
+        assert.is_true(tab.fillToInterior) -- the logo fills the tab
+        assert.is_true(tab.checked) -- highlighted while the panel is visible
         tab.mouseUp(tab, "LeftButton", true)
         assert.is_false(panel.shown)
         assert.is_false(db.panelShown)
@@ -109,7 +110,7 @@ describe("the panel", function()
         assert.are.equal("1 2 3", shown())
         tab.mouseUp(tab, "LeftButton", true)
         assert.is_true(panel.shown)
-        assert.is_false(tab.checked) -- never the gold edge of the page you are on
+        assert.is_true(tab.checked)
         assert.are.equal("1 2", shown())
         assert.are.equal(0, STATE.tab2Clicks)
     end)
@@ -123,6 +124,17 @@ describe("the panel", function()
         assert.is_true(LFGBrowseFrame.shown)
         assert.is_true(db.panelShown)
         assert.is_true(panel.shown)
+    end)
+
+    it("highlights the tab only while the panel is visible on the Group Browser", function()
+        local tab = ns.tab
+        assert.is_true(tab.checked)
+        LFGBrowseFrame.shown = false
+        RUNSCRIPT(LFGBrowseFrame, "OnHide")
+        assert.is_false(tab.checked)
+        LFGBrowseFrame.shown = true
+        RUNSCRIPT(LFGBrowseFrame, "OnShow")
+        assert.is_true(tab.checked)
     end)
 
     it("starts hidden when it was hidden before", function()
