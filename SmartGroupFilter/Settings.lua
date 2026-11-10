@@ -76,7 +76,8 @@ local function Gear()
     local gear = CreateFrame("Button", nil, panel)
     panel.gearButton = gear
     gear:SetSize(22, 22)
-    gear:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -136, -30)
+    -- Left of Reset Filter, whose width follows its translation
+    gear:SetPoint("RIGHT", panel.resetButton, "LEFT", -6, 0)
     CopyLook(gear)
     gear:SetScript("OnClick", function()
         ns.ShowView(panel.view == "settings" and "filter" or "settings")
