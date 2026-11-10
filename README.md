@@ -30,7 +30,9 @@ builds your five-player group with one click.
   Not listed yet, the button reads **List Self** and lights up Blizzard's eye tab, where you
   list yourself with dungeon, play style and role. When the list is older than 30 seconds it reads
   **Refresh List** first and clicks Blizzard's own refresh arrow. The chat names every invite;
-  the button's tooltip says why it is greyed out.
+  the button's tooltip says why it is greyed out. Listed for several dungeons, it builds for the
+  one with the most players to invite and names it in the chat; the group keeps that dungeon
+  while it has members or pending invites.
 - **Minimap button** - left-click opens or closes the Group Finder as Blizzard's button and key
   do; right-click opens the settings; drag it around the minimap. The AddOn menu entry opens the
   settings too.

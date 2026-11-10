@@ -35,7 +35,8 @@ before_each(function()
     FIRE("PLAYER_LOGIN")
     db = SmartGroupFilterDB
     button = ns.panel.buildButton
-    STATE.activities[800] = { minLevelSuggestion = 20, maxLevelSuggestion = 30 }
+    STATE.activities[800] = { minLevelSuggestion = 20, maxLevelSuggestion = 30, fullName = "Shadowfang Keep" }
+    STATE.activities[801] = { minLevelSuggestion = 20, maxLevelSuggestion = 30, fullName = "Blackfathom Deeps" }
     STATE.activeEntry = { activityIDs = { 800 } }
     result(1, "Pal", "PALADIN", 25, { tank = true })
     result(2, "War", "WARRIOR", 26, { tank = true })
@@ -66,6 +67,109 @@ describe("Build Group", function()
         STATE.results[1].info.activityIDs = nil
         click()
         assert.are.equal("War", STATE.invites[1])
+    end)
+
+    describe("the target dungeon", function()
+        local function listedFor(id, ...)
+            result(id, ...)
+            STATE.results[id].info.activityIDs = { 801 }
+        end
+
+        local function line(text)
+            for i, l in ipairs(CHAT) do
+                if l:find(text, 1, true) then return i end
+            end
+        end
+
+        local function count(text)
+            local n = 0
+            for _, l in ipairs(CHAT) do
+                if l:find(text, 1, true) then n = n + 1 end
+            end
+            return n
+        end
+
+        before_each(function()
+            for i = #CHAT, 1, -1 do CHAT[i] = nil end
+            STATE.activeEntry = { activityIDs = { 801, 800 } }
+            listedFor(7, "Dru", "DRUID", 25, { dps = true })
+            LFGBrowseFrame:UpdateResultList()
+            fresh()
+        end)
+
+        it("is named before the invites, and only players listed for it are invited", function()
+            click() -- 800 would get four players, 801 one
+            assert.are.equal("Pal Pri Wlk Rog", table.concat(STATE.invites, " "))
+            local building = line("Building a group for Shadowfang Keep.")
+            assert.truthy(building)
+            assert.is_true(building < line("Invited Pal"))
+        end)
+
+        it("is kept while SGF's invites are pending, and named on every click", function()
+            click()
+            FIRE("CHAT_MSG_SYSTEM", "Rog declines your group invitation.")
+            STATE.invites = {}
+            click() -- chosen anew, 800 and 801 would tie at one, and 801 comes first
+            assert.are.equal("Hun", table.concat(STATE.invites, " "))
+            assert.are.equal(2, count("Building a group for Shadowfang Keep."))
+        end)
+
+        it("is kept while the group has members", function()
+            click()
+            STATE.party = { { name = "Pal", class = "PALADIN", level = 25 } }
+            FIRE("GROUP_ROSTER_UPDATE")
+            STATE.time = STATE.time + 121 -- the others let their invites run out
+            RUNTIMERS()
+            fresh()
+            STATE.invites = {}
+            click()
+            assert.are.equal("Hun", table.concat(STATE.invites, " "))
+            assert.are.equal(0, count("Blackfathom Deeps"))
+        end)
+
+        it("is chosen anew once the group is empty and no invite pending", function()
+            listedFor(8, "Pa2", "PALADIN", 25, { tank = true })
+            listedFor(9, "Sha", "SHAMAN", 25, { healer = true })
+            LFGBrowseFrame:UpdateResultList()
+            click() -- 800 four, 801 three
+            assert.truthy(line("Building a group for Shadowfang Keep."))
+            STATE.time = STATE.time + 121 -- nobody came
+            RUNTIMERS()
+            fresh()
+            STATE.invites = {}
+            click() -- 800 has War and Hun left, 801 Pa2, Sha and Dru
+            assert.are.equal("Pa2 Sha Dru", table.concat(STATE.invites, " "))
+            assert.truthy(line("Building a group for Blackfathom Deeps."))
+        end)
+
+        it("is chosen anew when it is no longer in your listing", function()
+            click()
+            FIRE("CHAT_MSG_SYSTEM", "Rog declines your group invitation.")
+            STATE.activeEntry = { activityIDs = { 801 } }
+            STATE.invites = {}
+            click()
+            assert.are.equal("Dru", table.concat(STATE.invites, " "))
+            assert.truthy(line("Building a group for Blackfathom Deeps."))
+        end)
+
+        it("is never stored by the button's look or by /sgf test", function()
+            STATE.party = { { name = "Xan", class = "HUNTER", level = 25 } } -- a member SGF did not invite
+            FIRE("GROUP_ROSTER_UPDATE")
+            SlashCmdList.SMARTGROUPFILTER("test")
+            assert.truthy(line("Target dungeon: Shadowfang Keep - a click would choose it."))
+            for id = 1, 6 do STATE.results[id].info.activityIDs = { 802 } end
+            LFGBrowseFrame:UpdateResultList()
+            click()
+            assert.are.equal("Dru", table.concat(STATE.invites, " "))
+            assert.truthy(line("Building a group for Blackfathom Deeps."))
+        end)
+
+        it("is named by /sgf test once chosen", function()
+            click()
+            SlashCmdList.SMARTGROUPFILTER("test")
+            assert.truthy(line("Target dungeon: Shadowfang Keep - kept for your group."))
+            assert.truthy(line("Dru DRUID 25 (damager, waits 0s): listed for your other dungeon, not the target"))
+        end)
     end)
 
     it("chooses from the whole list, even while the Filter is reset", function()

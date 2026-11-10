@@ -80,6 +80,23 @@ local function Better(a, b)
     return a.name < b.name
 end
 
+-- The dungeon Build Group builds for, of the own dungeons (activityIDs, the listing's order):
+-- the one for which ChooseInvites would choose the most players; a tie goes to the earlier.
+-- state as for ChooseInvites, without dungeons.
+function ns.ChooseTarget(state, dungeons)
+    if #dungeons <= 1 then return dungeons[1] end
+    local best, most
+    for _, id in ipairs(dungeons) do
+        local each = {}
+        for k, v in pairs(state) do each[k] = v end
+        each.dungeons = { id }
+        local chosen = ns.ChooseInvites(each)
+        local n = chosen and #chosen or 0
+        if not most or n > most then best, most = id, n end
+    end
+    return best
+end
+
 -- Chooses whom Build Group invites. state:
 --   own             { class, level, roles }
 --   members         { { name, class, level } } - the group without the player

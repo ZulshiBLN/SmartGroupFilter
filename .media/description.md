@@ -20,6 +20,8 @@ it invites the tank, the healer and the damage dealers you are missing.
 - **Nobody twice:** invited players keep their place for two minutes, and while they are in
   your group. Whoever declines, lets the invite run out or is already in a group is not asked
   again - the place goes to the next player.
+- **One dungeon at a time:** listed for several, it builds for the one with the most players
+  to invite and names it in the chat.
 - **Always a fresh list:** is the list older than 30 seconds, the button refreshes it first.
 - **Not listed yet?** The button reads List Self and lights up Blizzard's eye tab, where you
   choose the dungeon, play style and role.

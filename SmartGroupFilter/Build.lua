@@ -18,6 +18,10 @@ ns.OnDBReady(function(d) db = d end)
 D.INVITES_PER_CLICK = D.INVITES_PER_CLICK or 5
 
 local placed = {}   -- name -> { role, class, level, until, joined }
+-- The dungeon (activityID) the group is built for, chosen by a click only (ruleset plan
+-- 2026-11-11-build-dungeon). It holds while SGF's invites are pending or the group has
+-- members and while it is in the own listing; then a click chooses anew.
+local target
 local declined = {} -- name -> true: an invite of this session ran out
 
 local ROLE_KEY = { TANK = "ROLE_TANK", HEALER = "ROLE_HEALER", DAMAGER = "ROLE_DAMAGE" }
@@ -83,6 +87,27 @@ local function OwnDungeons()
     return ns.ReadActivities(entry and entry.activityIDs) or {}
 end
 
+-- The stored target if it still holds, else nil
+local function KeptTarget(own, members)
+    if not target then return nil end
+    local listed = false
+    for _, id in ipairs(own) do
+        if id == target then listed = true end
+    end
+    if not listed then return nil end
+    if #members > 0 then return target end
+    for _, p in pairs(placed) do
+        if not p.joined then return target end
+    end
+    return nil
+end
+
+function ns.DungeonName(id)
+    local info = id and C_LFGList.GetActivityInfoTable(id)
+    local name = info and Clean(info.fullName)
+    return type(name) == "string" and name or ("#" .. tostring(id))
+end
+
 local function Candidates()
     local list = {}
     local _, ids = C_LFGList.GetFilteredSearchResults()
@@ -112,8 +137,14 @@ local function Plan()
     local state = {
         own = { class = class, level = UnitLevel("player"), roles = C_LFGListRoles.GetRoles() },
         members = members, placed = placed, numGroupMembers = GetNumGroupMembers(),
-        candidates = Candidates(), dungeons = OwnDungeons(), db = db, range = ns.LevelRange(),
+        candidates = Candidates(), db = db, range = ns.LevelRange(),
     }
+    -- The target a click keeps, or the one it would choose - read here, stored by the click only
+    local own = OwnDungeons()
+    state.target = KeptTarget(own, members)
+    state.kept = state.target ~= nil
+    state.target = state.target or ns.ChooseTarget(state, own)
+    state.dungeons, state.ownDungeons = { state.target }, own
     local list, why, info = ns.ChooseInvites(state)
     if not list then return nil, why, state end
     if #list == 0 then
@@ -152,10 +183,10 @@ local function SetMode(mode)
         button.mode = mode
         -- refresh: Blizzard's refresh arrow. List Self has no secure action: SGF cannot switch
         -- the Group Finder's page safely, it points at Blizzard's eye tab instead
-        local target = mode == "refresh" and LFGBrowseFrame and LFGBrowseFrame.RefreshButton or nil
-        if target then
+        local arrow = mode == "refresh" and LFGBrowseFrame and LFGBrowseFrame.RefreshButton or nil
+        if arrow then
             button:SetAttribute("type", "click")
-            button:SetAttribute("clickbutton", target)
+            button:SetAttribute("clickbutton", arrow)
         else
             button:SetAttribute("type", nil)
             button:SetAttribute("clickbutton", nil)
@@ -196,8 +227,11 @@ end
 
 -- The click: invite and hold the places. Called only from the button's OnClick.
 local function BuildGroup()
-    local list = Plan()
+    local list, _, state = Plan()
     if not list then return ns.UpdateBuildButton() end
+    target = state.target
+    ns.Print(L.BUILDING_FOR:format(ns.DungeonName(target)))
+    ns.Log("target " .. tostring(target))
     local now = GetTime()
     for i = 1, math.min(#list, D.INVITES_PER_CLICK) do
         local c = list[i]
@@ -269,6 +303,7 @@ end
 ---------------------------------------------------------------------------
 function ns.ReportBuildState()
     local state = { invited = {}, declined = 0 }
+    state.target = KeptTarget(OwnDungeons(), Members())
     if button then
         state.mode, state.reasonKey, state.enabled = button.mode, button.reasonKey, button:IsEnabled()
     end
@@ -323,7 +358,10 @@ local function WhyNot(e, state, chosenNames, ownArmor, after)
         if m.name == e.name then return "in your group" end
     end
     if not e.activities then return "dungeon not loaded yet" end
-    if not ns.ListedFor(e, state.dungeons) then return "not listed for your dungeon" end
+    if not ns.ListedFor(e, state.dungeons) then
+        return ns.ListedFor(e, state.ownDungeons) and "listed for your other dungeon, not the target"
+            or "not listed for your dungeon"
+    end
     local r = state.range
     if e.level < r.min or e.level > r.max then
         return ("level %d outside %d-%d"):format(e.level, r.min, r.max)
@@ -391,6 +429,10 @@ function ns.DryRun()
     local age = ListAge()
     print(age and ("  List from %ds ago%s."):format(math.floor(age), ListFresh() and "" or " - older than "
         .. D.LIST_FRESH_SECONDS .. "s, the button refreshes it first") or "  No search results yet.")
+    if state.target then
+        print(("  Target dungeon: %s - %s."):format(ns.DungeonName(state.target),
+            state.kept and "kept for your group" or "a click would choose it"))
+    end
     local own, r = state.own, state.range
     print(("  You: %s %s, listed as %s."):format(tostring(own.class), tostring(own.level), RolesText(own.roles)))
     print(("  Level range %d-%d; double classes %s; same armor class %s."):format(r.min, r.max,

@@ -88,6 +88,31 @@ describe("the armor class", function()
     end)
 end)
 
+describe("the target dungeon", function()
+    local function state(candidates)
+        return {
+            own = { class = "MAGE", level = 25, roles = D }, members = {}, placed = {}, numGroupMembers = 0,
+            candidates = candidates, db = db, range = RANGE,
+        }
+    end
+
+    it("is the one own dungeon", function()
+        assert.are.equal(801, ns.ChooseTarget(state({ solo("War", "WARRIOR", 25, T) }), { 801 }))
+    end)
+
+    it("is the own dungeon for which the most players would be chosen", function()
+        local c = { solo("War", "WARRIOR", 25, T), solo("Pal", "PALADIN", 25, T, 0, { 801 }),
+            solo("Pri", "PRIEST", 25, H, 0, { 801 }) }
+        assert.are.equal(801, ns.ChooseTarget(state(c), { 800, 801 }))
+    end)
+
+    it("goes to the listing's order on a tie", function()
+        local c = { solo("War", "WARRIOR", 25, T), solo("Pal", "PALADIN", 25, T, 0, { 801 }) }
+        assert.are.equal(800, ns.ChooseTarget(state(c), { 800, 801 }))
+        assert.are.equal(801, ns.ChooseTarget(state(c), { 801, 800 }))
+    end)
+end)
+
 describe("the choice of invites", function()
     local ME = { class = "MAGE", level = 25, roles = D }
 

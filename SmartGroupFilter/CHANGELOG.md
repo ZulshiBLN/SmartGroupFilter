@@ -25,7 +25,8 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   minutes and while they are in the group; a decline, a run-out invite or "already in a group"
   frees the place, and that player is not asked again. A list older than 30 seconds is
   refreshed first with the same button. The chat names each invite; the tooltip says why the
-  button is greyed out.
+  button is greyed out. Listed for several dungeons, it builds for the one with the most players
+  to invite and names it in the chat; the group keeps it while it has members or pending invites.
 - Not listed yet? The same button reads List Self and lights up Blizzard's eye tab, where you
   choose the dungeon, play style and role; once Blizzard has listed you it reads Build Group.
 - A minimap button with the logo: left-click opens or closes the Group Finder, as Blizzard's

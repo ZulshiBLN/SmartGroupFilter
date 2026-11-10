@@ -116,6 +116,18 @@ describe("the state snapshot", function()
         end
     end)
 
+    it("reports the target dungeon by its ID, never by its name", function()
+        local ns = login()
+        listed()
+        STATE.activities[800].fullName = "Shadowfang Keep"
+        local text = report(ns, "BUILD")
+        assert.is_truthy(text:find("declined=0 target=none", 1, true), text)
+        clickBuild(ns)
+        text = report(ns, "BUILD")
+        assert.is_truthy(text:find("declined=0 target=800", 1, true), text)
+        assert.is_nil(text:find("Shadowfang", 1, true), text)
+    end)
+
     it("reports the build button by mode and key, never by its text", function()
         local ns = login()
         listed()
