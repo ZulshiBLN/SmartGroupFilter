@@ -201,7 +201,7 @@ local function WhyNot(e, state, chosenNames, ownArmor, after)
     if not after then return "nothing is chosen" end
     local count = after.classCount[e.class] or 0
     if count >= D.MAX_SAME_CLASS[db.allowDouble and true or false] then
-        return ("class limit: %d %s already (you included)"):format(count, e.class)
+        return ("class limit: %d %s already counted (you, your group and those chosen)"):format(count, e.class)
     end
     local open = false
     for _, role in ipairs(fits) do
@@ -293,8 +293,8 @@ function ns.DryRun()
             local reason = WhyNot(e, state, chosenNames, ownArmor, after)
             if reason then
                 left = left + 1
-                print(("   - %s %s %s (%s): %s"):format(tostring(e.name), tostring(e.class), tostring(e.level),
-                    RolesText(e.roles), reason))
+                print(("   - %s %s %s (%s, waits %ds): %s"):format(tostring(e.name), tostring(e.class),
+                    tostring(e.level), RolesText(e.roles), e.age or 0, reason))
             end
         end
     end
