@@ -47,7 +47,8 @@ Not published yet. Once it is, it will be on CurseForge and Wago, and WowUp will
 ## Languages
 
 The addon speaks your client's language: English, German, French, Spanish (Spain and Mexico),
-Italian, Brazilian Portuguese, Russian, Korean and Chinese (simplified and traditional).
+Italian, Brazilian Portuguese, Russian, Korean and Chinese (simplified and traditional). The
+gear in the panel lets you choose another one.
 
 ## Privacy and security
 

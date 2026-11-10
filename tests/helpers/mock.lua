@@ -159,6 +159,12 @@ function CreateFrame(kind, name, parent, template)
             if action == "click" and target then target:Click() end
         end
     end
+    -- The modern menu dropdown: keeps its menu generator for the specs
+    if template == "WowStyle1DropdownTemplate" then
+        function f:SetupMenu(gen) self.menuGenerator = gen end
+        function f:GenerateMenu() self.generated = (self.generated or 0) + 1 end
+        f.Text = NewWidget("FontString", nil, f)
+    end
     if template == "LargeSideTabButtonTemplate" or template == "LFGVanillaRightTabTemplate" then
         f.Icon = NewWidget("Texture", nil, f)
         function f:SetCustomOnMouseUpHandler(fn) self.mouseUp = fn end
@@ -379,3 +385,28 @@ function Widget:GetFrameLevel() return self.level or 1 end
 STATE.microClicks = 0
 LFDMicroButton = NewWidget("Button", "LFDMicroButton", UIParent)
 function LFDMicroButton:Click() STATE.microClicks = STATE.microClicks + 1 end
+
+-- Button textures: what a button was given, read back as a texture region would answer
+function Widget:SetNormalAtlas(a) self.normalAtlas = a end
+function Widget:SetPushedAtlas(a) self.pushedAtlas = a end
+function Widget:SetHighlightAtlas(a) self.highlightAtlas = a end
+function Widget:SetNormalTexture(t) self.normalTexture = t end
+function Widget:SetPushedTexture(t) self.pushedTexture = t end
+function Widget:GetAtlas() return self.atlas end
+function Widget:GetTexture() return self.textureFile end
+for _, part in ipairs({ "Normal", "Pushed", "Highlight" }) do
+    Widget["Get" .. part .. "Texture"] = function(self)
+        local t = NewWidget("Texture")
+        t.atlas = self[part:lower() .. "Atlas"]
+        t.textureFile = self[part:lower() .. "Texture"]
+        return t
+    end
+end
+function Widget:IsVisible()
+    local f = self
+    while f do
+        if f.shown == false then return false end
+        f = f.parent
+    end
+    return true
+end

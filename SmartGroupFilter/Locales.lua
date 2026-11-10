@@ -60,6 +60,13 @@ locales.enUS = {
     MINIMAP_HIDDEN = "Minimap button hidden. %s brings it back.",
     COMPARTMENT_CLICK = "Click: SmartGroupFilter settings",
     COMPARTMENT_HINT = "The minimap button or Blizzard's own button opens the Group Finder.",
+    SETTINGS = "Settings",
+    GEAR_BACK = "Back to the filter",
+    LANGUAGE = "Language",
+    LANG_AUTO = "Automatic (%s)",
+    SHOW_MINIMAP = "Show minimap button",
+    SETTINGS_NEXT = "The settings open the next time the player list shows.",
+    NOT_IN_COMBAT = "Not in combat.",
 }
 
 locales.deDE = {
@@ -114,6 +121,13 @@ locales.deDE = {
     MINIMAP_HIDDEN = "Minimap-Button ausgeblendet. %s holt ihn zurück.",
     COMPARTMENT_CLICK = "Klick: SmartGroupFilter-Einstellungen",
     COMPARTMENT_HINT = "Die Gruppensuche öffnet der Minimap-Button oder Blizzards eigener Knopf.",
+    SETTINGS = "Einstellungen",
+    GEAR_BACK = "Zurück zum Filter",
+    LANGUAGE = "Sprache",
+    LANG_AUTO = "Automatisch (%s)",
+    SHOW_MINIMAP = "Minimap-Button anzeigen",
+    SETTINGS_NEXT = "Die Einstellungen öffnen sich, sobald die Spielerliste das nächste Mal angezeigt wird.",
+    NOT_IN_COMBAT = "Nicht im Kampf.",
 }
 
 locales.frFR = {
@@ -168,6 +182,13 @@ locales.frFR = {
     MINIMAP_HIDDEN = "Bouton de la minicarte masqué. %s le fait revenir.",
     COMPARTMENT_CLICK = "Clic : paramètres de SmartGroupFilter",
     COMPARTMENT_HINT = "Le bouton de la minicarte ou celui de Blizzard ouvre la recherche de groupe.",
+    SETTINGS = "Paramètres",
+    GEAR_BACK = "Retour au filtre",
+    LANGUAGE = "Langue",
+    LANG_AUTO = "Automatique (%s)",
+    SHOW_MINIMAP = "Afficher le bouton de la minicarte",
+    SETTINGS_NEXT = "Les paramètres s'ouvriront la prochaine fois que la liste des joueurs s'affichera.",
+    NOT_IN_COMBAT = "Pas en combat.",
 }
 
 locales.esES = {
@@ -222,6 +243,13 @@ locales.esES = {
     MINIMAP_HIDDEN = "Botón del minimapa oculto. %s lo recupera.",
     COMPARTMENT_CLICK = "Clic: ajustes de SmartGroupFilter",
     COMPARTMENT_HINT = "El botón del minimapa o el propio de Blizzard abre el buscador de grupos.",
+    SETTINGS = "Ajustes",
+    GEAR_BACK = "Volver al filtro",
+    LANGUAGE = "Idioma",
+    LANG_AUTO = "Automático (%s)",
+    SHOW_MINIMAP = "Mostrar botón del minimapa",
+    SETTINGS_NEXT = "Los ajustes se abrirán la próxima vez que se muestre la lista de jugadores.",
+    NOT_IN_COMBAT = "No en combate.",
 }
 
 -- esMX holds only what differs from esES
@@ -280,6 +308,13 @@ locales.itIT = {
     MINIMAP_HIDDEN = "Pulsante della minimappa nascosto. %s lo riporta.",
     COMPARTMENT_CLICK = "Clic: impostazioni di SmartGroupFilter",
     COMPARTMENT_HINT = "Il pulsante della minimappa o quello di Blizzard apre la ricerca gruppi.",
+    SETTINGS = "Impostazioni",
+    GEAR_BACK = "Torna al filtro",
+    LANGUAGE = "Lingua",
+    LANG_AUTO = "Automatica (%s)",
+    SHOW_MINIMAP = "Mostra pulsante minimappa",
+    SETTINGS_NEXT = "Le impostazioni si apriranno la prossima volta che appare l'elenco dei giocatori.",
+    NOT_IN_COMBAT = "Non in combattimento.",
 }
 
 locales.ptBR = {
@@ -334,6 +369,13 @@ locales.ptBR = {
     MINIMAP_HIDDEN = "Botão do minimapa oculto. %s o traz de volta.",
     COMPARTMENT_CLICK = "Clique: configurações do SmartGroupFilter",
     COMPARTMENT_HINT = "O botão do minimapa ou o da própria Blizzard abre o localizador de grupos.",
+    SETTINGS = "Configurações",
+    GEAR_BACK = "Voltar ao filtro",
+    LANGUAGE = "Idioma",
+    LANG_AUTO = "Automático (%s)",
+    SHOW_MINIMAP = "Mostrar botão do minimapa",
+    SETTINGS_NEXT = "As configurações abrem na próxima vez que a lista de jogadores aparecer.",
+    NOT_IN_COMBAT = "Não em combate.",
 }
 
 locales.ruRU = {
@@ -388,6 +430,13 @@ locales.ruRU = {
     MINIMAP_HIDDEN = "Кнопка у миникарты скрыта. %s вернёт её.",
     COMPARTMENT_CLICK = "Щелчок: настройки SmartGroupFilter",
     COMPARTMENT_HINT = "Поиск группы открывает кнопка у миникарты или кнопка Blizzard.",
+    SETTINGS = "Настройки",
+    GEAR_BACK = "Назад к фильтру",
+    LANGUAGE = "Язык",
+    LANG_AUTO = "Автоматически (%s)",
+    SHOW_MINIMAP = "Показывать кнопку у миникарты",
+    SETTINGS_NEXT = "Настройки откроются, когда список игроков появится в следующий раз.",
+    NOT_IN_COMBAT = "Не в бою.",
 }
 
 locales.koKR = {
@@ -442,6 +491,13 @@ locales.koKR = {
     MINIMAP_HIDDEN = "미니맵 버튼을 숨겼습니다. %s 입력 시 다시 표시됩니다.",
     COMPARTMENT_CLICK = "클릭: SmartGroupFilter 설정",
     COMPARTMENT_HINT = "파티 찾기는 미니맵 버튼이나 Blizzard 버튼으로 엽니다.",
+    SETTINGS = "설정",
+    GEAR_BACK = "필터로 돌아가기",
+    LANGUAGE = "언어",
+    LANG_AUTO = "자동 (%s)",
+    SHOW_MINIMAP = "미니맵 버튼 표시",
+    SETTINGS_NEXT = "다음에 플레이어 목록이 표시될 때 설정이 열립니다.",
+    NOT_IN_COMBAT = "전투 중에는 안 됩니다.",
 }
 
 locales.zhCN = {
@@ -496,6 +552,13 @@ locales.zhCN = {
     MINIMAP_HIDDEN = "已隐藏小地图按钮。输入 %s 可恢复。",
     COMPARTMENT_CLICK = "点击：SmartGroupFilter 设置",
     COMPARTMENT_HINT = "队伍查找器可用小地图按钮或暴雪自带的按钮打开。",
+    SETTINGS = "设置",
+    GEAR_BACK = "返回过滤",
+    LANGUAGE = "语言",
+    LANG_AUTO = "自动（%s）",
+    SHOW_MINIMAP = "显示小地图按钮",
+    SETTINGS_NEXT = "下次显示玩家列表时将打开设置。",
+    NOT_IN_COMBAT = "战斗中不可用。",
 }
 
 locales.zhTW = {
@@ -550,6 +613,13 @@ locales.zhTW = {
     MINIMAP_HIDDEN = "已隱藏小地圖按鈕。輸入 %s 可恢復。",
     COMPARTMENT_CLICK = "點擊：SmartGroupFilter 設定",
     COMPARTMENT_HINT = "隊伍搜尋器可用小地圖按鈕或暴雪內建的按鈕開啟。",
+    SETTINGS = "設定",
+    GEAR_BACK = "返回過濾",
+    LANGUAGE = "語言",
+    LANG_AUTO = "自動（%s）",
+    SHOW_MINIMAP = "顯示小地圖按鈕",
+    SETTINGS_NEXT = "下次顯示玩家列表時將開啟設定。",
+    NOT_IN_COMBAT = "戰鬥中不可用。",
 }
 
 local client = GetLocale()

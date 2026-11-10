@@ -52,10 +52,14 @@ end
 -- A section header as in SimpleConjureBar's settings (UI.AddHeader): a Blizzard font object a
 -- bit larger than body text, in Blizzard gold
 local HEADER_FONT
-local function Header(parent, key)
+function ns.HeaderFont()
     HEADER_FONT = HEADER_FONT or (_G.GameFontNormalMed3 and "GameFontNormalMed3")
         or (_G.GameFontNormalMed2 and "GameFontNormalMed2") or "GameFontNormal"
-    local h = parent:CreateFontString(nil, "OVERLAY", HEADER_FONT)
+    return HEADER_FONT
+end
+
+local function Header(parent, key)
+    local h = parent:CreateFontString(nil, "OVERLAY", ns.HeaderFont())
     h:SetTextColor(1, 0.82, 0)
     ns.SetL(h, key)
     return h
@@ -472,7 +476,12 @@ local function Create()
     -- The count in the bottom right corner (Michel), Reset Filter at the top right
     panel.count = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     panel.count:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -14, 12)
-    panel.resetButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    -- The filter view: every filter control is its child, so the settings view (Settings.lua)
+    -- hides them in one; the protected build button sits on the panel itself
+    local view = CreateFrame("Frame", nil, panel)
+    view:SetAllPoints()
+    panel.filterView = view
+    panel.resetButton = CreateFrame("Button", nil, view, "UIPanelButtonTemplate")
     panel.resetButton:SetSize(120, 22)
     panel.resetButton:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -10, -30)
     ns.SetL(panel.resetButton, "RESET_FILTER")
@@ -482,19 +491,19 @@ local function Create()
         RefreshAll()
     end)
 
-    local rangeLabel = Header(panel, "LEVEL_RANGE")
+    local rangeLabel = Header(view, "LEVEL_RANGE")
     panel.rangeHeader = rangeLabel
     rangeLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", PAD, -70)
-    panel.fromBox = LevelBox(panel, true)
+    panel.fromBox = LevelBox(view, true)
     panel.fromBox:SetPoint("TOPLEFT", rangeLabel, "BOTTOMLEFT", 6, -6)
-    panel.toBox = LevelBox(panel, false)
+    panel.toBox = LevelBox(view, false)
     panel.toBox:SetPoint("TOPLEFT", rangeLabel, "BOTTOMLEFT", TRACK - 30, -6)
-    local fromLabel = Label(panel, "LEVEL_FROM", "GameFontHighlightSmall")
+    local fromLabel = Label(view, "LEVEL_FROM", "GameFontHighlightSmall")
     fromLabel:SetPoint("LEFT", panel.fromBox, "RIGHT", 4, 0)
-    local toLabel = Label(panel, "LEVEL_TO", "GameFontHighlightSmall")
+    local toLabel = Label(view, "LEVEL_TO", "GameFontHighlightSmall")
     toLabel:SetPoint("RIGHT", panel.toBox, "LEFT", -8, 0)
 
-    local slider = CreateFrame("Frame", nil, panel)
+    local slider = CreateFrame("Frame", nil, view)
     panel.slider = slider
     slider:SetSize(TRACK, 20)
     slider:SetPoint("TOPLEFT", panel.fromBox, "BOTTOMLEFT", -2, -8)
@@ -506,24 +515,24 @@ local function Create()
     slider.handles = { Handle(slider, 1), Handle(slider, 2) }
 
     -- Gold line, then the priority section under its header (Michel, after SCB and SBB)
-    panel.separators = { Separator(panel, slider, 12) }
-    panel.prioHeader = Header(panel, "PRIORITIES")
+    panel.separators = { Separator(view, slider, 12) }
+    panel.prioHeader = Header(view, "PRIORITIES")
     panel.prioHeader:SetPoint("TOPLEFT", panel.separators[1], "BOTTOMLEFT", 0, -12)
 
     panel.rows = {}
     local anchor = panel.prioHeader
     for i, role in ipairs(D.ROLES) do
-        local row = Row(panel, role, anchor, i == 1 and -8 or -14)
+        local row = Row(view, role, anchor, i == 1 and -8 or -14)
         panel.rows[role] = row
         anchor = row
     end
 
     -- Gold line, then the two options - no header
-    panel.separators[2] = Separator(panel, anchor, 12)
-    panel.doubleCheck = Check(panel, "ALLOW_DOUBLE",
+    panel.separators[2] = Separator(view, anchor, 12)
+    panel.doubleCheck = Check(view, "ALLOW_DOUBLE",
         function() return db.allowDouble end, function(v) db.allowDouble = v end)
     panel.doubleCheck:SetPoint("TOPLEFT", panel.separators[2], "BOTTOMLEFT", -4, -10)
-    panel.armorCheck = Check(panel, "ALLOW_ARMOR",
+    panel.armorCheck = Check(view, "ALLOW_ARMOR",
         function() return db.allowSameArmor end, function(v) db.allowSameArmor = v end)
     panel.armorCheck:SetPoint("TOPLEFT", panel.doubleCheck, "BOTTOMLEFT", 0, -2)
     panel.buildButton = ns.CreateBuildButton(panel)
@@ -537,6 +546,7 @@ local function Create()
     Dock()
     RefreshAll()
     ToggleTab()
+    ns.CreateSettingsView(panel)
 end
 
 -- Blizzard's Group Finder may load after this addon: build the panel once both are ready
