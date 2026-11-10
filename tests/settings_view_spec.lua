@@ -149,6 +149,36 @@ describe("the window background slider", function()
         assert.are.equal(100, db.windowOpacity)
     end)
 
+    it("takes a typed value from 0 to 100 on Enter or when the field loses focus", function()
+        local slider, box = panel.opacitySlider, panel.opacitySlider.value
+        box:SetText("35")
+        RUNSCRIPT(box, "OnEnterPressed")
+        assert.are.equal(35, db.windowOpacity)
+        assert.are.equal("35", box.text)
+        assert.are.equal(35 / 60, panel.opacityTexture.alpha)
+        assert.are.same({ "CENTER", slider, "LEFT", 70, 0 }, slider.thumb.points[1])
+        box:SetText("100")
+        RUNSCRIPT(box, "OnEditFocusLost")
+        assert.are.equal(100, db.windowOpacity)
+        box:SetText("0")
+        RUNSCRIPT(box, "OnEnterPressed")
+        assert.are.equal(0, db.windowOpacity)
+    end)
+
+    it("shows the previous value again after an invalid one, and on Escape", function()
+        local box = panel.opacitySlider.value
+        for _, typed in ipairs({ "101", "150", "", "abc" }) do
+            box:SetText(typed)
+            RUNSCRIPT(box, "OnEnterPressed")
+            assert.are.equal(60, db.windowOpacity, typed)
+            assert.are.equal("60", box.text, typed)
+        end
+        box:SetText("20")
+        RUNSCRIPT(box, "OnEscapePressed")
+        assert.are.equal(60, db.windowOpacity)
+        assert.are.equal("60", box.text)
+    end)
+
     it("shows the saved value whenever the panel shows", function()
         db.windowOpacity = 30
         RUNSCRIPT(panel, "OnShow")

@@ -174,7 +174,8 @@ end
 
 ---------------------------------------------------------------------------
 -- Window background, 0 % invisible to 100 % solid, for the panel and the bug report (ruleset
--- plan 2026-11-11-window-opacity). Dragging saves and applies at once.
+-- plan 2026-11-11-window-opacity). Dragging saves and applies at once; the field beside it
+-- takes a typed 0-100, anything else shows the previous value again (Michel).
 ---------------------------------------------------------------------------
 local function OpacitySlider(view, anchor)
     local label = view:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -188,8 +189,12 @@ local function OpacitySlider(view, anchor)
     ns.SliderTrack(slider)
     local thumb = ns.SliderThumb(slider)
     slider.thumb = thumb
-    local value = view:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    value:SetPoint("LEFT", slider, "RIGHT", 12, 0)
+    local value = CreateFrame("EditBox", nil, view, "InputBoxTemplate")
+    value:SetSize(36, 20)
+    value:SetAutoFocus(false)
+    value:SetNumeric(true)
+    value:SetMaxLetters(3)
+    value:SetPoint("LEFT", slider, "RIGHT", 14, 0)
     slider.value = value
 
     function slider.Show(v)
@@ -206,17 +211,31 @@ local function OpacitySlider(view, anchor)
         return math.floor(f * 100 + 0.5)
     end
 
-    thumb:SetScript("OnMouseDown", function(self) self.dragging = true end)
-    thumb:SetScript("OnMouseUp", function(self) self.dragging = false end)
-    thumb:SetScript("OnUpdate", function(self)
-        if not self.dragging then return end
-        local v = AtCursor()
+    local function Set(v)
         if v ~= db.windowOpacity then
             db.windowOpacity = v
             ns.ApplyWindowOpacity(panel, v)
             ns.ApplyReportOpacity()
         end
         slider.Show(v)
+    end
+
+    -- A whole number 0-100, else the value before; Enter and leaving the field both take it
+    local function Typed(self)
+        local v = tonumber(self:GetText())
+        if v and v == math.floor(v) and v >= 0 and v <= 100 then Set(v) else slider.Show(db.windowOpacity) end
+    end
+    value:SetScript("OnEnterPressed", function(self) Typed(self) self:ClearFocus() end)
+    value:SetScript("OnEditFocusLost", Typed)
+    value:SetScript("OnEscapePressed", function(self)
+        slider.Show(db.windowOpacity)
+        self:ClearFocus()
+    end)
+
+    thumb:SetScript("OnMouseDown", function(self) self.dragging = true end)
+    thumb:SetScript("OnMouseUp", function(self) self.dragging = false end)
+    thumb:SetScript("OnUpdate", function(self)
+        if self.dragging then Set(AtCursor()) end
     end)
     slider.Show(db.windowOpacity)
     panel.opacitySlider = slider
