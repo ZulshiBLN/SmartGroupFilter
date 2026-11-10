@@ -348,9 +348,9 @@ local function Create()
     if panel.CloseButton then panel.CloseButton:Hide() end
     panel:GetTitleText():SetText(ns.ADDON_NAME)
 
-    -- Top: the count right of the portrait, Reset Filter at the right edge
+    -- The count in the bottom right corner (Michel), Reset Filter at the top right
     panel.count = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    panel.count:SetPoint("TOPLEFT", panel, "TOPLEFT", 64, -36)
+    panel.count:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -14, 12)
     panel.resetButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     panel.resetButton:SetSize(120, 22)
     panel.resetButton:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -10, -30)
