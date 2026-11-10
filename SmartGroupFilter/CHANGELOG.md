@@ -27,6 +27,8 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   frees the place, and that player is not asked again. A list older than 30 seconds is
   refreshed first with the same button. The chat names each invite; the tooltip says why the
   button is greyed out.
+- Not listed yet? The same button reads List Self and opens Blizzard's listing page; choose the
+  dungeon, play style and role there, and once Blizzard has listed you it reads Build Group.
 - `/sgf test` shows in the chat whom Build Group would invite and why, and why every other
   single player is left out - without sending a single invite.
 - The addon loads in every client language and answers `/sgf` with its chat commands; its icon

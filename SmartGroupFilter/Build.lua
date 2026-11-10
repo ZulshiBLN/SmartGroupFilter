@@ -81,7 +81,11 @@ end
 local function Plan()
     -- A full group is delisted by the game: say it is full, not that the listing is missing
     if GetNumGroupMembers() >= D.GROUP_SIZE then return nil, "GROUP_FULL" end
-    if not C_LFGList.HasActiveEntryInfo() then return nil, "NEED_LISTING" end
+    if not C_LFGList.HasActiveEntryInfo() then
+        -- Only the leader lists a group; alone, anyone lists himself
+        if IsInGroup() and not UnitIsGroupLeader("player") then return nil, "NOT_LEADER_LIST" end
+        return nil, "NEED_LISTING"
+    end
     if IsInGroup() and not (UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")) then
         return nil, "NOT_LEADER"
     end
@@ -129,9 +133,13 @@ local function SetMode(mode)
     if InCombatLockdown() then return false end
     if button.mode ~= mode then
         button.mode = mode
-        if mode == "refresh" and LFGBrowseFrame and LFGBrowseFrame.RefreshButton then
+        -- refresh: Blizzard's refresh arrow; list: Blizzard's hidden tab button of the listing
+        -- page, whose own OnClick switches the page (plan 2026-11-11-list-self)
+        local target = (mode == "refresh" and LFGBrowseFrame and LFGBrowseFrame.RefreshButton)
+            or (mode == "list" and LFGParentFrameTab1) or nil
+        if target then
             button:SetAttribute("type", "click")
-            button:SetAttribute("clickbutton", LFGBrowseFrame.RefreshButton)
+            button:SetAttribute("clickbutton", target)
         else
             button:SetAttribute("type", nil)
             button:SetAttribute("clickbutton", nil)
@@ -143,6 +151,14 @@ end
 function ns.UpdateBuildButton()
     if not button or InCombatLockdown() then return end
     local list, why = Plan()
+    -- Not listed: List Self opens Blizzard's listing page; listing stays Blizzard's (Michel)
+    if why == "NEED_LISTING" then
+        SetMode("list")
+        button.reason = L.LIST_SELF_TIP
+        button:SetEnabled(true)
+        button:SetText(L.LIST_SELF)
+        return
+    end
     -- Fresh results may bring a candidate the old ones lack; nothing else a search changes
     if not ListFresh() and (list or why == "NO_CANDIDATE") then
         SetMode("refresh")
@@ -193,13 +209,17 @@ function ns.CreateBuildButton(parent)
     -- After the secure handler: in build mode invite; in refresh mode Blizzard's arrow has
     -- been clicked and the button only shows the search
     button:HookScript("OnClick", function()
-        if button.mode == "refresh" then ns.UpdateBuildButton() else BuildGroup() end
+        if button.mode == "build" then BuildGroup() else ns.UpdateBuildButton() end
     end)
     button:SetMotionScriptsWhileDisabled(true)
     button:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:AddLine(self:GetText())
-        if self.reason then GameTooltip:AddLine(self.reason, 1, 0.2, 0.2) end
+        -- Why it is greyed out in red; what it will do in white
+        if self.reason then
+            if self:IsEnabled() then GameTooltip:AddLine(self.reason, 1, 1, 1, true)
+            else GameTooltip:AddLine(self.reason, 1, 0.2, 0.2, true) end
+        end
         GameTooltip:Show()
     end)
     button:SetScript("OnLeave", function() GameTooltip:Hide() end)

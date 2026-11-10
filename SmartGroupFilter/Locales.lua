@@ -49,6 +49,9 @@ locales.enUS = {
     REFRESH_LIST = "Refresh List",
     LIST_OLD = "The list is older than %d seconds: refresh it first.",
     ROLE_COUNT = "(%d listed)",
+    LIST_SELF = "List Self",
+    LIST_SELF_TIP = "Opens Blizzard's listing page: choose the dungeon, play style and role there.",
+    NOT_LEADER_LIST = "Only the group leader can list the group.",
 }
 
 locales.deDE = {
@@ -92,6 +95,9 @@ locales.deDE = {
     REFRESH_LIST = "Liste aktualisieren",
     LIST_OLD = "Die Liste ist älter als %d Sekunden: zuerst aktualisieren.",
     ROLE_COUNT = "(%d eingetragen)",
+    LIST_SELF = "Selbst eintragen",
+    LIST_SELF_TIP = "Öffnet Blizzards Eintragen-Seite: dort Dungeon, Spielstil und Rolle wählen.",
+    NOT_LEADER_LIST = "Nur der Gruppenleiter kann die Gruppe eintragen.",
 }
 
 locales.frFR = {
@@ -135,6 +141,9 @@ locales.frFR = {
     REFRESH_LIST = "Actualiser la liste",
     LIST_OLD = "La liste date de plus de %d secondes : actualisez-la d'abord.",
     ROLE_COUNT = "(%d inscrits)",
+    LIST_SELF = "S'inscrire",
+    LIST_SELF_TIP = "Ouvre la page d'inscription de Blizzard : choisissez-y le donjon, le style de jeu et le rôle.",
+    NOT_LEADER_LIST = "Seul le chef de groupe peut inscrire le groupe.",
 }
 
 locales.esES = {
@@ -178,6 +187,9 @@ locales.esES = {
     REFRESH_LIST = "Actualizar lista",
     LIST_OLD = "La lista tiene más de %d segundos: actualízala primero.",
     ROLE_COUNT = "(%d apuntados)",
+    LIST_SELF = "Inscribirse",
+    LIST_SELF_TIP = "Abre la página de inscripción de Blizzard: elige allí la mazmorra, el estilo de juego y el rol.",
+    NOT_LEADER_LIST = "Solo el líder del grupo puede inscribir al grupo.",
 }
 
 -- esMX holds only what differs from esES
@@ -225,6 +237,9 @@ locales.itIT = {
     REFRESH_LIST = "Aggiorna elenco",
     LIST_OLD = "L'elenco ha più di %d secondi: aggiornalo prima.",
     ROLE_COUNT = "(%d iscritti)",
+    LIST_SELF = "Iscriviti",
+    LIST_SELF_TIP = "Apre la pagina d'iscrizione di Blizzard: scegli lì spedizione, stile di gioco e ruolo.",
+    NOT_LEADER_LIST = "Solo il capogruppo può iscrivere il gruppo.",
 }
 
 locales.ptBR = {
@@ -268,6 +283,9 @@ locales.ptBR = {
     REFRESH_LIST = "Atualizar lista",
     LIST_OLD = "A lista tem mais de %d segundos: atualize-a primeiro.",
     ROLE_COUNT = "(%d inscritos)",
+    LIST_SELF = "Inscrever-se",
+    LIST_SELF_TIP = "Abre a página de inscrição da Blizzard: escolha lá a masmorra, o estilo de jogo e a função.",
+    NOT_LEADER_LIST = "Só o líder do grupo pode inscrever o grupo.",
 }
 
 locales.ruRU = {
@@ -311,6 +329,9 @@ locales.ruRU = {
     REFRESH_LIST = "Обновить список",
     LIST_OLD = "Списку больше %d секунд: сначала обновите его.",
     ROLE_COUNT = "(записались: %d)",
+    LIST_SELF = "Записаться",
+    LIST_SELF_TIP = "Открывает страницу записи Blizzard: выберите там подземелье, стиль игры и роль.",
+    NOT_LEADER_LIST = "Записать группу может только лидер.",
 }
 
 locales.koKR = {
@@ -354,6 +375,9 @@ locales.koKR = {
     REFRESH_LIST = "목록 새로고침",
     LIST_OLD = "목록이 %d초 넘게 지났습니다. 먼저 새로고침하세요.",
     ROLE_COUNT = "(%d명 등록)",
+    LIST_SELF = "등록하기",
+    LIST_SELF_TIP = "Blizzard 등록 페이지를 엽니다: 거기서 던전, 플레이 스타일, 역할을 고르세요.",
+    NOT_LEADER_LIST = "파티장만 파티를 등록할 수 있습니다.",
 }
 
 locales.zhCN = {
@@ -397,6 +421,9 @@ locales.zhCN = {
     REFRESH_LIST = "刷新列表",
     LIST_OLD = "列表已超过%d秒：请先刷新。",
     ROLE_COUNT = "（%d 人登记）",
+    LIST_SELF = "登记自己",
+    LIST_SELF_TIP = "打开暴雪的登记页面：在那里选择地下城、游戏风格和职责。",
+    NOT_LEADER_LIST = "只有队长可以为队伍登记。",
 }
 
 locales.zhTW = {
@@ -440,6 +467,9 @@ locales.zhTW = {
     REFRESH_LIST = "重新整理列表",
     LIST_OLD = "列表已超過%d秒：請先重新整理。",
     ROLE_COUNT = "（%d 人登記）",
+    LIST_SELF = "登記自己",
+    LIST_SELF_TIP = "開啟暴雪的登記頁面：在那裡選擇地城、遊戲風格和職責。",
+    NOT_LEADER_LIST = "只有隊長可以為隊伍登記。",
 }
 
 local client = GetLocale()

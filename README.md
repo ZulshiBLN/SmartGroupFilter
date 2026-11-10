@@ -27,8 +27,9 @@ builds your five-player group with one click.
   level, then the longest wait; players without a role only fill what is left. Only free places
   are filled. Invited players keep their place for two minutes, and while they are in the
   group; whoever declines, lets the invite run out or is already in a group is not asked again.
-  When the list is older than 30 seconds the button reads **Refresh List** first and clicks
-  Blizzard's own refresh arrow. The chat names every invite; the button's tooltip says why it is
+  Not listed yet, the button reads **List Self** and opens Blizzard's listing page, where you
+  choose the dungeon, play style and role. When the list is older than 30 seconds it reads
+  **Refresh List** first and clicks Blizzard's own refresh arrow. The chat names every invite; the button's tooltip says why it is
   greyed out.
 
 ## Installation

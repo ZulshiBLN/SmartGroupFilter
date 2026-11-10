@@ -264,7 +264,8 @@ end
 function GetNumGroupMembers() return #STATE.party > 0 and #STATE.party + 1 or 0 end
 function IsInGroup() return #STATE.party > 0 end
 function UnitIsGroupLeader() return STATE.leader end
-function UnitIsGroupAssistant() return false end
+STATE.assistant = false
+function UnitIsGroupAssistant() return STATE.assistant end
 
 STATE.time = 1000
 function GetTime() return STATE.time end
@@ -316,3 +317,17 @@ function InCombatLockdown() return STATE.combat end
 -- Blizzard's refresh arrow in the Group Finder: a click searches
 LFGBrowseFrame.RefreshButton = NewWidget("Button", nil, LFGBrowseFrame)
 function LFGBrowseFrame.RefreshButton:Click() LFGBrowse_DoSearch() end
+
+-- Blizzard's hidden page buttons of the Group Finder window (Mainline ParentFrame.xml):
+-- Tab1 the listing page, Tab2 the Group Browser; a click switches the page
+STATE.tab1Clicks, STATE.tab2ButtonClicks = 0, 0
+LFGParentFrameTab1 = NewWidget("Button", "LFGParentFrameTab1", LFGParentFrame)
+function LFGParentFrameTab1:Click()
+    STATE.tab1Clicks = STATE.tab1Clicks + 1
+    LFGBrowseFrame.shown = false
+end
+LFGParentFrameTab2 = NewWidget("Button", "LFGParentFrameTab2", LFGParentFrame)
+function LFGParentFrameTab2:Click()
+    STATE.tab2ButtonClicks = STATE.tab2ButtonClicks + 1
+    LFGBrowseFrame.shown = true
+end

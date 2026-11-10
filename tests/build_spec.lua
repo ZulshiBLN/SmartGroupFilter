@@ -256,13 +256,57 @@ describe("Build Group", function()
         assert.are.equal("Hun", table.concat(STATE.invites, " "))
     end)
 
-    it("is disabled without an own listing, and says why", function()
-        STATE.activeEntry = nil
-        ns.UpdateBuildButton()
-        assert.is_false(button:IsEnabled())
-        assert.are.equal("List yourself in the Group Finder first.", button.reason)
-        click()
-        assert.are.equal(0, #STATE.invites)
+    describe("List Self", function()
+        it("opens Blizzard's listing page through a secure click when you are not listed", function()
+            STATE.activeEntry = nil
+            ns.UpdateBuildButton()
+            assert.are.equal("List Self", button.text)
+            assert.is_true(button:IsEnabled())
+            assert.are.equal("click", button:GetAttribute("type"))
+            assert.are.equal(LFGParentFrameTab1, button:GetAttribute("clickbutton"))
+            click()
+            assert.are.equal(1, STATE.tab1Clicks)
+            assert.are.equal(0, #STATE.invites)
+            assert.are.equal(0, STATE.searches)
+        end)
+
+        it("reads Build Group once Blizzard has listed you and searched", function()
+            STATE.activeEntry = nil
+            ns.UpdateBuildButton()
+            STATE.activeEntry = { activityIDs = { 800 } }
+            FIRE("LFG_LIST_ACTIVE_ENTRY_UPDATE", true)
+            fresh()
+            assert.are.equal("Build Group", button.text)
+            assert.is_nil(button:GetAttribute("type"))
+        end)
+
+        it("comes before Refresh List, after a full group", function()
+            STATE.activeEntry = nil
+            STATE.time = STATE.time + 31 -- an old list too
+            ns.UpdateBuildButton()
+            assert.are.equal("List Self", button.text)
+            STATE.party = { { name = "A", class = "HUNTER", level = 25 }, { name = "B", class = "ROGUE", level = 25 },
+                { name = "C", class = "PRIEST", level = 25 }, { name = "D", class = "PALADIN", level = 25 } }
+            ns.UpdateBuildButton()
+            assert.is_false(button:IsEnabled())
+            assert.are.equal("Your group is full.", button.reason)
+        end)
+
+        it("is not offered to an assistant: only the leader lists", function()
+            STATE.activeEntry = nil
+            STATE.party = { { name = "X", class = "HUNTER", level = 25 } }
+            STATE.leader, STATE.assistant = false, true
+            ns.UpdateBuildButton()
+            assert.is_false(button:IsEnabled())
+            assert.are.equal("Only the group leader can list the group.", button.reason)
+        end)
+
+        it("is offered to the leader of a group", function()
+            STATE.activeEntry = nil
+            STATE.party = { { name = "X", class = "HUNTER", level = 25 } }
+            ns.UpdateBuildButton()
+            assert.are.equal("List Self", button.text)
+        end)
     end)
 
     it("is disabled when listed without a role", function()
@@ -284,11 +328,17 @@ describe("Build Group", function()
         assert.are.equal("No fitting player in the list.", button.reason)
     end)
 
-    it("names the reason in its tooltip", function()
-        STATE.activeEntry = nil
+    it("names the reason in its tooltip, and what List Self does", function()
+        STATE.party = { { name = "X", class = "HUNTER", level = 25 } }
+        STATE.leader = false
         ns.UpdateBuildButton()
         RUNSCRIPT(button, "OnEnter")
-        assert.are.equal("List yourself in the Group Finder first.", GameTooltip.lines[2])
+        assert.are.equal("Only the group leader or an assistant can invite.", GameTooltip.lines[2])
+        STATE.party, STATE.leader, STATE.activeEntry = {}, true, nil
+        ns.UpdateBuildButton()
+        RUNSCRIPT(button, "OnEnter")
+        assert.are.equal("Opens Blizzard's listing page: choose the dungeon, play style and role there.",
+            GameTooltip.lines[2])
     end)
 
     describe("/sgf test", function()
