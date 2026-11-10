@@ -37,7 +37,8 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   button and key do; right-click opens SmartGroupFilter's settings; drag it around the minimap.
   `/sgf minimap` hides and shows it. An entry in the AddOn menu opens the settings too.
 - A gear in the panel switches to the settings and back: the language - Automatic follows the
-  client, or choose one of eleven, every text switches at once - and the minimap button.
+  client, or choose one of eleven, every text switches at once - the minimap button, and the
+  window background: a slider from invisible to solid for the panel and the bug report.
 - A bug report: `/sgf bug` or the button in the settings opens a window where you describe the
   bug; it shows a code to copy into a GitHub issue. It holds SmartGroupFilter's state and its
   errors, never another player's name.

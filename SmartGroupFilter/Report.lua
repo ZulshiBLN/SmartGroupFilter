@@ -460,6 +460,11 @@ end
 
 -- /sgf bug and the settings' button (docked). In combat nothing opens, and only /sgf bug says
 -- why.
+-- The window background slider moved: follow it while open (Settings.lua)
+function ns.ApplyReportOpacity()
+    if frame then ns.ApplyWindowOpacity(frame, db.windowOpacity) end
+end
+
 function ns.OpenBugReport(docked)
     if not frame then CreateWindow() end
     if InCombatLockdown() then

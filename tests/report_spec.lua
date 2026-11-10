@@ -245,7 +245,7 @@ describe("the report window", function()
         ns.ShowView("settings")
         local bug = ns.panel.bugButton
         assert.are.equal(ns.L.BTN_REPORT_BUG, bug:GetText())
-        assert.are.equal(ns.panel.minimapCheck, select(2, bug:GetPoint())) -- below the checkbox
+        assert.are.equal(ns.panel.opacitySlider, select(2, bug:GetPoint())) -- below the background slider
         RUNSCRIPT(bug, "OnClick")
         assert.is_true(f:IsShown())
         assert.are.equal("", f.desc:GetText())

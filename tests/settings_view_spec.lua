@@ -101,6 +101,61 @@ describe("the settings view", function()
     end)
 end)
 
+describe("the window background slider", function()
+    it("sits below the minimap checkbox with its label and value, the bug report button below it", function()
+        local slider = panel.opacitySlider
+        assert.are.equal("Window background (%)", panel.opacityLabel.text)
+        assert.are.equal("60", slider.value.text)
+        assert.are.same({ "TOPLEFT", panel.minimapCheck, "BOTTOMLEFT", 4, -16 }, panel.opacityLabel.points[1])
+        assert.are.equal(slider, panel.bugButton.points[1][2])
+    end)
+
+    it("looks like the level slider: the same track and thumb", function()
+        local thumb, level = panel.opacitySlider.thumb, panel.slider.handles[1]
+        assert.are.equal(level.width, thumb.width)
+        assert.are.equal(level.height, thumb.height)
+        assert.are.same(level.children[1].color, thumb.children[1].color)
+        assert.are.same({ 0.25, 0.25, 0.25, 1 }, panel.opacitySlider.track.color)
+        assert.are.same(panel.slider.track.color, panel.opacitySlider.track.color)
+    end)
+
+    it("saves and applies while dragged, to the panel and the docked report", function()
+        ns.ShowView("settings")
+        ns.OpenBugReport(true)
+        local slider = panel.opacitySlider
+        slider.left, slider.width = 100, 200
+        RUNSCRIPT(slider.thumb, "OnMouseDown")
+        STATE.cursor = { x = 100 + 160, y = 0 } -- 80 %
+        RUNSCRIPT(slider.thumb, "OnUpdate")
+        assert.are.equal(80, db.windowOpacity)
+        assert.are.equal("80", slider.value.text)
+        assert.are.equal(0.5, panel.opacityLayer.alpha)
+        assert.are.equal(0.5, SmartGroupFilterReport.opacityLayer.alpha)
+        RUNSCRIPT(slider.thumb, "OnMouseUp")
+        STATE.cursor = { x = 100, y = 0 }
+        RUNSCRIPT(slider.thumb, "OnUpdate") -- released: no longer follows the cursor
+        assert.are.equal(80, db.windowOpacity)
+    end)
+
+    it("stops at 0 and 100", function()
+        local slider = panel.opacitySlider
+        slider.left, slider.width = 100, 200
+        RUNSCRIPT(slider.thumb, "OnMouseDown")
+        STATE.cursor = { x = 50, y = 0 }
+        RUNSCRIPT(slider.thumb, "OnUpdate")
+        assert.are.equal(0, db.windowOpacity)
+        STATE.cursor = { x = 400, y = 0 }
+        RUNSCRIPT(slider.thumb, "OnUpdate")
+        assert.are.equal(100, db.windowOpacity)
+    end)
+
+    it("shows the saved value whenever the panel shows", function()
+        db.windowOpacity = 30
+        RUNSCRIPT(panel, "OnShow")
+        assert.are.equal("30", panel.opacitySlider.value.text)
+    end)
+end)
+
 describe("the language choice", function()
     it("offers Automatic and the eleven languages, Automatic chosen", function()
         local list = radios()

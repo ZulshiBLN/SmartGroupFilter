@@ -82,6 +82,27 @@ function ns.ApplyWindowOpacity(window, value)
     window.opacityLayer:SetAlpha(math.max(0, (value - today) / (100 - today)))
 end
 
+-- The sliders' look, one place for the level slider and the settings' window background
+-- slider: SimpleConjureBar's grey track and gold 10x16 thumb (its UI.MakeSlider)
+function ns.SliderTrack(slider)
+    local bar = slider:CreateTexture(nil, "BACKGROUND")
+    bar:SetPoint("LEFT")
+    bar:SetPoint("RIGHT")
+    bar:SetHeight(6)
+    bar:SetColorTexture(0.25, 0.25, 0.25, 1)
+    slider.track = bar
+    return bar
+end
+
+function ns.SliderThumb(slider)
+    local h = CreateFrame("Button", nil, slider)
+    h:SetSize(10, 16)
+    local tex = h:CreateTexture(nil, "OVERLAY")
+    tex:SetAllPoints()
+    tex:SetColorTexture(1, 0.82, 0, 1) -- WoW gold
+    return h
+end
+
 local function Separator(parent, anchor, gap)
     local line = CreateFrame("Frame", nil, parent)
     line:SetSize(WIDTH - 2 * PAD, SEP_HEIGHT)
@@ -188,11 +209,7 @@ local function LevelAtCursor()
 end
 
 local function Handle(slider, index)
-    local h = CreateFrame("Button", nil, slider)
-    h:SetSize(10, 16) -- as SimpleConjureBar's slider thumb (UI.MakeSlider)
-    local tex = h:CreateTexture(nil, "OVERLAY")
-    tex:SetAllPoints()
-    tex:SetColorTexture(1, 0.82, 0, 1) -- WoW gold
+    local h = ns.SliderThumb(slider)
     h:SetScript("OnMouseDown", function(self) self.dragging = true end)
     h:SetScript("OnUpdate", function(self)
         if not self.dragging then return end
@@ -528,11 +545,7 @@ local function Create()
     panel.slider = slider
     slider:SetSize(TRACK, 20)
     slider:SetPoint("TOPLEFT", panel.fromBox, "BOTTOMLEFT", -2, -8)
-    local bar = slider:CreateTexture(nil, "BACKGROUND")
-    bar:SetPoint("LEFT")
-    bar:SetPoint("RIGHT")
-    bar:SetHeight(6)
-    bar:SetColorTexture(0.25, 0.25, 0.25, 1) -- as SimpleConjureBar's slider track
+    ns.SliderTrack(slider)
     slider.handles = { Handle(slider, 1), Handle(slider, 2) }
 
     -- Gold line, then the priority section under its header (Michel, after SCB and SBB)

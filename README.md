@@ -42,7 +42,8 @@ builds your five-player group with one click.
   do; right-click opens the settings; drag it around the minimap. The AddOn menu entry opens the
   settings too.
 - **Settings** - the gear left of Reset Filter switches the panel to the language, the minimap
-  button and the bug report, and back.
+  button, the window background - a slider from invisible to solid for the panel and the bug
+  report - and the bug report, and back.
 
 ## Installation
 

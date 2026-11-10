@@ -14,6 +14,8 @@ local PAD = 14
 local DD_WIDTH = 180
 local DD_TEXT_PAD = 50 -- room beside the text: its inset and the arrow
 
+local OPACITY_TRACK = 200 -- the window background slider; its value beside it, in 272 px
+
 local HINT_WIDTH = 220
 local HINT_SECONDS = 8
 
@@ -171,6 +173,57 @@ local function LanguageDropdown(view, anchor)
 end
 
 ---------------------------------------------------------------------------
+-- Window background, 0 % invisible to 100 % solid, for the panel and the bug report (ruleset
+-- plan 2026-11-11-window-opacity). Dragging saves and applies at once.
+---------------------------------------------------------------------------
+local function OpacitySlider(view, anchor)
+    local label = view:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    ns.SetL(label, "OPT_WINDOW_OPACITY")
+    label:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 4, -16)
+    panel.opacityLabel = label
+
+    local slider = CreateFrame("Frame", nil, view)
+    slider:SetSize(OPACITY_TRACK, 20)
+    slider:SetPoint("TOPLEFT", label, "BOTTOMLEFT", 0, -8)
+    ns.SliderTrack(slider)
+    local thumb = ns.SliderThumb(slider)
+    slider.thumb = thumb
+    local value = view:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    value:SetPoint("LEFT", slider, "RIGHT", 12, 0)
+    slider.value = value
+
+    function slider.Show(v)
+        thumb:ClearAllPoints()
+        thumb:SetPoint("CENTER", slider, "LEFT", v / 100 * OPACITY_TRACK, 0)
+        value:SetText(tostring(v))
+    end
+
+    local function AtCursor()
+        local x = GetCursorPosition() / UIParent:GetEffectiveScale()
+        local width = slider:GetWidth()
+        if not width or width <= 0 then width = OPACITY_TRACK end
+        local f = math.max(0, math.min(1, (x - slider:GetLeft()) / width))
+        return math.floor(f * 100 + 0.5)
+    end
+
+    thumb:SetScript("OnMouseDown", function(self) self.dragging = true end)
+    thumb:SetScript("OnMouseUp", function(self) self.dragging = false end)
+    thumb:SetScript("OnUpdate", function(self)
+        if not self.dragging then return end
+        local v = AtCursor()
+        if v ~= db.windowOpacity then
+            db.windowOpacity = v
+            ns.ApplyWindowOpacity(panel, v)
+            ns.ApplyReportOpacity()
+        end
+        slider.Show(v)
+    end)
+    slider.Show(db.windowOpacity)
+    panel.opacitySlider = slider
+    return slider
+end
+
+---------------------------------------------------------------------------
 -- The view
 ---------------------------------------------------------------------------
 function ns.CreateSettingsView(p)
@@ -202,10 +255,12 @@ function ns.CreateSettingsView(p)
     end)
     panel.minimapCheck = check
 
+    local opacity = OpacitySlider(view, check)
+
     -- The bug report (Report.lua); under it, for a while, why it did not open
     local bug = CreateFrame("Button", nil, view, "UIPanelButtonTemplate")
     bug:SetSize(160, 22)
-    bug:SetPoint("TOPLEFT", check, "BOTTOMLEFT", 4, -16)
+    bug:SetPoint("TOPLEFT", opacity, "BOTTOMLEFT", 0, -16)
     ns.SetL(bug, "BTN_REPORT_BUG")
     bug:SetScript("OnClick", function() ns.OpenBugReport(true) end) -- docked to the panel
     panel.bugButton = bug
@@ -218,6 +273,7 @@ function ns.CreateSettingsView(p)
 
     panel:HookScript("OnShow", function()
         check:SetChecked(not db.hideMinimap)
+        opacity.Show(db.windowOpacity)
         if settingsNext and not InCombatLockdown() then
             settingsNext = false
             ns.ShowView("settings")
