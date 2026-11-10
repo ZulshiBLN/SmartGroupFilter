@@ -58,7 +58,7 @@ describe("the filter", function()
     end)
 
     it("leaves Blizzard's list untouched while the Filter is off", function()
-        db.filterOn = false
+        ns.ResetFilter()
         result(1, "MAGE", 35, { dps = true })
         result(2, "MAGE", 25, { dps = true }, { isDelisted = true })
         LFGBrowseFrame:UpdateResultList()
@@ -147,6 +147,19 @@ describe("the filter", function()
         assert.are.equal(60, ns.LevelRange().max)
         ns.FilterChanged()
         assert.are.equal("1", shown()) -- filtering again: the delisted entry goes
+    end)
+
+    it("filters again after a login that followed Reset Filter", function()
+        ns.ResetFilter()
+        local saved = SmartGroupFilterDB
+        ns = addon.load("enUS", { db = saved })
+        FIRE("PLAYER_LOGIN")
+        STATE.activities[800] = { minLevelSuggestion = 20, maxLevelSuggestion = 30 }
+        STATE.activeEntry = { activityIDs = { 800 } }
+        result(1, "MAGE", 19, { dps = true })
+        result(2, "MAGE", 25, { dps = true })
+        LFGBrowseFrame:UpdateResultList()
+        assert.are.equal("2", shown()) -- the panel's 20-30 applies again
     end)
 
     it("refreshes Blizzard's list without a new search, only while it is shown", function()

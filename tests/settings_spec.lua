@@ -14,7 +14,6 @@ local function joined(list) return table.concat(list, " ") end
 describe("the settings", function()
     it("start with the decided defaults", function()
         local _, db = login()
-        assert.is_true(db.filterOn)
         assert.is_false(db.allowDouble)
         assert.is_true(db.allowSameArmor)
         assert.are.equal("PALADIN WARRIOR DRUID", joined(db.order.TANK))
@@ -27,12 +26,12 @@ describe("the settings", function()
         local _, db = login({
             order = { TANK = { "DRUID", "PALADIN", "WARRIOR" } },
             excluded = { HEALER = { SHAMAN = true } },
-            allowDouble = true, filterOn = false,
+            allowDouble = true, filterOn = false, -- saved by earlier builds
         })
         assert.are.equal("DRUID PALADIN WARRIOR", joined(db.order.TANK))
         assert.is_true(db.excluded.HEALER.SHAMAN)
         assert.is_true(db.allowDouble)
-        assert.is_false(db.filterOn)
+        assert.is_nil(db.filterOn) -- Reset Filter's "off" is not kept across logins
     end)
 
     it("reset an order that misses, repeats or adds a class", function()
@@ -60,8 +59,7 @@ describe("the settings", function()
     end)
 
     it("reset options of the wrong type", function()
-        local _, db = login({ filterOn = "yes", allowDouble = 1, allowSameArmor = {} })
-        assert.is_true(db.filterOn)
+        local _, db = login({ allowDouble = 1, allowSameArmor = {} })
         assert.is_false(db.allowDouble)
         assert.is_true(db.allowSameArmor)
     end)

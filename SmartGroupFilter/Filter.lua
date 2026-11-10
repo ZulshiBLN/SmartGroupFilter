@@ -8,7 +8,13 @@
 local _, ns = ...
 
 local db
-ns.OnDBReady(function(d) db = d end)
+ns.OnDBReady(function(d)
+    db = d
+    db.filterOn = nil -- saved by earlier builds; Reset Filter's "off" is no longer kept
+end)
+
+-- Off after Reset Filter, until the next change in the panel; on again at every login
+local filterOn = true
 
 -- A secret value is unreadable: it counts as missing (ruleset code.md, "Secret values")
 local function Clean(v)
@@ -120,7 +126,7 @@ end
 
 -- The filter works while it is on and the panel is shown; else Blizzard's list stays as it is
 function ns.FilterActive()
-    return db and db.filterOn and db.panelShown or false
+    return db and filterOn and db.panelShown or false
 end
 
 local function Filter(results)
@@ -149,7 +155,7 @@ end
 
 -- A setting in the panel changed: the filter is on again (after Reset Filter) and filters anew
 function ns.FilterChanged()
-    db.filterOn = true
+    filterOn = true
     ns.RefreshList()
 end
 
@@ -158,7 +164,7 @@ end
 function ns.ResetFilter()
     for _, role in ipairs(ns.D.ROLES) do db.excluded[role] = {} end
     db.allowSameArmor = true
-    db.filterOn = false
+    filterOn = false
     ns.SetLevelRange(1, GetMaxPlayerLevel and GetMaxPlayerLevel() or 60)
     ns.RefreshList()
 end

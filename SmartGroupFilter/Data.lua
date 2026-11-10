@@ -67,9 +67,10 @@ D.HOLD_SECONDS = 120
 -- (Michel, 2026-11-11)
 D.LIST_FRESH_SECONDS = 30
 
--- The panel's options and their defaults. filterOn: off after Reset Filter until the next
--- change; panelShown: the side tab's switch - a hidden panel leaves Blizzard's list as it is.
-D.OPTION_DEFAULTS = { filterOn = true, allowDouble = false, allowSameArmor = true, panelShown = true }
+-- The panel's options and their defaults. panelShown: the side tab's switch - a hidden panel
+-- leaves Blizzard's list as it is. Reset Filter's "off" is not saved: it lasts until the next
+-- change in the panel or the next login, so the panel never shows a filter that is not applied.
+D.OPTION_DEFAULTS = { allowDouble = false, allowSameArmor = true, panelShown = true }
 
 -- The project's logo, shipped as Media/Logo.tga: the panel's portrait (cut to the medallion)
 D.LOGO = "Interface\\AddOns\\SmartGroupFilter\\Media\\Logo"

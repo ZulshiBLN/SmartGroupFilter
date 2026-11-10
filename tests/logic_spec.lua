@@ -193,7 +193,7 @@ describe("the choice of invites", function()
     end)
 
     it("takes candidates by the filter's rules even when the Filter is off", function()
-        db.filterOn = false
+        ns.ResetFilter()
         local list = choose({ solo("Pal19", "PALADIN", 19, T), solo("War", "WARRIOR", 25, T) })
         assert.are.equal("War:TANK", names(list))
     end)
