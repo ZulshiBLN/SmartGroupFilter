@@ -112,6 +112,7 @@ function CreateFrame(kind, name, parent, template)
     if template == "LargeSideTabButtonTemplate" or template == "LFGVanillaRightTabTemplate" then
         f.Icon = NewWidget("Texture", nil, f)
         function f:SetCustomOnMouseUpHandler(fn) self.mouseUp = fn end
+        function f:SetFillToInterior(v) self.fillToInterior = v end
     end
     frames[#frames + 1] = f
     return f
