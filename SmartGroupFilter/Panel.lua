@@ -354,9 +354,13 @@ local function TabTemplate()
     return "LargeSideTabButtonTemplate"
 end
 
--- The fourth side tab, below Blizzard's three and made from the same template, with the logo
+-- The fourth side tab, below Blizzard's three and made from the same template, with the logo.
+-- Shown on every page of the window (a child of LFGParentFrame). On another page a click opens
+-- the Group Browser with the panel; on the Group Browser it shows or hides the panel (Michel).
+-- Never "checked": Blizzard draws the checked tab - the page you are on - with a gold edge, and
+-- this tab is no page of its own.
 local function ToggleTab()
-    local tab = CreateFrame("Frame", "SmartGroupFilterTab", LFGBrowseFrame, TabTemplate())
+    local tab = CreateFrame("Frame", "SmartGroupFilterTab", LFGParentFrame, TabTemplate())
     ns.tab = tab
     local who = LFGParentFrame.WhoListingTab
     if who then
@@ -370,11 +374,16 @@ local function ToggleTab()
     end
     tab.tooltipText = ns.ADDON_NAME
     local function Sync()
-        if tab.SetChecked then tab:SetChecked(db.panelShown) end
+        if tab.SetChecked then tab:SetChecked(false) end
         panel:SetShown(db.panelShown)
     end
     local function Toggle()
-        db.panelShown = not db.panelShown
+        if LFGBrowseFrame:IsShown() then
+            db.panelShown = not db.panelShown
+        else
+            db.panelShown = true
+            if LFGParentFrameTab2_OnClick then LFGParentFrameTab2_OnClick() end
+        end
         Sync()
         ns.RefreshList()
     end

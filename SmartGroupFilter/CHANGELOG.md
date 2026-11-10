@@ -16,7 +16,8 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   priority row of class icons per role - drag to reorder, right-click to exclude - and the
   options "Allow double classes" and "Allow same armor class" (off: classes of your armor get a
   faint cross and leave the list). Saved per character.
-- A fourth side tab with the SmartGroupFilter logo shows and hides the panel; while it is hidden
+- A fourth side tab with the SmartGroupFilter logo, on every page of the window, opens the Group
+  Browser with the panel there, and shows or hides the panel on it; while it is hidden
   the list is Blizzard's own.
 - Players whose class and level the game hands over only after the search are filtered as soon
   as they arrive.

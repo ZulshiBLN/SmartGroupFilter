@@ -97,7 +97,7 @@ describe("the panel", function()
 
     it("shows and hides the panel with a fourth side tab, remembered, Blizzard's list while hidden", function()
         local tab = ns.tab
-        assert.are.equal(LFGBrowseFrame, tab.parent)
+        assert.are.equal(LFGParentFrame, tab.parent) -- on every page of the window
         assert.are.equal("LFGVanillaRightTabTemplate", tab.template) -- Blizzard's tabs' own
         assert.are.same({ "TOPLEFT", LFGParentFrame.WhoListingTab, "BOTTOMLEFT", 0, -2 }, tab.points[1])
         assert.are.equal("Interface\\AddOns\\SmartGroupFilter\\Media\\Logo", tab.Icon.textureFile)
@@ -108,7 +108,20 @@ describe("the panel", function()
         assert.are.equal("1 2 3", shown())
         tab.mouseUp(tab, "LeftButton", true)
         assert.is_true(panel.shown)
+        assert.is_false(tab.checked) -- never the gold edge of the page you are on
         assert.are.equal("1 2", shown())
+        assert.are.equal(0, STATE.tab2Clicks)
+    end)
+
+    it("opens the Group Browser with the panel when clicked on another page", function()
+        local tab = ns.tab
+        tab.mouseUp(tab, "LeftButton", true) -- hidden
+        LFGBrowseFrame.shown = false -- another page
+        tab.mouseUp(tab, "LeftButton", true)
+        assert.are.equal(1, STATE.tab2Clicks)
+        assert.is_true(LFGBrowseFrame.shown)
+        assert.is_true(db.panelShown)
+        assert.is_true(panel.shown)
     end)
 
     it("starts hidden when it was hidden before", function()

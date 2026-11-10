@@ -225,3 +225,10 @@ STATE.templates = { LFGVanillaRightTabTemplate = true, LargeSideTabButtonTemplat
 C_XMLUtil = {
     GetTemplateInfo = function(name) return STATE.templates[name] and {} or nil end,
 }
+
+-- Blizzard's switch to the Group Browser page (Blizzard_LFGVanilla_ParentFrame.lua)
+STATE.tab2Clicks = 0
+function LFGParentFrameTab2_OnClick()
+    STATE.tab2Clicks = STATE.tab2Clicks + 1
+    LFGBrowseFrame.shown = true
+end

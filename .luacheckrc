@@ -31,6 +31,7 @@ read_globals = {
     "GetMaxPlayerLevel", "issecretvalue", "UnitClass", "UnitLevel", "C_Timer", "C_XMLUtil",
     -- The panel
     "LFGParentFrame", "UIParent", "GameTooltip", "GetCursorPosition", "PixelUtil", "CreateColor",
+    "LFGParentFrameTab2_OnClick",
     "LOCALIZED_CLASS_NAMES_MALE", "TANK", "HEALER", "DAMAGER",
     SlashCmdList = { fields = { SMARTGROUPFILTER = { read_only = false } } },
 }
