@@ -63,5 +63,9 @@ D.MAX_SAME_CLASS = { [false] = 1, [true] = 2 }
 -- How long an invited player keeps his place before he joins, in seconds
 D.HOLD_SECONDS = 120
 
--- The panel's options and their defaults
-D.OPTION_DEFAULTS = { filterOn = true, allowDouble = false, allowSameArmor = true }
+-- The panel's options and their defaults. filterOn: off after Reset Filter until the next
+-- change; panelShown: the side tab's switch - a hidden panel leaves Blizzard's list as it is.
+D.OPTION_DEFAULTS = { filterOn = true, allowDouble = false, allowSameArmor = true, panelShown = true }
+
+-- The project's logo, shipped as Media/Logo.tga: the panel's portrait and its side tab's icon
+D.LOGO = "Interface\\AddOns\\SmartGroupFilter\\Media\\Logo"

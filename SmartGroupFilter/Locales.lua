@@ -13,7 +13,6 @@ locales.enUS = {
     HELP_HEADER = "Chat commands:",
     CMD_HELP = "Show this list",
     CMD_UNKNOWN = "Unknown command. Type %s for a list.",
-    FILTER = "Filter",
     SHOWN_COUNT = "%d of %d single players",
     LEVEL_RANGE = "Level range",
     LEVEL_FROM = "From",
@@ -34,6 +33,9 @@ locales.enUS = {
     CLASS_MAGE = "Mage",
     CLASS_WARLOCK = "Warlock",
     CLASS_DRUID = "Druid",
+    RESET_FILTER = "Reset Filter",
+    SAME_ARMOR = "Same armor class as you",
+    TIP_TOGGLE = "Show or hide the panel",
 }
 
 locales.deDE = {
@@ -41,7 +43,6 @@ locales.deDE = {
     HELP_HEADER = "Chat-Befehle:",
     CMD_HELP = "Diese Liste anzeigen",
     CMD_UNKNOWN = "Unbekannter Befehl. %s zeigt alle Befehle.",
-    FILTER = "Filter",
     SHOWN_COUNT = "%d von %d Einzelspielern",
     LEVEL_RANGE = "Levelbereich",
     LEVEL_FROM = "Von",
@@ -62,6 +63,9 @@ locales.deDE = {
     CLASS_MAGE = "Magier",
     CLASS_WARLOCK = "Hexenmeister",
     CLASS_DRUID = "Druide",
+    RESET_FILTER = "Filter zurücksetzen",
+    SAME_ARMOR = "Gleiche Rüstungsklasse wie du",
+    TIP_TOGGLE = "Panel ein- oder ausblenden",
 }
 
 locales.frFR = {
@@ -69,7 +73,6 @@ locales.frFR = {
     HELP_HEADER = "Commandes de discussion :",
     CMD_HELP = "Afficher cette liste",
     CMD_UNKNOWN = "Commande inconnue. Tapez %s pour la liste.",
-    FILTER = "Filtre",
     SHOWN_COUNT = "%d sur %d joueurs seuls",
     LEVEL_RANGE = "Niveaux",
     LEVEL_FROM = "De",
@@ -90,6 +93,9 @@ locales.frFR = {
     CLASS_MAGE = "Mage",
     CLASS_WARLOCK = "Démoniste",
     CLASS_DRUID = "Druide",
+    RESET_FILTER = "Réinitialiser le filtre",
+    SAME_ARMOR = "Même type d'armure que vous",
+    TIP_TOGGLE = "Afficher ou masquer le panneau",
 }
 
 locales.esES = {
@@ -97,7 +103,6 @@ locales.esES = {
     HELP_HEADER = "Comandos de chat:",
     CMD_HELP = "Mostrar esta lista",
     CMD_UNKNOWN = "Comando desconocido. Escribe %s para ver la lista.",
-    FILTER = "Filtro",
     SHOWN_COUNT = "%d de %d jugadores solos",
     LEVEL_RANGE = "Rango de nivel",
     LEVEL_FROM = "Desde",
@@ -118,6 +123,9 @@ locales.esES = {
     CLASS_MAGE = "Mago",
     CLASS_WARLOCK = "Brujo",
     CLASS_DRUID = "Druida",
+    RESET_FILTER = "Restablecer filtro",
+    SAME_ARMOR = "Mismo tipo de armadura que tú",
+    TIP_TOGGLE = "Mostrar u ocultar el panel",
 }
 
 -- esMX holds only what differs from esES
@@ -129,7 +137,6 @@ locales.itIT = {
     HELP_HEADER = "Comandi chat:",
     CMD_HELP = "Mostra questo elenco",
     CMD_UNKNOWN = "Comando sconosciuto. Digita %s per l'elenco.",
-    FILTER = "Filtro",
     SHOWN_COUNT = "%d di %d giocatori singoli",
     LEVEL_RANGE = "Intervallo di livello",
     LEVEL_FROM = "Da",
@@ -150,6 +157,9 @@ locales.itIT = {
     CLASS_MAGE = "Mago",
     CLASS_WARLOCK = "Stregone",
     CLASS_DRUID = "Druido",
+    RESET_FILTER = "Azzera filtro",
+    SAME_ARMOR = "Stesso tipo di armatura tuo",
+    TIP_TOGGLE = "Mostra o nascondi il pannello",
 }
 
 locales.ptBR = {
@@ -157,7 +167,6 @@ locales.ptBR = {
     HELP_HEADER = "Comandos de chat:",
     CMD_HELP = "Mostrar esta lista",
     CMD_UNKNOWN = "Comando desconhecido. Digite %s para ver a lista.",
-    FILTER = "Filtro",
     SHOWN_COUNT = "%d de %d jogadores solo",
     LEVEL_RANGE = "Faixa de nível",
     LEVEL_FROM = "De",
@@ -178,6 +187,9 @@ locales.ptBR = {
     CLASS_MAGE = "Mago",
     CLASS_WARLOCK = "Bruxo",
     CLASS_DRUID = "Druida",
+    RESET_FILTER = "Redefinir filtro",
+    SAME_ARMOR = "Mesmo tipo de armadura que você",
+    TIP_TOGGLE = "Mostrar ou ocultar o painel",
 }
 
 locales.ruRU = {
@@ -185,7 +197,6 @@ locales.ruRU = {
     HELP_HEADER = "Команды чата:",
     CMD_HELP = "Показать этот список",
     CMD_UNKNOWN = "Неизвестная команда. Введите %s для списка.",
-    FILTER = "Фильтр",
     SHOWN_COUNT = "%d из %d одиночных игроков",
     LEVEL_RANGE = "Диапазон уровней",
     LEVEL_FROM = "От",
@@ -206,6 +217,9 @@ locales.ruRU = {
     CLASS_MAGE = "Маг",
     CLASS_WARLOCK = "Чернокнижник",
     CLASS_DRUID = "Друид",
+    RESET_FILTER = "Сбросить фильтр",
+    SAME_ARMOR = "Тот же тип брони, что у вас",
+    TIP_TOGGLE = "Показать или скрыть панель",
 }
 
 locales.koKR = {
@@ -213,7 +227,6 @@ locales.koKR = {
     HELP_HEADER = "채팅 명령어:",
     CMD_HELP = "이 목록 표시",
     CMD_UNKNOWN = "알 수 없는 명령어입니다. 목록은 %s 를 입력하세요.",
-    FILTER = "필터",
     SHOWN_COUNT = "개인 플레이어 %d/%d명",
     LEVEL_RANGE = "레벨 범위",
     LEVEL_FROM = "최소",
@@ -234,6 +247,9 @@ locales.koKR = {
     CLASS_MAGE = "마법사",
     CLASS_WARLOCK = "흑마법사",
     CLASS_DRUID = "드루이드",
+    RESET_FILTER = "필터 초기화",
+    SAME_ARMOR = "나와 같은 방어구 유형",
+    TIP_TOGGLE = "패널 표시 또는 숨기기",
 }
 
 locales.zhCN = {
@@ -241,7 +257,6 @@ locales.zhCN = {
     HELP_HEADER = "聊天命令：",
     CMD_HELP = "显示此列表",
     CMD_UNKNOWN = "未知命令。输入 %s 查看列表。",
-    FILTER = "过滤",
     SHOWN_COUNT = "单人玩家 %d/%d",
     LEVEL_RANGE = "等级范围",
     LEVEL_FROM = "从",
@@ -262,6 +277,9 @@ locales.zhCN = {
     CLASS_MAGE = "法师",
     CLASS_WARLOCK = "术士",
     CLASS_DRUID = "德鲁伊",
+    RESET_FILTER = "重置过滤",
+    SAME_ARMOR = "与你相同的护甲类型",
+    TIP_TOGGLE = "显示或隐藏面板",
 }
 
 locales.zhTW = {
@@ -269,7 +287,6 @@ locales.zhTW = {
     HELP_HEADER = "聊天指令：",
     CMD_HELP = "顯示此列表",
     CMD_UNKNOWN = "未知指令。輸入 %s 查看列表。",
-    FILTER = "過濾",
     SHOWN_COUNT = "單人玩家 %d/%d",
     LEVEL_RANGE = "等級範圍",
     LEVEL_FROM = "從",
@@ -290,6 +307,9 @@ locales.zhTW = {
     CLASS_MAGE = "法師",
     CLASS_WARLOCK = "術士",
     CLASS_DRUID = "德魯伊",
+    RESET_FILTER = "重置過濾",
+    SAME_ARMOR = "與你相同的護甲類型",
+    TIP_TOGGLE = "顯示或隱藏面板",
 }
 
 local client = GetLocale()

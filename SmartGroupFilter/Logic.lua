@@ -31,12 +31,22 @@ local function Fits(entry, role, db)
     return true
 end
 
--- Does Blizzard's list keep this entry? range: { min, max }
-function ns.Passes(entry, db, range)
+local function Known(entry)
+    return entry.class ~= nil and type(entry.level) == "number" and entry.level >= 1
+end
+
+-- Does Blizzard's list keep this entry? range: { min, max }; ownArmor: the player's armor
+-- class, which the list leaves out while "Allow same armor class" is off
+function ns.Passes(entry, db, range, ownArmor)
     if entry.isDelisted then return false end
     if not IsSingle(entry) then return true end -- groups and the own listing stay
-    if not entry.class or not entry.level then return true end -- shown as Blizzard shows him
+    -- Class or level not loaded yet (the client reports level 0 then): shown as Blizzard
+    -- shows him; Filter.lua filters again once the client updates the result
+    if not Known(entry) then return true end
     if entry.level < range.min or entry.level > range.max then return false end
+    if not db.allowSameArmor and ownArmor and ns.ArmorOf(entry.class, entry.level) == ownArmor then
+        return false
+    end
     for _, role in ipairs(D.ROLES) do
         if Fits(entry, role, db) then return true end
     end
@@ -97,7 +107,7 @@ function ns.ChooseInvites(state)
 
     local signed, unsigned = {}, {}
     for _, e in ipairs(state.candidates) do
-        if IsSingle(e) and e.name and e.class and e.level and not state.placed[e.name]
+        if IsSingle(e) and e.name and Known(e) and not state.placed[e.name]
             and not inGroup[e.name] and ns.Passes(e, db, state.range) then
             if HasRole(e.roles) then signed[#signed + 1] = e else unsigned[#unsigned + 1] = e end
         end

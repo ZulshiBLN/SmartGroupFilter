@@ -1,7 +1,8 @@
 -- SmartGroupFilter - panel
 -- The panel beside Blizzard's player list (ruleset plan 2026-11-10-panel-filter-build, phase 3):
--- Filter checkbox and count, level range, the three priority rows, the two options. A child of
+-- Reset Filter and the count, level range, the three priority rows, the two options. A child of
 -- LFGBrowseFrame, so it shows and hides with the list; docked right of the window's side tabs.
+-- A fourth side tab with the project's logo shows and hides it (Michel, 2026-11-10).
 
 local _, ns = ...
 local D, L = ns.D, ns.L
@@ -17,12 +18,15 @@ local PER_LINE = 5     -- icons per line; the damage row takes two lines
 local TRACK = 236      -- the level slider's track, px
 
 local panel
+local LayoutRows -- defined with the rows below
 
 ---------------------------------------------------------------------------
 -- Helpers
 ---------------------------------------------------------------------------
+-- A setting changed: the filter is on again and filters anew; the rows show the new state
 local function Changed()
-    ns.RefreshList()
+    ns.FilterChanged()
+    LayoutRows()
 end
 
 local function Label(parent, key, font)
@@ -95,11 +99,12 @@ local function LevelBox(parent, isFrom)
     box:SetAutoFocus(false)
     box:SetNumeric(true)
     box:SetMaxLetters(2)
+    -- A typed level past the other one moves the other one along: from 52 with to 12 is 52-52
     local function Apply(self)
         local r = ns.LevelRange()
         local v = TypedLevel(self)
         if v then
-            if isFrom then ApplyRange(v, r.max) else ApplyRange(r.min, v) end
+            if isFrom then ApplyRange(v, math.max(v, r.max)) else ApplyRange(math.min(r.min, v), v) end
         else
             RefreshRange()
         end
@@ -166,6 +171,14 @@ function ns.SlotAt(row, x, y)
     return math.min(index, n)
 end
 
+-- With "Allow same armor class" off: does this class wear the player's armor over the whole
+-- level range? Hunters, shamans, warriors and paladins change armor at 40.
+local function SameArmor(class)
+    if db.allowSameArmor then return false end
+    local own, r = ns.OwnArmor(), ns.LevelRange()
+    return ns.ArmorOf(class, r.min) == own and ns.ArmorOf(class, r.max) == own
+end
+
 local function LayoutRow(row)
     local order = db.order[row.role]
     for i, class in ipairs(order) do
@@ -174,7 +187,8 @@ local function LayoutRow(row)
         icon.index = i
         icon.texture:SetAtlas(D.CLASS_ATLAS[class])
         local excluded = db.excluded[row.role][class] and true or false
-        icon.texture:SetDesaturated(excluded)
+        icon.sameArmor = SameArmor(class)
+        icon.texture:SetDesaturated(excluded or icon.sameArmor)
         icon.cross:SetShown(excluded)
         icon:ClearAllPoints()
         local col, line = (i - 1) % PER_LINE, math.floor((i - 1) / PER_LINE)
@@ -187,6 +201,7 @@ local function ShowTooltip(icon)
     GameTooltip:AddLine(ClassName(icon.class))
     GameTooltip:AddLine(L.TIP_DRAG, 1, 1, 1)
     if db.excluded[icon.row.role][icon.class] then GameTooltip:AddLine(L.EXCLUDED, 1, 0.2, 0.2) end
+    if icon.sameArmor then GameTooltip:AddLine(L.SAME_ARMOR, 1, 0.2, 0.2) end
     GameTooltip:Show()
 end
 
@@ -205,7 +220,6 @@ local function Icon(row)
         if button ~= "RightButton" then return end
         local ex = db.excluded[row.role]
         ex[self.class] = (not ex[self.class]) or nil
-        LayoutRow(row)
         Changed()
         if GameTooltip:IsOwned(self) then ShowTooltip(self) end
     end)
@@ -255,6 +269,10 @@ local function Row(parent, role, anchor)
     return row
 end
 
+LayoutRows = function()
+    for _, row in pairs(panel.rows) do LayoutRow(row) end
+end
+
 ---------------------------------------------------------------------------
 -- The panel
 ---------------------------------------------------------------------------
@@ -274,22 +292,77 @@ local function UpdateCount(shown, total)
     panel.count:SetText(L.SHOWN_COUNT:format(shown, total))
 end
 
+local function RefreshAll()
+    RefreshRange()
+    LayoutRows()
+    UpdateCount(ns.Counts())
+end
+
+-- The fourth side tab, below Blizzard's three and made from the same template, with the logo
+local function ToggleTab()
+    local tab = CreateFrame("Frame", "SmartGroupFilterTab", LFGBrowseFrame, "LargeSideTabButtonTemplate")
+    ns.tab = tab
+    local who = LFGParentFrame.WhoListingTab
+    if who then
+        tab:SetPoint("TOPLEFT", who, "BOTTOMLEFT", 0, -2)
+    else
+        tab:SetPoint("TOPLEFT", LFGParentFrame, "TOPRIGHT", 0, -200)
+    end
+    if tab.Icon then
+        tab.Icon:SetTexture(D.LOGO)
+        tab.Icon:SetSize(30, 30)
+    end
+    tab.tooltipText = ns.ADDON_NAME
+    local function Sync()
+        if tab.SetChecked then tab:SetChecked(db.panelShown) end
+        panel:SetShown(db.panelShown)
+    end
+    local function Toggle()
+        db.panelShown = not db.panelShown
+        Sync()
+        ns.RefreshList()
+    end
+    tab.Toggle = Toggle
+    if tab.SetCustomOnMouseUpHandler then
+        tab:SetCustomOnMouseUpHandler(function(_, button, upInside)
+            if button == "LeftButton" and upInside then Toggle() end
+        end)
+    else
+        tab:SetScript("OnMouseUp", function(_, button) if button == "LeftButton" then Toggle() end end)
+    end
+    tab:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:AddLine(ns.ADDON_NAME)
+        GameTooltip:AddLine(L.TIP_TOGGLE, 1, 1, 1)
+        GameTooltip:Show()
+    end)
+    tab:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    Sync()
+end
+
 local function Create()
     panel = CreateFrame("Frame", "SmartGroupFilterPanel", LFGBrowseFrame, "PortraitFrameTemplate")
     ns.panel = panel
     panel:SetWidth(WIDTH)
-    if panel.SetPortraitShown then panel:SetPortraitShown(false) end
+    if panel.SetPortraitToAsset then panel:SetPortraitToAsset(D.LOGO) end
     if panel.CloseButton then panel.CloseButton:Hide() end
     panel:GetTitleText():SetText(ns.ADDON_NAME)
 
-    panel.filterCheck = Check(panel, "FILTER",
-        function() return db.filterOn end, function(v) db.filterOn = v end)
-    panel.filterCheck:SetPoint("TOPLEFT", panel, "TOPLEFT", PAD, -30)
+    -- Top: the count right of the portrait, Reset Filter at the right edge
     panel.count = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    panel.count:SetPoint("TOPLEFT", panel.filterCheck, "BOTTOMLEFT", 4, -2)
+    panel.count:SetPoint("TOPLEFT", panel, "TOPLEFT", 64, -36)
+    panel.resetButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    panel.resetButton:SetSize(120, 22)
+    panel.resetButton:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -10, -30)
+    ns.SetL(panel.resetButton, "RESET_FILTER")
+    panel.resetButton:SetScript("OnClick", function()
+        ns.ResetFilter()
+        panel.armorCheck:SetChecked(db.allowSameArmor)
+        RefreshAll()
+    end)
 
     local rangeLabel = Label(panel, "LEVEL_RANGE")
-    rangeLabel:SetPoint("TOPLEFT", panel.count, "BOTTOMLEFT", -4, -14)
+    rangeLabel:SetPoint("TOPLEFT", panel, "TOPLEFT", PAD, -70)
     panel.fromBox = LevelBox(panel, true)
     panel.fromBox:SetPoint("TOPLEFT", rangeLabel, "BOTTOMLEFT", 6, -6)
     panel.toBox = LevelBox(panel, false)
@@ -327,17 +400,13 @@ local function Create()
 
     panel:SetScript("OnShow", function()
         Dock()
-        RefreshRange()
-        UpdateCount(ns.Counts())
+        RefreshAll()
     end)
-    ns.OnListFiltered(function(shown, total)
-        UpdateCount(shown, total)
-        RefreshRange()
-    end)
+    ns.OnListFiltered(function() RefreshAll() end)
     ns.OnLanguageChanged(function() UpdateCount(ns.Counts()) end)
     Dock()
-    RefreshRange()
-    UpdateCount(ns.Counts())
+    RefreshAll()
+    ToggleTab()
 end
 
 -- Blizzard's Group Finder may load after this addon: build the panel once both are ready

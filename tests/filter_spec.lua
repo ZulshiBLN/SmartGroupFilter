@@ -86,6 +86,69 @@ describe("the filter", function()
         assert.are.equal(3, t)
     end)
 
+    it("keeps a player whose data has not loaded, and filters again once the client updates him", function()
+        result(1, "MAGE", 0, { dps = true }) -- level 0: not loaded yet
+        result(2, "MAGE", 25, { dps = true })
+        LFGBrowseFrame:UpdateResultList()
+        assert.are.equal("1 2", shown())
+        STATE.results[1].player.level = 35
+        FIRE("LFG_LIST_SEARCH_RESULT_UPDATED", 1)
+        FIRE("LFG_LIST_SEARCH_RESULT_UPDATED", 1)
+        assert.are.equal(1, #STATE.timers) -- one refresh, however many updates
+        RUNTIMERS()
+        assert.are.equal("2", shown())
+    end)
+
+    it("brings a hidden player back when an update lets him pass", function()
+        result(1, "MAGE", 35, { dps = true })
+        LFGBrowseFrame:UpdateResultList()
+        assert.are.equal("", shown())
+        STATE.results[1].player.level = 25
+        FIRE("LFG_LIST_SEARCH_RESULT_UPDATED", 1)
+        RUNTIMERS()
+        assert.are.equal("1", shown())
+    end)
+
+    it("does not refresh for an update that changes nothing", function()
+        result(1, "MAGE", 25, { dps = true })
+        LFGBrowseFrame:UpdateResultList()
+        FIRE("LFG_LIST_SEARCH_RESULT_UPDATED", 1)
+        assert.are.equal(0, #STATE.timers)
+    end)
+
+    it("leaves Blizzard's list untouched while the panel is hidden", function()
+        db.panelShown = false
+        result(1, "MAGE", 35, { dps = true })
+        LFGBrowseFrame:UpdateResultList()
+        assert.are.equal("1", shown())
+    end)
+
+    it("leaves out the own armor class while same armor is not allowed", function()
+        STATE.player = { class = "MAGE", level = 25 }
+        db.allowSameArmor = false
+        result(1, "PRIEST", 25, { healer = true })
+        result(2, "DRUID", 25, { healer = true })
+        LFGBrowseFrame:UpdateResultList()
+        assert.are.equal("2", shown())
+    end)
+
+    it("resets to Blizzard's list, the rows' order kept, until the next change", function()
+        db.excluded.DAMAGER.MAGE = true
+        db.allowSameArmor = false
+        db.order.TANK = { "DRUID", "PALADIN", "WARRIOR" }
+        result(1, "MAGE", 25, { dps = true })
+        result(2, "MAGE", 45, { dps = true }, { isDelisted = true })
+        ns.ResetFilter()
+        assert.are.equal("1 2", shown())
+        assert.are.same({}, db.excluded.DAMAGER)
+        assert.is_true(db.allowSameArmor)
+        assert.are.equal("DRUID PALADIN WARRIOR", table.concat(db.order.TANK, " "))
+        assert.are.equal(1, ns.LevelRange().min)
+        assert.are.equal(60, ns.LevelRange().max)
+        ns.FilterChanged()
+        assert.are.equal("1", shown()) -- filtering again: the delisted entry goes
+    end)
+
     it("refreshes Blizzard's list without a new search, only while it is shown", function()
         result(1, "MAGE", 25, { dps = true })
         LFGBrowseFrame:UpdateResultList()

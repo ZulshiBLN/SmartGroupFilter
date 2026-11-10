@@ -62,6 +62,18 @@ describe("the filter test", function()
     it("keeps a single player whose class or level is unknown, as Blizzard shows him", function()
         assert.is_true(ns.Passes(solo("A", nil, 25, D), db, RANGE))
         assert.is_true(ns.Passes(solo("A", "MAGE", nil, D), db, RANGE))
+        -- the client reports level 0 until the player's data has loaded
+        assert.is_true(ns.Passes(solo("A", "MAGE", 0, D), db, RANGE))
+    end)
+
+    it("leaves out the own armor class while same armor is not allowed, by the player's level", function()
+        assert.is_true(ns.Passes(solo("A", "PRIEST", 25, H), db, RANGE, "CLOTH"))
+        db.allowSameArmor = false
+        assert.is_false(ns.Passes(solo("A", "PRIEST", 25, H), db, RANGE, "CLOTH"))
+        assert.is_true(ns.Passes(solo("A", "DRUID", 25, H), db, RANGE, "CLOTH"))
+        local wide = { min = 1, max = 60 }
+        assert.is_true(ns.Passes(solo("A", "HUNTER", 39, D), db, wide, "MAIL"))
+        assert.is_false(ns.Passes(solo("A", "HUNTER", 40, D), db, wide, "MAIL"))
     end)
 end)
 

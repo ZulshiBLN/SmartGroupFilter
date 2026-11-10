@@ -112,15 +112,27 @@ local function IsSingle(entry)
     return entry and entry.numMembers == 1 and not entry.hasSelf
 end
 
+-- The player's own armor class, for "Allow same armor class"
+function ns.OwnArmor()
+    local _, class = UnitClass("player")
+    return ns.ArmorOf(class, UnitLevel("player"))
+end
+
+-- The filter works while it is on and the panel is shown; else Blizzard's list stays as it is
+function ns.FilterActive()
+    return db and db.filterOn and db.panelShown or false
+end
+
 local function Filter(results)
     if type(results) ~= "table" or not db then return end
-    local range = ns.LevelRange()
+    local active = ns.FilterActive()
+    local range, ownArmor = ns.LevelRange(), ns.OwnArmor()
     local shown, total = 0, 0
     for i = #results, 1, -1 do
         local entry = ns.ReadEntry(results[i])
         local single = IsSingle(entry)
         if single then total = total + 1 end
-        if db.filterOn and entry and not ns.Passes(entry, db, range) then
+        if active and entry and not ns.Passes(entry, db, range, ownArmor) then
             table.remove(results, i)
         elseif single then
             shown = shown + 1
@@ -135,7 +147,51 @@ function ns.RefreshList()
     if LFGBrowseFrame and LFGBrowseFrame:IsShown() then LFGBrowseFrame:UpdateResultList() end
 end
 
--- Blizzard's Group Finder may load after this addon; hook it once it is there
+-- A setting in the panel changed: the filter is on again (after Reset Filter) and filters anew
+function ns.FilterChanged()
+    db.filterOn = true
+    ns.RefreshList()
+end
+
+-- Reset Filter: Blizzard's own list again - no exclusion, every level, same armor allowed,
+-- the filter off until the next change. The rows' order is kept (Michel, 2026-11-10).
+function ns.ResetFilter()
+    for _, role in ipairs(ns.D.ROLES) do db.excluded[role] = {} end
+    db.allowSameArmor = true
+    db.filterOn = false
+    ns.SetLevelRange(1, GetMaxPlayerLevel and GetMaxPlayerLevel() or 60)
+    ns.RefreshList()
+end
+
+---------------------------------------------------------------------------
+-- Late data: the client may hand a single player's class and level over only after the list
+-- was drawn, then sends LFG_LIST_SEARCH_RESULT_UPDATED. Is the entry now on the wrong side of
+-- the filter, the list is filtered again - once, shortly after, however many updates arrive.
+---------------------------------------------------------------------------
+local REFILTER_DELAY = 0.3
+local refilterPending = false
+
+local function InList(id)
+    for _, v in ipairs(LFGBrowseFrame.results or {}) do
+        if v == id then return true end
+    end
+    return false
+end
+
+local function OnResultUpdated(id)
+    if refilterPending or not ns.FilterActive() or not LFGBrowseFrame then return end
+    local entry = ns.ReadEntry(id)
+    if not IsSingle(entry) then return end
+    local passes = ns.Passes(entry, db, ns.LevelRange(), ns.OwnArmor())
+    if passes == InList(id) then return end
+    refilterPending = true
+    C_Timer.After(REFILTER_DELAY, function()
+        refilterPending = false
+        ns.RefreshList()
+    end)
+end
+
+-- Blizzard's Group Finder loads on demand, after this addon; hook it once it is there
 local hooked = false
 local function Hook()
     if hooked or not LFGBrowseUtil_SortSearchResults then return end
@@ -146,4 +202,7 @@ end
 local events = CreateFrame("Frame")
 events:RegisterEvent("PLAYER_LOGIN")
 events:RegisterEvent("ADDON_LOADED")
-events:SetScript("OnEvent", function() Hook() end)
+events:RegisterEvent("LFG_LIST_SEARCH_RESULT_UPDATED")
+events:SetScript("OnEvent", function(_, event, id)
+    if event == "LFG_LIST_SEARCH_RESULT_UPDATED" then OnResultUpdated(id) else Hook() end
+end)

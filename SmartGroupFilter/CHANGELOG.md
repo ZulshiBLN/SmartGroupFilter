@@ -11,7 +11,12 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
 - The Group Finder's player list shows only the single players within the level range of the
   dungeon you are listed for (or chose in the list); groups and your own listing stay, delisted
   entries are hidden.
-- A panel docked beside the player list steers the filter: a Filter checkbox with the count of
-  single players shown, the level range as two fields and a slider, one priority row of class
-  icons per role - drag to reorder, right-click to exclude - and the options "Allow double
-  classes" and "Allow same armor class". Saved per character.
+- A panel docked beside the player list steers the filter: the count of single players shown,
+  Reset Filter for Blizzard's own list, the level range as two fields and a slider, one
+  priority row of class icons per role - drag to reorder, right-click to exclude - and the
+  options "Allow double classes" and "Allow same armor class" (off: classes of your armor are
+  greyed and leave the list). Saved per character.
+- A fourth side tab with the SmartGroupFilter logo shows and hides the panel; while it is hidden
+  the list is Blizzard's own.
+- Players whose class and level the game hands over only after the search are filtered as soon
+  as they arrive.

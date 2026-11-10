@@ -90,6 +90,7 @@ function Widget:GetTop() return self.top end
 function Widget:GetBottom() return self.bottom end
 function Widget:GetEffectiveScale() return self.scale end
 function Widget:SetAtlas(a) self.atlas = a return true end
+function Widget:SetTexture(t) self.textureFile = t end
 function Widget:SetColorTexture(...) self.color = { ... } end
 function Widget:SetDesaturated(v) self.desaturated = v and true or false end
 function Widget:SetNumber(n) self.text = tostring(n) end
@@ -105,6 +106,11 @@ function CreateFrame(kind, name, parent, template)
     local f = NewWidget(kind or "Frame", name, parent, template)
     if template and template:find("PortraitFrameTemplate") then
         f.CloseButton = NewWidget("Button", nil, f)
+        function f:SetPortraitToAsset(path) self.portrait = path end
+    end
+    if template == "LargeSideTabButtonTemplate" then
+        f.Icon = NewWidget("Texture", nil, f)
+        function f:SetCustomOnMouseUpHandler(fn) self.mouseUp = fn end
     end
     frames[#frames + 1] = f
     return f
@@ -184,6 +190,7 @@ LFGParentFrame = NewWidget("Frame", "LFGParentFrame", UIParent)
 LFGParentFrame.right, LFGParentFrame.height = 400, 600
 LFGParentFrame.BrowsingTab = NewWidget("CheckButton", nil, LFGParentFrame)
 LFGParentFrame.BrowsingTab.right = 440
+LFGParentFrame.WhoListingTab = NewWidget("CheckButton", nil, LFGParentFrame)
 
 LFGBrowseFrame = NewWidget("Frame", "LFGBrowseFrame", LFGParentFrame)
 LFGBrowseFrame.results = {}
@@ -194,4 +201,20 @@ function LFGBrowseFrame:UpdateResultList()
     for i, id in ipairs(STATE.order) do results[i] = id end
     self.totalResults, self.results = #results, results
     LFGBrowseUtil_SortSearchResults(self.results)
+end
+
+-- The player: STATE.player = { class, level }
+STATE.player = { class = "MAGE", level = 25 }
+function UnitClass() return "Mage", STATE.player.class end
+function UnitLevel() return STATE.player.level end
+
+-- C_Timer.After queues; RUNTIMERS runs what is due, as the client's next frames would
+STATE.timers = {}
+C_Timer = {
+    After = function(_, fn) STATE.timers[#STATE.timers + 1] = fn end,
+}
+function RUNTIMERS()
+    local due = STATE.timers
+    STATE.timers = {}
+    for _, fn in ipairs(due) do fn() end
 end

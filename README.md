@@ -6,7 +6,8 @@ role, class and level - so you can build your own group without scrolling throug
 
 **Status: in development.** Version 0.1.0 filters the player list from a panel docked beside
 it: level range, one priority row of classes per role (drag to reorder, right-click to exclude),
-and a Filter checkbox to see Blizzard's full list. Build Group comes next.
+the armor option, and Reset Filter for Blizzard's full list. A side tab with the logo shows and
+hides the panel. Build Group comes next.
 
 ## Installation
 

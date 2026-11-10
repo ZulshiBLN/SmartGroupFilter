@@ -46,6 +46,9 @@ trap 'rm -rf "$work" "$lists"' EXIT
         case "$line" in ''|'#'*) continue ;; esac
         echo "${line//\\//}"
     done < "$toc"
+    # SGF's own textures - the logo - which Lua loads by path, not the TOC (plan
+    # 2026-11-10-panel-filter-build): only .tga files, only in Media/
+    (cd "$dir" && find Media -maxdepth 1 -type f -name '*.tga' 2>/dev/null)
 } | sort -u > "$lists/files"
 # every folder above a listed file: libs/X/X.lua allows libs/X and libs
 awk -F/ '{ p = ""; for (i = 1; i < NF; i++) { p = p (i > 1 ? "/" : "") $i; print p } }' "$lists/files" | sort -u > "$lists/folders"
