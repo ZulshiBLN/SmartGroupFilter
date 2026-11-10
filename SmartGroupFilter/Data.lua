@@ -70,7 +70,10 @@ D.LIST_FRESH_SECONDS = 30
 -- The panel's options and their defaults. panelShown: the side tab's switch - a hidden panel
 -- leaves Blizzard's list as it is. Reset Filter's "off" is not saved: it lasts until the next
 -- change in the panel or the next login, so the panel never shows a filter that is not applied.
-D.OPTION_DEFAULTS = { allowDouble = false, allowSameArmor = true, panelShown = true }
+D.OPTION_DEFAULTS = { allowDouble = false, allowSameArmor = true, panelShown = true, hideMinimap = false }
+
+-- The minimap button's place on its circle, degrees; 225 = bottom left, as SimpleConjureBar
+D.MINIMAP_ANGLE = 225
 
 -- The project's logo, shipped as Media/Logo.tga: the panel's portrait (cut to the medallion)
 D.LOGO = "Interface\\AddOns\\SmartGroupFilter\\Media\\Logo"

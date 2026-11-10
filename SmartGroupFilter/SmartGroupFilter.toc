@@ -28,4 +28,5 @@ Logic.lua
 Filter.lua
 Build.lua
 Panel.lua
+Minimap.lua
 Main.lua

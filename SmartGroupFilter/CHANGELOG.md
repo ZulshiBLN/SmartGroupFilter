@@ -28,6 +28,9 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   button is greyed out.
 - Not listed yet? The same button reads List Self and lights up Blizzard's eye tab, where you
   choose the dungeon, play style and role; once Blizzard has listed you it reads Build Group.
+- A minimap button with the logo: left-click opens or closes the Group Finder, as Blizzard's
+  button and key do; right-click opens SmartGroupFilter's settings; drag it around the minimap.
+  `/sgf minimap` hides and shows it.
 - `/sgf test` shows in the chat whom Build Group would invite and why, and why every other
   single player is left out - without sending a single invite.
 - The addon loads in every client language and answers `/sgf` with its chat commands; its icon

@@ -22,6 +22,7 @@ SLASH_SMARTGROUPFILTER1 = D.SLASH
 -- In the order the help lists them
 local COMMANDS = {
     { cmd = "help", desc = "CMD_HELP" },
+    { cmd = "minimap", desc = "CMD_MINIMAP" },
     { cmd = "test", desc = "CMD_TEST" },
 }
 
@@ -36,6 +37,8 @@ SlashCmdList.SMARTGROUPFILTER = function(msg)
     msg = (msg or ""):lower():match("^%s*(.-)%s*$")
     if msg == "" or msg == "help" then
         PrintHelp()
+    elseif msg == "minimap" then
+        ns.ToggleMinimapButton()
     elseif msg == "test" then
         ns.DryRun()
     else

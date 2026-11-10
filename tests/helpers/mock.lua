@@ -39,7 +39,7 @@ local function noop() end
 function Widget:SetAllPoints(rel) self.allPointsTo = rel end
 for _, m in ipairs({ "SetAutoFocus", "SetNumeric", "SetMaxLetters", "ClearFocus",
     "RegisterForClicks", "RegisterForDrag", "SetFrameStrata", "SetPortraitShown", "SetTextColor",
-    "SetMotionScriptsWhileDisabled", "SetBlendMode" }) do
+    "SetMotionScriptsWhileDisabled", "SetBlendMode", "SetHighlightTexture" }) do
     Widget[m] = noop
 end
 function Widget:GetFrameStrata() return "MEDIUM" end
@@ -149,10 +149,14 @@ function CreateFrame(kind, name, parent, template)
             self.attributes[k] = v
         end
         function f:GetAttribute(k) return self.attributes[k] end
-        f.scripts.OnClick = function(self)
-            if self.attributes.type == "click" and self.attributes.clickbutton then
-                self.attributes.clickbutton:Click()
-            end
+        -- As SecureButton_GetModifiedAttribute: "type1"/"clickbutton1" for the left button,
+        -- "...2" for the right, else the plain attribute
+        f.scripts.OnClick = function(self, mouse)
+            local n = mouse == "RightButton" and "2" or "1"
+            local a = self.attributes
+            local action = a["type" .. n] or a.type
+            local target = a["clickbutton" .. n] or a.clickbutton
+            if action == "click" and target then target:Click() end
         end
     end
     if template == "LargeSideTabButtonTemplate" or template == "LFGVanillaRightTabTemplate" then
@@ -362,3 +366,16 @@ function CLICK(frame, button)
         if frame.scripts[name] then frame.scripts[name](frame, button or "LeftButton", false) end
     end
 end
+
+-- The minimap and Blizzard's micro menu button for the Group Finder (MainMenuBarMicroButtons.lua)
+Minimap = NewWidget("Frame", "Minimap", UIParent)
+Minimap.cx, Minimap.cy, Minimap.width, Minimap.height = 1000, 600, 140, 140
+Minimap.strata, Minimap.level = "LOW", 2
+function Widget:GetCenter() return self.cx, self.cy end
+function Widget:SetFrameStrata(s) self.strata = s end
+function Widget:GetFrameStrata() return self.strata or "MEDIUM" end
+function Widget:SetFrameLevel(l) self.level = l end
+function Widget:GetFrameLevel() return self.level or 1 end
+STATE.microClicks = 0
+LFDMicroButton = NewWidget("Button", "LFDMicroButton", UIParent)
+function LFDMicroButton:Click() STATE.microClicks = STATE.microClicks + 1 end

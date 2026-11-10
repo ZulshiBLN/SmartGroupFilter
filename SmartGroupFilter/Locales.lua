@@ -52,6 +52,12 @@ locales.enUS = {
     LIST_SELF = "List Self",
     LIST_SELF_TIP = "List yourself on Blizzard's eye tab, top right: choose the dungeon, play style and role there.",
     NOT_LEADER_LIST = "Only the group leader can list the group.",
+    MM_LEFT = "Left-click: open or close the Group Finder",
+    MM_RIGHT = "Right-click: SmartGroupFilter settings",
+    MM_DRAG = "Drag: move this button",
+    CMD_MINIMAP = "Show or hide the minimap button",
+    MINIMAP_SHOWN = "Minimap button shown.",
+    MINIMAP_HIDDEN = "Minimap button hidden. %s brings it back.",
 }
 
 locales.deDE = {
@@ -98,6 +104,12 @@ locales.deDE = {
     LIST_SELF = "Selbst eintragen",
     LIST_SELF_TIP = "Trag dich über Blizzards Augen-Reiter oben rechts ein: dort Dungeon, Spielstil und Rolle wählen.",
     NOT_LEADER_LIST = "Nur der Gruppenleiter kann die Gruppe eintragen.",
+    MM_LEFT = "Linksklick: Gruppensuche öffnen oder schließen",
+    MM_RIGHT = "Rechtsklick: SmartGroupFilter-Einstellungen",
+    MM_DRAG = "Ziehen: diesen Button verschieben",
+    CMD_MINIMAP = "Minimap-Button ein- oder ausblenden",
+    MINIMAP_SHOWN = "Minimap-Button eingeblendet.",
+    MINIMAP_HIDDEN = "Minimap-Button ausgeblendet. %s holt ihn zurück.",
 }
 
 locales.frFR = {
@@ -144,6 +156,12 @@ locales.frFR = {
     LIST_SELF = "S'inscrire",
     LIST_SELF_TIP = "Inscrivez-vous via l'onglet œil de Blizzard en haut à droite : choisissez-y le donjon, le style de jeu et le rôle.",
     NOT_LEADER_LIST = "Seul le chef de groupe peut inscrire le groupe.",
+    MM_LEFT = "Clic gauche : ouvrir ou fermer la recherche de groupe",
+    MM_RIGHT = "Clic droit : paramètres de SmartGroupFilter",
+    MM_DRAG = "Glisser : déplacer ce bouton",
+    CMD_MINIMAP = "Afficher ou masquer le bouton de la minicarte",
+    MINIMAP_SHOWN = "Bouton de la minicarte affiché.",
+    MINIMAP_HIDDEN = "Bouton de la minicarte masqué. %s le fait revenir.",
 }
 
 locales.esES = {
@@ -190,6 +208,12 @@ locales.esES = {
     LIST_SELF = "Inscribirse",
     LIST_SELF_TIP = "Apúntate en la pestaña del ojo de Blizzard, arriba a la derecha: elige allí la mazmorra, el estilo de juego y el rol.",
     NOT_LEADER_LIST = "Solo el líder del grupo puede inscribir al grupo.",
+    MM_LEFT = "Clic izquierdo: abrir o cerrar el buscador de grupos",
+    MM_RIGHT = "Clic derecho: ajustes de SmartGroupFilter",
+    MM_DRAG = "Arrastrar: mover este botón",
+    CMD_MINIMAP = "Mostrar u ocultar el botón del minimapa",
+    MINIMAP_SHOWN = "Botón del minimapa visible.",
+    MINIMAP_HIDDEN = "Botón del minimapa oculto. %s lo recupera.",
 }
 
 -- esMX holds only what differs from esES
@@ -240,6 +264,12 @@ locales.itIT = {
     LIST_SELF = "Iscriviti",
     LIST_SELF_TIP = "Iscriviti dalla scheda con l'occhio di Blizzard in alto a destra: scegli lì spedizione, stile di gioco e ruolo.",
     NOT_LEADER_LIST = "Solo il capogruppo può iscrivere il gruppo.",
+    MM_LEFT = "Clic sinistro: apri o chiudi la ricerca gruppi",
+    MM_RIGHT = "Clic destro: impostazioni di SmartGroupFilter",
+    MM_DRAG = "Trascina: sposta questo pulsante",
+    CMD_MINIMAP = "Mostra o nascondi il pulsante della minimappa",
+    MINIMAP_SHOWN = "Pulsante della minimappa mostrato.",
+    MINIMAP_HIDDEN = "Pulsante della minimappa nascosto. %s lo riporta.",
 }
 
 locales.ptBR = {
@@ -286,6 +316,12 @@ locales.ptBR = {
     LIST_SELF = "Inscrever-se",
     LIST_SELF_TIP = "Inscreva-se na aba do olho da Blizzard, no canto superior direito: escolha lá a masmorra, o estilo de jogo e a função.",
     NOT_LEADER_LIST = "Só o líder do grupo pode inscrever o grupo.",
+    MM_LEFT = "Clique esquerdo: abrir ou fechar o localizador de grupos",
+    MM_RIGHT = "Clique direito: configurações do SmartGroupFilter",
+    MM_DRAG = "Arrastar: mover este botão",
+    CMD_MINIMAP = "Mostrar ou ocultar o botão do minimapa",
+    MINIMAP_SHOWN = "Botão do minimapa exibido.",
+    MINIMAP_HIDDEN = "Botão do minimapa oculto. %s o traz de volta.",
 }
 
 locales.ruRU = {
@@ -332,6 +368,12 @@ locales.ruRU = {
     LIST_SELF = "Записаться",
     LIST_SELF_TIP = "Запишитесь через вкладку с глазом Blizzard справа вверху: выберите там подземелье, стиль игры и роль.",
     NOT_LEADER_LIST = "Записать группу может только лидер.",
+    MM_LEFT = "ЛКМ: открыть или закрыть поиск группы",
+    MM_RIGHT = "ПКМ: настройки SmartGroupFilter",
+    MM_DRAG = "Перетащить: переместить кнопку",
+    CMD_MINIMAP = "Показать или скрыть кнопку у миникарты",
+    MINIMAP_SHOWN = "Кнопка у миникарты показана.",
+    MINIMAP_HIDDEN = "Кнопка у миникарты скрыта. %s вернёт её.",
 }
 
 locales.koKR = {
@@ -378,6 +420,12 @@ locales.koKR = {
     LIST_SELF = "등록하기",
     LIST_SELF_TIP = "오른쪽 위 Blizzard 눈 탭에서 등록하세요: 거기서 던전, 플레이 스타일, 역할을 고르세요.",
     NOT_LEADER_LIST = "파티장만 파티를 등록할 수 있습니다.",
+    MM_LEFT = "왼쪽 클릭: 파티 찾기 열기/닫기",
+    MM_RIGHT = "오른쪽 클릭: SmartGroupFilter 설정",
+    MM_DRAG = "끌기: 이 버튼 이동",
+    CMD_MINIMAP = "미니맵 버튼 표시 또는 숨기기",
+    MINIMAP_SHOWN = "미니맵 버튼을 표시합니다.",
+    MINIMAP_HIDDEN = "미니맵 버튼을 숨겼습니다. %s 입력 시 다시 표시됩니다.",
 }
 
 locales.zhCN = {
@@ -424,6 +472,12 @@ locales.zhCN = {
     LIST_SELF = "登记自己",
     LIST_SELF_TIP = "请通过右上方暴雪的眼睛标签登记：在那里选择地下城、游戏风格和职责。",
     NOT_LEADER_LIST = "只有队长可以为队伍登记。",
+    MM_LEFT = "左键：打开或关闭队伍查找器",
+    MM_RIGHT = "右键：SmartGroupFilter 设置",
+    MM_DRAG = "拖动：移动此按钮",
+    CMD_MINIMAP = "显示或隐藏小地图按钮",
+    MINIMAP_SHOWN = "已显示小地图按钮。",
+    MINIMAP_HIDDEN = "已隐藏小地图按钮。输入 %s 可恢复。",
 }
 
 locales.zhTW = {
@@ -470,6 +524,12 @@ locales.zhTW = {
     LIST_SELF = "登記自己",
     LIST_SELF_TIP = "請透過右上方暴雪的眼睛標籤登記：在那裡選擇地城、遊戲風格和職責。",
     NOT_LEADER_LIST = "只有隊長可以為隊伍登記。",
+    MM_LEFT = "左鍵：開啟或關閉隊伍搜尋器",
+    MM_RIGHT = "右鍵：SmartGroupFilter 設定",
+    MM_DRAG = "拖曳：移動此按鈕",
+    CMD_MINIMAP = "顯示或隱藏小地圖按鈕",
+    MINIMAP_SHOWN = "已顯示小地圖按鈕。",
+    MINIMAP_HIDDEN = "已隱藏小地圖按鈕。輸入 %s 可恢復。",
 }
 
 local client = GetLocale()

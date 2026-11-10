@@ -114,6 +114,10 @@ function ns.InitDB()
     for key, default in pairs(D.OPTION_DEFAULTS) do
         if type(db[key]) ~= "boolean" then db[key] = default end
     end
+    local angle = db.minimapAngle
+    if type(angle) ~= "number" or angle ~= angle or angle < 0 or angle > 360 then
+        db.minimapAngle = D.MINIMAP_ANGLE
+    end
     if type(db.order) ~= "table" then db.order = {} end
     if type(db.excluded) ~= "table" then db.excluded = {} end
     for key in pairs(db.excluded) do

@@ -41,6 +41,7 @@ Not published yet. Once it is, it will be on CurseForge and Wago, and WowUp will
 | Command | What it does |
 |---|---|
 | `/sgf` or `/sgf help` | Lists the chat commands |
+| `/sgf minimap` | Hides or shows the minimap button |
 | `/sgf test` | Shows whom Build Group would invite and why, and why every other single player is left out - sends nothing |
 
 ## Languages
