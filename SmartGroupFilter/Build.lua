@@ -4,8 +4,8 @@
 -- C_PartyInfo.InviteUnit runs only from the button, never from a timer or an event.
 --
 -- Placed players - the ones SGF invited - keep their role's place: while the invite is open
--- (D.HOLD_SECONDS), then as long as they are in the group. An invite that ran out was declined
--- or ignored: the place opens again, and that player is not invited again this session.
+-- (D.HOLD_SECONDS), then as long as they are in the group. An invite declined or left to run
+-- out opens the place again, and that player is not invited again this session (Michel).
 
 local _, ns = ...
 local D, L = ns.D, ns.L
@@ -157,12 +157,47 @@ function ns.CreateBuildButton(parent, anchor)
     return button
 end
 
+-- An active decline: the client's system message ERR_DECLINE_GROUP_S ("%s declines your group
+-- invitation.", in the client's language). The place opens at once, and the player is not
+-- invited again this session (Michel, 2026-11-10).
+local declinePattern
+local function DeclinedName(msg)
+    if type(msg) ~= "string" or (issecretvalue and issecretvalue(msg)) then return nil end
+    if not declinePattern then
+        if type(ERR_DECLINE_GROUP_S) ~= "string" then return nil end
+        local escaped = ERR_DECLINE_GROUP_S:gsub("[%(%)%.%+%-%*%?%[%]%^%$]", "%%%0")
+        declinePattern = "^" .. escaped:gsub("%%s", "(.+)") .. "$"
+    end
+    return msg:match(declinePattern)
+end
+
+-- The system message names the player with or without his realm
+local function PlacedName(name)
+    if placed[name] then return name end
+    for full in pairs(placed) do
+        if full:match("^([^%-]+)") == name then return full end
+    end
+end
+
+local function OnDeclined(name)
+    local full = PlacedName(name)
+    if not full or placed[full].joined then return end
+    placed[full] = nil
+    declined[full] = true
+    ns.UpdateBuildButton()
+end
+
 local events = CreateFrame("Frame")
 events:RegisterEvent("GROUP_ROSTER_UPDATE")
 events:RegisterEvent("LFG_LIST_ACTIVE_ENTRY_UPDATE")
-events:SetScript("OnEvent", function()
-    if button then
-        Prune(Members())
-        ns.UpdateBuildButton()
+events:RegisterEvent("CHAT_MSG_SYSTEM")
+events:SetScript("OnEvent", function(_, event, msg)
+    if not button then return end
+    if event == "CHAT_MSG_SYSTEM" then
+        local name = DeclinedName(msg)
+        if name then OnDeclined(name) end
+        return
     end
+    Prune(Members())
+    ns.UpdateBuildButton()
 end)

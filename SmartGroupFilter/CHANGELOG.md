@@ -24,6 +24,6 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
 - Build Group in the panel: one click invites the players your group lacks - one tank, one
   healer, three damage dealers around your own role - by your priority rows, highest level
   first, then the longest wait, players without a role last. Invited players keep their place
-  for two minutes, and for as long as they are in the group; someone who lets an invite run
-  out is not asked again. The chat names each invite; the button's tooltip says why it is
+  for two minutes, and for as long as they are in the group; someone who declines an invite or
+  lets it run out is not asked again. The chat names each invite; the button's tooltip says why it is
   greyed out.

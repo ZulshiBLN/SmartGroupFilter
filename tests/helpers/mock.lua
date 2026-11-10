@@ -272,3 +272,4 @@ function LFGParentFrameTab2_OnClick()
     STATE.tab2Clicks = STATE.tab2Clicks + 1
     LFGBrowseFrame.shown = true
 end
+ERR_DECLINE_GROUP_S = "%s declines your group invitation."

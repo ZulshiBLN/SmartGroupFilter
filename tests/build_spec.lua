@@ -76,6 +76,32 @@ describe("Build Group", function()
         assert.are.equal("Hun", table.concat(STATE.invites, " ")) -- a damage dealer, not a tank
     end)
 
+    it("opens a place at once when the player declines, and never asks him again", function()
+        click()
+        FIRE("CHAT_MSG_SYSTEM", "Rog declines your group invitation.")
+        STATE.invites = {}
+        click()
+        assert.are.equal("Hun", table.concat(STATE.invites, " ")) -- Rog's place, not Rog
+    end)
+
+    it("knows a declining player by his name without the realm", function()
+        STATE.results[5].player.name = "Rog-Realm"
+        click()
+        FIRE("CHAT_MSG_SYSTEM", "Rog declines your group invitation.")
+        STATE.invites = {}
+        click()
+        assert.are.equal("Hun", table.concat(STATE.invites, " "))
+    end)
+
+    it("ignores other system messages", function()
+        click()
+        FIRE("CHAT_MSG_SYSTEM", "Rog has joined the party.")
+        FIRE("CHAT_MSG_SYSTEM", "Somebody declines your group invitation.")
+        STATE.invites = {}
+        click()
+        assert.are.equal(0, #STATE.invites) -- every place still held
+    end)
+
     it("keeps a joined player's place while he is in the group", function()
         click()
         STATE.party = { { name = "Pal", class = "PALADIN", level = 25 } }
