@@ -80,8 +80,9 @@ describe("the panel", function()
         local healer = panel.rows.HEALER.icons[1]
         assert.are.equal("PRIEST", healer.class)
         assert.is_true(healer.texture.desaturated)
-        assert.is_false(healer.cross.shown) -- greyed, not excluded
-        assert.is_nil(db.excluded.HEALER.PRIEST)
+        assert.is_true(healer.cross.shown) -- the cross, fainter than an exclusion
+        assert.are.equal(0.45, healer.cross.alpha)
+        assert.is_nil(db.excluded.HEALER.PRIEST) -- not saved as an exclusion
         assert.is_false(panel.rows.HEALER.icons[2].texture.desaturated) -- druid: leather
         RUNSCRIPT(healer, "OnEnter")
         assert.are.equal("Same armor class as you", GameTooltip.lines[3])
@@ -89,11 +90,15 @@ describe("the panel", function()
         panel.armorCheck:SetChecked(true)
         RUNSCRIPT(panel.armorCheck, "OnClick")
         assert.is_false(healer.texture.desaturated)
+        assert.is_false(healer.cross.shown)
+        RUNSCRIPT(healer, "OnClick", "RightButton")
+        assert.are.equal(1, healer.cross.alpha) -- an exclusion: the full cross
     end)
 
     it("shows and hides the panel with a fourth side tab, remembered, Blizzard's list while hidden", function()
         local tab = ns.tab
         assert.are.equal(LFGBrowseFrame, tab.parent)
+        assert.are.equal("LFGVanillaRightTabTemplate", tab.template) -- Blizzard's tabs' own
         assert.are.same({ "TOPLEFT", LFGParentFrame.WhoListingTab, "BOTTOMLEFT", 0, -2 }, tab.points[1])
         assert.are.equal("Interface\\AddOns\\SmartGroupFilter\\Media\\Logo", tab.Icon.textureFile)
         tab.mouseUp(tab, "LeftButton", true)

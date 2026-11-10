@@ -16,6 +16,7 @@ local SLOT = 32        -- an icon's slot in a row, px
 local ICON = 28
 local PER_LINE = 5     -- icons per line; the damage row takes two lines
 local TRACK = 236      -- the level slider's track, px
+local SAME_ARMOR_ALPHA = 0.45 -- the cross over a class of the player's armor
 
 local panel
 local LayoutRows -- defined with the rows below
@@ -188,8 +189,10 @@ local function LayoutRow(row)
         icon.texture:SetAtlas(D.CLASS_ATLAS[class])
         local excluded = db.excluded[row.role][class] and true or false
         icon.sameArmor = SameArmor(class)
+        -- Excluded: the full red cross; the player's armor: the same cross, fainter (Michel)
         icon.texture:SetDesaturated(excluded or icon.sameArmor)
-        icon.cross:SetShown(excluded)
+        icon.cross:SetShown(excluded or icon.sameArmor)
+        icon.cross:SetAlpha(excluded and 1 or SAME_ARMOR_ALPHA)
         icon:ClearAllPoints()
         local col, line = (i - 1) % PER_LINE, math.floor((i - 1) / PER_LINE)
         icon:SetPoint("TOPLEFT", row, "TOPLEFT", col * SLOT, -line * SLOT)
@@ -298,9 +301,18 @@ local function RefreshAll()
     UpdateCount(ns.Counts())
 end
 
+-- The template of Blizzard's three side tabs (Mainline/Blizzard_LFGVanilla_ParentFrame.xml): its
+-- fillToInterior gives the black edge; the plain LargeSideTabButtonTemplate has a golden one.
+-- Its OnLoad sets a click that switches Blizzard's tabs - replaced below.
+local function TabTemplate()
+    local exists = C_XMLUtil and C_XMLUtil.GetTemplateInfo
+    if exists and exists("LFGVanillaRightTabTemplate") then return "LFGVanillaRightTabTemplate" end
+    return "LargeSideTabButtonTemplate"
+end
+
 -- The fourth side tab, below Blizzard's three and made from the same template, with the logo
 local function ToggleTab()
-    local tab = CreateFrame("Frame", "SmartGroupFilterTab", LFGBrowseFrame, "LargeSideTabButtonTemplate")
+    local tab = CreateFrame("Frame", "SmartGroupFilterTab", LFGBrowseFrame, TabTemplate())
     ns.tab = tab
     local who = LFGParentFrame.WhoListingTab
     if who then

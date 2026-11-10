@@ -91,6 +91,7 @@ function Widget:GetBottom() return self.bottom end
 function Widget:GetEffectiveScale() return self.scale end
 function Widget:SetAtlas(a) self.atlas = a return true end
 function Widget:SetTexture(t) self.textureFile = t end
+function Widget:SetAlpha(a) self.alpha = a end
 function Widget:SetColorTexture(...) self.color = { ... } end
 function Widget:SetDesaturated(v) self.desaturated = v and true or false end
 function Widget:SetNumber(n) self.text = tostring(n) end
@@ -108,7 +109,7 @@ function CreateFrame(kind, name, parent, template)
         f.CloseButton = NewWidget("Button", nil, f)
         function f:SetPortraitToAsset(path) self.portrait = path end
     end
-    if template == "LargeSideTabButtonTemplate" then
+    if template == "LargeSideTabButtonTemplate" or template == "LFGVanillaRightTabTemplate" then
         f.Icon = NewWidget("Texture", nil, f)
         function f:SetCustomOnMouseUpHandler(fn) self.mouseUp = fn end
     end
@@ -218,3 +219,9 @@ function RUNTIMERS()
     STATE.timers = {}
     for _, fn in ipairs(due) do fn() end
 end
+
+-- Templates the client knows: STATE.templates
+STATE.templates = { LFGVanillaRightTabTemplate = true, LargeSideTabButtonTemplate = true }
+C_XMLUtil = {
+    GetTemplateInfo = function(name) return STATE.templates[name] and {} or nil end,
+}

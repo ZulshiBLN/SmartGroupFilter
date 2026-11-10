@@ -28,7 +28,7 @@ read_globals = {
     "C_AddOns", "CreateFrame", "GetLocale",
     -- Group Finder (Blizzard_LFGVanilla_Browse.lua, Forever 1.60.1)
     "C_LFGList", "LFGBrowseFrame", "LFGBrowseUtil_SortSearchResults", "hooksecurefunc",
-    "GetMaxPlayerLevel", "issecretvalue", "UnitClass", "UnitLevel", "C_Timer",
+    "GetMaxPlayerLevel", "issecretvalue", "UnitClass", "UnitLevel", "C_Timer", "C_XMLUtil",
     -- The panel
     "LFGParentFrame", "UIParent", "GameTooltip", "GetCursorPosition",
     "LOCALIZED_CLASS_NAMES_MALE", "TANK", "HEALER", "DAMAGER",

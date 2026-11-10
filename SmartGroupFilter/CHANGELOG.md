@@ -14,8 +14,8 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
 - A panel docked beside the player list steers the filter: the count of players shown (bottom right),
   Reset Filter for Blizzard's own list, the level range as two fields and a slider, one
   priority row of class icons per role - drag to reorder, right-click to exclude - and the
-  options "Allow double classes" and "Allow same armor class" (off: classes of your armor are
-  greyed and leave the list). Saved per character.
+  options "Allow double classes" and "Allow same armor class" (off: classes of your armor get a
+  faint cross and leave the list). Saved per character.
 - A fourth side tab with the SmartGroupFilter logo shows and hides the panel; while it is hidden
   the list is Blizzard's own.
 - Players whose class and level the game hands over only after the search are filtered as soon
