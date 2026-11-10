@@ -406,6 +406,7 @@ end
 -- List Self's pointer: Blizzard's eye tab (the listing page) glows for a few seconds. SGF does
 -- not switch the page itself (see the side tab above).
 local GLOW_SECONDS = 5
+local GLOW_GROW = 6 -- px the outer glow layer reaches beyond the tab
 function ns.PointToListing()
     local target = LFGParentFrame.ListingTab
     if not target then return end
@@ -415,14 +416,21 @@ function ns.PointToListing()
         ns.listingGlow = glow
         glow:SetAllPoints(target)
         glow:SetFrameStrata("HIGH")
-        local tex = glow:CreateTexture(nil, "OVERLAY")
-        tex:SetAllPoints()
-        Art(tex, "common-sidetab-hover", 1, 0.82, 0, 0.5)
-        if tex.SetBlendMode then tex:SetBlendMode("ADD") end
-        glow.texture = tex
+        -- Two additive layers, the outer one a little larger than the tab: a strong pulse
+        -- (Michel found one layer too faint)
+        glow.layers = {}
+        for i, grow in ipairs({ 0, GLOW_GROW }) do
+            local tex = glow:CreateTexture(nil, "OVERLAY")
+            tex:SetPoint("TOPLEFT", glow, "TOPLEFT", -grow, grow)
+            tex:SetPoint("BOTTOMRIGHT", glow, "BOTTOMRIGHT", grow, -grow)
+            Art(tex, "common-sidetab-hover", 1, 0.82, 0, 0.7)
+            if tex.SetBlendMode then tex:SetBlendMode("ADD") end
+            glow.layers[i] = tex
+        end
         glow:SetScript("OnUpdate", function(self, elapsed)
             self.t = (self.t or 0) + elapsed
-            self.texture:SetAlpha(0.55 + 0.45 * math.sin(self.t * 6))
+            local a = 0.3 + 0.7 * (0.5 + 0.5 * math.sin(self.t * 7))
+            for _, tex in ipairs(self.layers) do tex:SetAlpha(a) end
         end)
     end
     glow.t = 0
