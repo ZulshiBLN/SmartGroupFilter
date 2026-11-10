@@ -22,6 +22,7 @@ SLASH_SMARTGROUPFILTER1 = D.SLASH
 -- In the order the help lists them
 local COMMANDS = {
     { cmd = "help", desc = "CMD_HELP" },
+    { cmd = "test", desc = "CMD_TEST" },
 }
 
 local function PrintHelp()
@@ -35,6 +36,8 @@ SlashCmdList.SMARTGROUPFILTER = function(msg)
     msg = (msg or ""):lower():match("^%s*(.-)%s*$")
     if msg == "" or msg == "help" then
         PrintHelp()
+    elseif msg == "test" then
+        ns.DryRun()
     else
         ns.Print(L.CMD_UNKNOWN:format("|cffffd100" .. D.SLASH .. " help|r"))
     end

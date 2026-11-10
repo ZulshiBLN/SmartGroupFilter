@@ -45,6 +45,7 @@ locales.enUS = {
     NO_OWN_ROLE = "Your listing has no role.",
     GROUP_FULL = "Your group is full.",
     NO_CANDIDATE = "No fitting player in the list.",
+    CMD_TEST = "Show whom Build Group would invite, and why - sends nothing",
 }
 
 locales.deDE = {
@@ -84,6 +85,7 @@ locales.deDE = {
     NO_OWN_ROLE = "Dein Eintrag hat keine Rolle.",
     GROUP_FULL = "Deine Gruppe ist voll.",
     NO_CANDIDATE = "Kein passender Spieler in der Liste.",
+    CMD_TEST = "Zeigen, wen Build Group einladen würde und warum - verschickt nichts",
 }
 
 locales.frFR = {
@@ -123,6 +125,7 @@ locales.frFR = {
     NO_OWN_ROLE = "Votre inscription n'a pas de rôle.",
     GROUP_FULL = "Votre groupe est complet.",
     NO_CANDIDATE = "Aucun joueur adapté dans la liste.",
+    CMD_TEST = "Montrer qui Build Group inviterait et pourquoi - n'envoie rien",
 }
 
 locales.esES = {
@@ -162,6 +165,7 @@ locales.esES = {
     NO_OWN_ROLE = "Tu inscripción no tiene rol.",
     GROUP_FULL = "Tu grupo está completo.",
     NO_CANDIDATE = "Ningún jugador adecuado en la lista.",
+    CMD_TEST = "Mostrar a quién invitaría Build Group y por qué - no envía nada",
 }
 
 -- esMX holds only what differs from esES
@@ -205,6 +209,7 @@ locales.itIT = {
     NO_OWN_ROLE = "La tua iscrizione non ha un ruolo.",
     GROUP_FULL = "Il tuo gruppo è al completo.",
     NO_CANDIDATE = "Nessun giocatore adatto nell'elenco.",
+    CMD_TEST = "Mostra chi inviterebbe Build Group e perché - non invia nulla",
 }
 
 locales.ptBR = {
@@ -244,6 +249,7 @@ locales.ptBR = {
     NO_OWN_ROLE = "Sua inscrição não tem função.",
     GROUP_FULL = "Seu grupo está completo.",
     NO_CANDIDATE = "Nenhum jogador adequado na lista.",
+    CMD_TEST = "Mostrar quem o Build Group convidaria e por quê - não envia nada",
 }
 
 locales.ruRU = {
@@ -283,6 +289,7 @@ locales.ruRU = {
     NO_OWN_ROLE = "В вашей записи не указана роль.",
     GROUP_FULL = "Ваша группа заполнена.",
     NO_CANDIDATE = "В списке нет подходящих игроков.",
+    CMD_TEST = "Показать, кого пригласил бы Build Group и почему - ничего не отправляет",
 }
 
 locales.koKR = {
@@ -322,6 +329,7 @@ locales.koKR = {
     NO_OWN_ROLE = "등록에 역할이 없습니다.",
     GROUP_FULL = "파티가 가득 찼습니다.",
     NO_CANDIDATE = "목록에 맞는 플레이어가 없습니다.",
+    CMD_TEST = "Build Group이 누구를 왜 초대할지 표시 - 아무것도 보내지 않음",
 }
 
 locales.zhCN = {
@@ -361,6 +369,7 @@ locales.zhCN = {
     NO_OWN_ROLE = "你的登记没有职责。",
     GROUP_FULL = "你的队伍已满。",
     NO_CANDIDATE = "列表中没有合适的玩家。",
+    CMD_TEST = "显示 Build Group 会邀请谁及原因 - 不发送任何内容",
 }
 
 locales.zhTW = {
@@ -400,6 +409,7 @@ locales.zhTW = {
     NO_OWN_ROLE = "你的登記沒有職責。",
     GROUP_FULL = "你的隊伍已滿。",
     NO_CANDIDATE = "列表中沒有合適的玩家。",
+    CMD_TEST = "顯示 Build Group 會邀請誰及原因 - 不傳送任何內容",
 }
 
 local client = GetLocale()

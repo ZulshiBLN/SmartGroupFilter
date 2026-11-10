@@ -163,6 +163,56 @@ describe("Build Group", function()
         assert.are.equal("List yourself in the Group Finder first.", GameTooltip.lines[2])
     end)
 
+    describe("/sgf test", function()
+        local function lines()
+            return table.concat(CHAT, "\n")
+        end
+
+        before_each(function()
+            for i = #CHAT, 1, -1 do CHAT[i] = nil end
+        end)
+
+        it("shows whom a click would invite and why, and invites nobody", function()
+            result(7, "Old", "MAGE", 35, { dps = true })
+            result(8, "NoRole", "DRUID", 25)
+            LFGBrowseFrame:UpdateResultList()
+            SlashCmdList.SMARTGROUPFILTER("test")
+            local out = lines()
+            assert.are.equal(0, #STATE.invites)
+            assert.truthy(out:find("nothing is sent", 1, true))
+            assert.truthy(out:find("You: MAGE 25, listed as damager.", 1, true))
+            assert.truthy(out:find("Places to fill: tank 1, healer 1, damage 2.", 1, true))
+            assert.truthy(out:find("1. tank: Pal - PALADIN 25, tank, waits 0s, row place 1", 1, true))
+            assert.truthy(out:find("4. damager: Rog - ROGUE 25, damager, waits 0s, row place 3", 1, true))
+            assert.truthy(out:find("War WARRIOR 26 (tank): a higher choice took the place", 1, true))
+            assert.truthy(out:find("Old MAGE 35 (damager): level 35 outside 20-30", 1, true))
+            assert.truthy(out:find("NoRole DRUID 25 (no role): a higher choice", 1, true))
+        end)
+
+        it("names exclusions, the armor rule, invited and declined players", function()
+            db.excluded.DAMAGER.HUNTER = true
+            click()
+            FIRE("CHAT_MSG_SYSTEM", "Rog declines your group invitation.")
+            for i = #CHAT, 1, -1 do CHAT[i] = nil end
+            SlashCmdList.SMARTGROUPFILTER("test")
+            local out = lines()
+            assert.truthy(out:find("Hun HUNTER 25 (damager): no row takes this class", 1, true))
+            assert.truthy(out:find("Pal PALADIN 25 (tank): already invited", 1, true))
+            assert.truthy(out:find("Rog ROGUE 25 (damager): declined", 1, true))
+        end)
+
+        it("says why it would do nothing", function()
+            STATE.activeEntry = nil
+            SlashCmdList.SMARTGROUPFILTER("test")
+            assert.truthy(lines():find("Would do nothing: List yourself in the Group Finder first.", 1, true))
+        end)
+
+        it("is listed in the help", function()
+            SlashCmdList.SMARTGROUPFILTER("help")
+            assert.truthy(lines():find("/sgf test", 1, true))
+        end)
+    end)
+
     it("invites one player per click in one-per-click mode, naming the next on the button", function()
         ns.D.INVITES_PER_CLICK = 1
         ns.UpdateBuildButton()

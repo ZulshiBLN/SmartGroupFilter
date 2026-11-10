@@ -77,7 +77,7 @@ local function Candidates()
 end
 
 -- What the next click would do: a list of { name, role, class, level }, or nil and the key of
--- the reason it can do nothing
+-- the reason it can do nothing; then the state the choice was made from and its start (Logic)
 local function Plan()
     if not C_LFGList.HasActiveEntryInfo() then return nil, "NEED_LISTING" end
     if IsInGroup() and not (UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")) then
@@ -86,24 +86,20 @@ local function Plan()
     local members = Members()
     Prune(members)
     local _, class = UnitClass("player")
-    local list, why = ns.ChooseInvites({
+    local state = {
         own = { class = class, level = UnitLevel("player"), roles = C_LFGListRoles.GetRoles() },
         members = members, placed = placed, numGroupMembers = GetNumGroupMembers(),
         candidates = Candidates(), db = db, range = ns.LevelRange(),
-    })
-    if not list then return nil, why end
+    }
+    local list, why, info = ns.ChooseInvites(state)
+    if not list then return nil, why, state end
     if #list == 0 then
         -- Nobody chosen: no place left to fill, or no player for the places left
-        local waiting, held = 0, 0
-        for _, p in pairs(placed) do
-            held = held + 1
-            if not p.joined then waiting = waiting + 1 end
-        end
-        local free = D.GROUP_SIZE - math.max(1, GetNumGroupMembers()) - waiting
-        local open = D.GROUP_SIZE - 1 - held -- role places: all but the player's own and SGF's
-        return nil, (free <= 0 or open <= 0) and "GROUP_FULL" or "NO_CANDIDATE"
+        local open = 0
+        for _, n in pairs(info.open) do open = open + n end
+        return nil, (info.free <= 0 or open <= 0) and "GROUP_FULL" or "NO_CANDIDATE", state, info
     end
-    return list
+    return list, nil, state, info
 end
 
 local button
@@ -155,6 +151,106 @@ function ns.CreateBuildButton(parent, anchor)
     ns.OnLanguageChanged(ns.UpdateBuildButton)
     ns.UpdateBuildButton()
     return button
+end
+
+---------------------------------------------------------------------------
+-- /sgf test: what the next click would do and why, invites nothing (Michel, 2026-11-10).
+-- Technical output, English on purpose (ruleset localization.md).
+---------------------------------------------------------------------------
+local function RolesText(roles)
+    local out = {}
+    for _, role in ipairs(D.ROLES) do
+        if roles and roles[D.ROLE_FIELD[role]] then out[#out + 1] = role:lower() end
+    end
+    return #out > 0 and table.concat(out, "+") or "no role"
+end
+
+local function RowPlace(role, class)
+    for i, c in ipairs(db.order[role]) do
+        if c == class then return i end
+    end
+end
+
+-- Why a single player of the list is not chosen, checked in the order Logic.lua checks
+local function WhyNot(e, state, chosenNames, ownArmor)
+    if e.isDelisted then return "delisted" end
+    if not e.name then return "name not readable" end
+    if not (e.class and e.level and e.level >= 1) then return "class or level not loaded yet" end
+    if declined[e.name] then return "declined or let an invite run out" end
+    if placed[e.name] then return "already invited" end
+    for _, m in ipairs(state.members) do
+        if m.name == e.name then return "in your group" end
+    end
+    local r = state.range
+    if e.level < r.min or e.level > r.max then
+        return ("level %d outside %d-%d"):format(e.level, r.min, r.max)
+    end
+    local fits = false
+    for _, role in ipairs(D.ROLES) do
+        local signed = RolesText(e.roles) ~= "no role"
+        if D.ROLE_CLASSES[role][e.class] and not db.excluded[role][e.class]
+            and (not signed or e.roles[D.ROLE_FIELD[role]]) then
+            fits = true
+        end
+    end
+    if not fits then return "no row takes this class for its role" end
+    if not db.allowSameArmor and ns.ArmorOf(e.class, e.level) == ownArmor then
+        return "same armor class as you"
+    end
+    if chosenNames[e.name] then return nil end
+    return "a higher choice took the place, or the class limit is reached"
+end
+
+function ns.DryRun()
+    local list, why, state, info = Plan()
+    ns.Print("Build Group test - nothing is sent.")
+    if not state then
+        print("  Would do nothing: " .. L[why])
+        return
+    end
+    local own, r = state.own, state.range
+    print(("  You: %s %s, listed as %s."):format(tostring(own.class), tostring(own.level), RolesText(own.roles)))
+    print(("  Level range %d-%d; double classes %s; same armor class %s."):format(r.min, r.max,
+        db.allowDouble and "allowed" or "not allowed", db.allowSameArmor and "allowed" or "not allowed"))
+    local held = 0
+    for _ in pairs(placed) do held = held + 1 end
+    if info then
+        print(("  Your place: %s. Group %d of %d, free %d, invited and pending %d."):format(
+            info.ownRole:lower(), math.max(1, state.numGroupMembers), D.GROUP_SIZE, info.free, info.waiting))
+        print(("  Places to fill: tank %d, healer %d, damage %d."):format(info.open.TANK, info.open.HEALER,
+            info.open.DAMAGER))
+    end
+    local chosenNames = {}
+    if list then
+        print(("  Would invite (%s):"):format(D.INVITES_PER_CLICK == 1 and "first one per click" or "all in one click"))
+        for i, c in ipairs(list) do
+            chosenNames[c.name] = true
+            local e
+            for _, cand in ipairs(state.candidates) do
+                if cand.name == c.name then e = cand end
+            end
+            print(("   %d. %s: %s - %s %d, %s, waits %ds, row place %d"):format(i, c.role:lower(), c.name,
+                c.class, c.level, RolesText(e and e.roles), e and e.age or 0, RowPlace(c.role, c.class) or 0))
+        end
+    else
+        print("  Would invite nobody: " .. L[why])
+    end
+    local ownArmor = ns.ArmorOf(own.class, own.level)
+    print("  Not chosen:")
+    local left = 0
+    local _, ids = C_LFGList.GetFilteredSearchResults()
+    for _, id in ipairs(ids or {}) do
+        local e = ns.ReadEntry(id) or {}
+        if e.numMembers == 1 and not e.hasSelf then
+            local reason = WhyNot(e, state, chosenNames, ownArmor)
+            if reason then
+                left = left + 1
+                print(("   - %s %s %s (%s): %s"):format(tostring(e.name), tostring(e.class), tostring(e.level),
+                    RolesText(e.roles), reason))
+            end
+        end
+    end
+    if left == 0 then print("   nobody") end
 end
 
 -- An active decline: the client's system message ERR_DECLINE_GROUP_S ("%s declines your group

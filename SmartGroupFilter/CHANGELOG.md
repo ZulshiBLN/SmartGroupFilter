@@ -27,3 +27,5 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   for two minutes, and for as long as they are in the group; someone who declines an invite or
   lets it run out is not asked again. The chat names each invite; the button's tooltip says why it is
   greyed out.
+- `/sgf test` shows in the chat whom Build Group would invite and why, and why every other
+  single player is left out - without sending a single invite.

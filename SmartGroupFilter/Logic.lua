@@ -76,7 +76,8 @@ end
 --   numGroupMembers GetNumGroupMembers(): 0 alone, else the group's size with the player
 --   candidates      entries from the Group Finder list
 --   db, range
--- Returns a list of { name, role, class, level }, or nil and the reason.
+-- Returns a list of { name, role, class, level }, nil and a table of what the choice started
+-- from ({ ownRole, free, waiting, open }); or nil and the reason.
 function ns.ChooseInvites(state)
     local db, own = state.db, state.own
     local ownRole
@@ -104,6 +105,9 @@ function ns.ChooseInvites(state)
         end
     end
     local free = D.GROUP_SIZE - math.max(1, state.numGroupMembers) - waiting
+    -- What the choice starts from, for /sgf test
+    local info = { ownRole = ownRole, free = free, waiting = waiting, open = {} }
+    for role, n in pairs(open) do info.open[role] = n end
 
     local signed, unsigned = {}, {}
     for _, e in ipairs(state.candidates) do
@@ -146,5 +150,5 @@ function ns.ChooseInvites(state)
             end
         end
     end
-    return chosen
+    return chosen, nil, info
 end
