@@ -270,12 +270,18 @@ describe("Build Group", function()
             click()
             local glow = ns.listingGlow
             assert.is_true(glow.shown)
+            -- Blizzard's proc loop, as SmartBlessingBar's button glow
+            assert.are.equal("UI-HUD-ActionBar-Proc-Loop-Flipbook", glow.texture.atlas)
+            assert.is_true(glow.anim.playing)
+            assert.are.equal(30, glow.anim.animations[1].frames)
             assert.are.same({ LFGParentFrame.ListingTab }, { glow.allPointsTo })
             assert.are.equal(0, STATE.tab1Clicks)
             assert.are.equal(0, #STATE.invites)
             STATE.time = STATE.time + 6
             RUNTIMERS()
             assert.is_false(glow.shown) -- a few seconds, then gone
+            RUNSCRIPT(glow, "OnHide")
+            assert.is_false(glow.anim.playing)
         end)
 
         it("reads Build Group once Blizzard has listed you and searched", function()

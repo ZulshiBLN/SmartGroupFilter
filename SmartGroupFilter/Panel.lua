@@ -411,28 +411,32 @@ function ns.PointToListing()
     if not target then return end
     local glow = ns.listingGlow
     if not glow then
+        -- The modern client's proc loop, as SmartBlessingBar's button glow (ns.AttachAnts):
+        -- Blizzard's flipbook atlas of 6 x 5 cells, 30 frames, 1.4 times the tab, on a frame of
+        -- SGF's own above Blizzard's tab - the tab itself is not touched (Michel, 2026-11-11)
         glow = CreateFrame("Frame", nil, LFGParentFrame)
         ns.listingGlow = glow
         glow:SetAllPoints(target)
         glow:SetFrameStrata("HIGH")
-        -- Two additive layers of the tab's own size: a strong pulse without a hard edge
-        -- (Michel: one layer too faint; a larger layer drew a frame)
-        glow.layers = {}
-        for i = 1, 2 do
-            local tex = glow:CreateTexture(nil, "OVERLAY")
-            tex:SetAllPoints()
-            Art(tex, "common-sidetab-hover", 1, 0.82, 0, 0.7)
-            if tex.SetBlendMode then tex:SetBlendMode("ADD") end
-            glow.layers[i] = tex
-        end
-        glow:SetScript("OnUpdate", function(self, elapsed)
-            self.t = (self.t or 0) + elapsed
-            local a = 0.3 + 0.7 * (0.5 + 0.5 * math.sin(self.t * 7))
-            for _, tex in ipairs(self.layers) do tex:SetAlpha(a) end
-        end)
+        local size = math.max(target:GetWidth(), target:GetHeight())
+        if size <= 0 then size = 55 end
+        local tex = glow:CreateTexture(nil, "OVERLAY")
+        tex:SetAtlas(D.GLOW_ATLAS)
+        tex:SetPoint("CENTER")
+        tex:SetSize(size * D.GLOW_SCALE, size * D.GLOW_SCALE)
+        glow.texture = tex
+        local anim = tex:CreateAnimationGroup()
+        anim:SetLooping("REPEAT")
+        local flip = anim:CreateAnimation("FlipBook")
+        flip:SetFlipBookRows(D.GLOW_ROWS)
+        flip:SetFlipBookColumns(D.GLOW_COLUMNS)
+        flip:SetFlipBookFrames(D.GLOW_FRAMES)
+        flip:SetDuration(D.GLOW_SECONDS_PER_LOOP)
+        glow.anim = anim
+        glow:SetScript("OnHide", function(self) self.anim:Stop() end)
     end
-    glow.t = 0
     glow:Show()
+    glow.anim:Play()
     glow.token = (glow.token or 0) + 1
     local token = glow.token
     C_Timer.After(GLOW_SECONDS, function()

@@ -76,5 +76,12 @@ D.OPTION_DEFAULTS = { allowDouble = false, allowSameArmor = true, panelShown = t
 D.LOGO = "Interface\\AddOns\\SmartGroupFilter\\Media\\Logo"
 -- The portrait's shift from the template's place, x and y in px: left and up (Michel, in game)
 D.PORTRAIT_NUDGE = { -2, 2 }
+-- List Self's pointer on Blizzard's eye tab: the modern client's proc loop, as
+-- SmartBlessingBar's button glow - Blizzard's flipbook atlas of 6 x 5 cells, 30 frames, 1.4
+-- times the tab, one loop a second (Blizzard's own speed)
+D.GLOW_ATLAS = "UI-HUD-ActionBar-Proc-Loop-Flipbook"
+D.GLOW_ROWS, D.GLOW_COLUMNS, D.GLOW_FRAMES = 6, 5, 30
+D.GLOW_SCALE = 1.4
+D.GLOW_SECONDS_PER_LOOP = 1
 -- The side tab's icon: the full logo with its own gold ring (Media/Tab.tga)
 D.TAB_ICON = "Interface\\AddOns\\SmartGroupFilter\\Media\\Tab"

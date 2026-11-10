@@ -101,6 +101,24 @@ function Widget:SetDesaturated(v) self.desaturated = v and true or false end
 function Widget:SetNumber(n) self.text = tostring(n) end
 function Widget:GetNumber() return tonumber(self.text) or 0 end
 function Widget:CreateTexture(name) return NewWidget("Texture", name, self) end
+-- Animation groups: a flipbook records its cells and whether it plays
+function Widget:CreateAnimationGroup()
+    local group = { playing = false, animations = {} }
+    group.SetLooping = function(g, v) g.looping = v end
+    group.Play = function(g) g.playing = true end
+    group.Stop = function(g) g.playing = false end
+    function group.CreateAnimation(g, kind)
+        local a = { kind = kind }
+        a.SetFlipBookRows = function(anim, n) anim.rows = n end
+        a.SetFlipBookColumns = function(anim, n) anim.columns = n end
+        a.SetFlipBookFrames = function(anim, n) anim.frames = n end
+        a.SetDuration = function(anim, d) anim.duration = d end
+        g.animations[#g.animations + 1] = a
+        return a
+    end
+    self.animGroup = group
+    return group
+end
 function Widget:CreateFontString(name) return NewWidget("FontString", name, self) end
 function Widget:GetTitleText()
     self.titleText = self.titleText or NewWidget("FontString", nil, self)
