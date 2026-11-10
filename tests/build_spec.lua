@@ -186,6 +186,40 @@ describe("Build Group", function()
         end)
     end)
 
+    it("looks again every second, so a run-out invite frees its place without an event", function()
+        click()
+        STATE.party = { { name = "Pal", class = "PALADIN", level = 25 }, { name = "Pri", class = "PRIEST", level = 24 },
+            { name = "Wlk", class = "WARLOCK", level = 25 } }
+        FIRE("GROUP_ROSTER_UPDATE")
+        assert.is_false(button:IsEnabled()) -- three in the group, Rog still awaited: full
+        ns.D.LIST_FRESH_SECONDS = 1000 -- the list stays fresh: only the clock moves
+        STATE.time = STATE.time + 121 -- Rog never came; no event follows
+        RUNSCRIPT(button, "OnUpdate", 0.5)
+        assert.is_false(button:IsEnabled()) -- not yet a second
+        RUNSCRIPT(button, "OnUpdate", 0.6)
+        assert.is_true(button:IsEnabled())
+        assert.are.equal("Build Group", button.text)
+    end)
+
+    it("says the group is full when the game delisted the full group", function()
+        STATE.party = { { name = "A", class = "HUNTER", level = 25 }, { name = "B", class = "ROGUE", level = 25 },
+            { name = "C", class = "PRIEST", level = 25 }, { name = "D", class = "PALADIN", level = 25 } }
+        STATE.activeEntry = nil
+        ns.UpdateBuildButton()
+        assert.are.equal("Your group is full.", button.reason)
+    end)
+
+    it("lists SGF's invites with their state in /sgf test", function()
+        click()
+        STATE.party = { { name = "Pal", class = "PALADIN", level = 25 } }
+        FIRE("GROUP_ROSTER_UPDATE")
+        STATE.time = STATE.time + 20
+        for i = #CHAT, 1, -1 do CHAT[i] = nil end
+        SlashCmdList.SMARTGROUPFILTER("test")
+        assert.is_true(said("Invited by SGF: Pal, tank - in the group."))
+        assert.is_true(said("Invited by SGF: Pri, healer - waiting, 100s left."))
+    end)
+
     it("treats a player already in another group like a decline", function()
         click()
         FIRE("CHAT_MSG_SYSTEM", "Rog is already in a group.")

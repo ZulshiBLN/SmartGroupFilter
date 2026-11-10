@@ -79,6 +79,8 @@ end
 -- What the next click would do: a list of { name, role, class, level }, or nil and the key of
 -- the reason it can do nothing; then the state the choice was made from and its start (Logic)
 local function Plan()
+    -- A full group is delisted by the game: say it is full, not that the listing is missing
+    if GetNumGroupMembers() >= D.GROUP_SIZE then return nil, "GROUP_FULL" end
     if not C_LFGList.HasActiveEntryInfo() then return nil, "NEED_LISTING" end
     if IsInGroup() and not (UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")) then
         return nil, "NOT_LEADER"
@@ -179,6 +181,16 @@ function ns.CreateBuildButton(parent, anchor)
     end)
     button:SetScript("OnLeave", function() GameTooltip:Hide() end)
     ns.OnListFiltered(ns.UpdateBuildButton)
+    -- Invites run out and lists grow old without an event: look again every second while the
+    -- button is shown (Michel saw it stay greyed after a player was already in a group)
+    local since = 0
+    button:SetScript("OnUpdate", function(_, elapsed)
+        since = since + elapsed
+        if since >= 1 then
+            since = 0
+            ns.UpdateBuildButton()
+        end
+    end)
     ns.OnLanguageChanged(ns.UpdateBuildButton)
     ns.UpdateBuildButton()
     return button
@@ -283,8 +295,11 @@ function ns.DryRun()
     print(("  You: %s %s, listed as %s."):format(tostring(own.class), tostring(own.level), RolesText(own.roles)))
     print(("  Level range %d-%d; double classes %s; same armor class %s."):format(r.min, r.max,
         db.allowDouble and "allowed" or "not allowed", db.allowSameArmor and "allowed" or "not allowed"))
-    local held = 0
-    for _ in pairs(placed) do held = held + 1 end
+    local now = GetTime()
+    for name, p in pairs(placed) do
+        print(("  Invited by SGF: %s, %s - %s."):format(name, p.role:lower(), p.joined and "in the group"
+            or ("waiting, %ds left"):format(math.max(0, math.floor(p["until"] - now)))))
+    end
     if info then
         print(("  Your place: %s. Group %d of %d, free %d, invited and pending %d."):format(
             info.ownRole:lower(), math.max(1, state.numGroupMembers), D.GROUP_SIZE, info.free, info.waiting))
