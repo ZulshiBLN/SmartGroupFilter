@@ -69,5 +69,7 @@ D.OPTION_DEFAULTS = { filterOn = true, allowDouble = false, allowSameArmor = tru
 
 -- The project's logo, shipped as Media/Logo.tga: the panel's portrait (cut to the medallion)
 D.LOGO = "Interface\\AddOns\\SmartGroupFilter\\Media\\Logo"
+-- The portrait's shift from the template's place, x and y in px: left and up (Michel, in game)
+D.PORTRAIT_NUDGE = { -2, 2 }
 -- The side tab's icon: the full logo with its own gold ring (Media/Tab.tga)
 D.TAB_ICON = "Interface\\AddOns\\SmartGroupFilter\\Media\\Tab"

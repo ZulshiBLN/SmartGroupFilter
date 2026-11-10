@@ -413,6 +413,13 @@ local function Create()
     bg:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -2, 2)
     panel.background = bg
     if panel.SetPortraitToAsset then panel:SetPortraitToAsset(D.LOGO) end
+    -- The template places the portrait a little right of and below the ring's centre for this
+    -- logo (Michel, in game): moved by D.PORTRAIT_NUDGE from wherever the template put it
+    local portrait = panel.GetPortrait and panel:GetPortrait()
+    if portrait and portrait:GetNumPoints() > 0 then
+        local point, rel, relPoint, x, y = portrait:GetPoint(1)
+        portrait:SetPoint(point, rel, relPoint, x + D.PORTRAIT_NUDGE[1], y + D.PORTRAIT_NUDGE[2])
+    end
     if panel.CloseButton then panel.CloseButton:Hide() end
     panel:GetTitleText():SetText(ns.ADDON_NAME)
 

@@ -80,6 +80,8 @@ function Widget:Disable() self.enabled = false end
 function Widget:IsEnabled() return self.enabled ~= false end
 function Widget:SetPoint(...) self.points[#self.points + 1] = { ... } end
 function Widget:ClearAllPoints() self.points = {} end
+function Widget:GetNumPoints() return #self.points end
+function Widget:GetPoint(i) return unpack(self.points[i or 1]) end
 function Widget:SetSize(w, h) self.width, self.height = w, h end
 function Widget:SetWidth(w) self.width = w end
 function Widget:SetHeight(h) self.height = h end
@@ -109,6 +111,9 @@ function CreateFrame(kind, name, parent, template)
     if template and template:find("PortraitFrameTemplate") then
         f.CloseButton = NewWidget("Button", nil, f)
         function f:SetPortraitToAsset(path) self.portrait = path end
+        f.Portrait = NewWidget("Texture", nil, f)
+        f.Portrait:SetPoint("TOPLEFT", f, "TOPLEFT", -5, 7)
+        function f:GetPortrait() return self.Portrait end
     end
     if template == "LargeSideTabButtonTemplate" or template == "LFGVanillaRightTabTemplate" then
         f.Icon = NewWidget("Texture", nil, f)

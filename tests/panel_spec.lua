@@ -44,6 +44,8 @@ describe("the panel", function()
         assert.are.equal(600, panel.height)
         assert.is_false(panel.CloseButton.shown)
         assert.are.equal("Interface\\AddOns\\SmartGroupFilter\\Media\\Logo", panel.portrait)
+        -- moved 2 px left and up from where the template put it (-5, 7 in the mock)
+        assert.are.same({ "TOPLEFT", panel, "TOPLEFT", -7, 9 }, panel.Portrait.points[2])
     end)
 
     it("docks to the window's edge when there are no side tabs", function()
