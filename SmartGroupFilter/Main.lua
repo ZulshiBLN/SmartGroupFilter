@@ -24,6 +24,7 @@ local COMMANDS = {
     { cmd = "help", desc = "CMD_HELP" },
     { cmd = "minimap", desc = "CMD_MINIMAP" },
     { cmd = "test", desc = "CMD_TEST" },
+    { cmd = "bug", desc = "CMD_BUG" },
 }
 
 local function PrintHelp()
@@ -35,13 +36,25 @@ end
 
 SlashCmdList.SMARTGROUPFILTER = function(msg)
     msg = (msg or ""):lower():match("^%s*(.-)%s*$")
+    -- the bug report's log names a known command only: the rest could be anything
+    local known = msg == "" and "help" or "other"
+    for _, c in ipairs(COMMANDS) do
+        if c.cmd == msg then known = msg end
+    end
+    ns.Log("command " .. known)
     if msg == "" or msg == "help" then
         PrintHelp()
     elseif msg == "minimap" then
         ns.ToggleMinimapButton()
     elseif msg == "test" then
         ns.DryRun()
+    elseif msg == "bug" then
+        -- the report says in the chat what a button click shows elsewhere (Report.lua)
+        ns.fromCommand = true
+        ns.OpenBugReport()
+        ns.fromCommand = false
     else
         ns.Print(L.CMD_UNKNOWN:format("|cffffd100" .. D.SLASH .. " help|r"))
     end
+    ns.LogSettings()
 end

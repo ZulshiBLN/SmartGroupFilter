@@ -1,6 +1,6 @@
 -- SmartGroupFilter - settings view
 -- A gear in the panel switches between the filter view and this settings view (ruleset plan
--- 2026-11-10-extras, phase 3): language, minimap button; the bug report follows in phase 4.
+-- 2026-11-10-extras, phases 3 and 4): language, minimap button, bug report.
 -- The minimap's right-click and the AddOn menu open it. The panel holds the protected build
 -- button, so the views switch out of combat only.
 
@@ -13,6 +13,9 @@ ns.OnDBReady(function(d) db = d end)
 local PAD = 14
 local DD_WIDTH = 180
 local DD_TEXT_PAD = 50 -- room beside the text: its inset and the arrow
+
+local HINT_WIDTH = 220
+local HINT_SECONDS = 8
 
 local panel
 local settingsNext = false -- open on the settings view the next time the panel shows
@@ -45,6 +48,22 @@ function ns.OpenSettings()
         settingsNext = true
         ns.Print(L.SETTINGS_NEXT)
     end
+end
+
+-- Why the bug report did not open (a player name is secret), under its button for a while;
+-- false when the settings view is not shown, so the caller says it in the chat
+local hintShown = 0
+function ns.ShowReportSecretHint()
+    local hint = panel and panel.reportHint
+    if not (hint and panel.settingsView:IsVisible()) then return false end
+    ns.SetL(hint, "REPORT_SECRET")
+    hint:Show()
+    hintShown = hintShown + 1
+    local mine = hintShown
+    C_Timer.After(HINT_SECONDS, function()
+        if mine == hintShown then hint:Hide() end
+    end)
+    return true
 end
 
 ---------------------------------------------------------------------------
@@ -182,6 +201,20 @@ function ns.CreateSettingsView(p)
         if db.hideMinimap == (self:GetChecked() and true or false) then ns.ToggleMinimapButton() end
     end)
     panel.minimapCheck = check
+
+    -- The bug report (Report.lua); under it, for a while, why it did not open
+    local bug = CreateFrame("Button", nil, view, "UIPanelButtonTemplate")
+    bug:SetSize(160, 22)
+    bug:SetPoint("TOPLEFT", check, "BOTTOMLEFT", 4, -16)
+    ns.SetL(bug, "BTN_REPORT_BUG")
+    bug:SetScript("OnClick", function() ns.OpenBugReport() end)
+    panel.bugButton = bug
+    local hint = view:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    hint:SetPoint("TOPLEFT", bug, "BOTTOMLEFT", 0, -6)
+    hint:SetWidth(HINT_WIDTH)
+    hint:SetJustifyH("LEFT")
+    hint:Hide()
+    panel.reportHint = hint
 
     panel:HookScript("OnShow", function()
         check:SetChecked(not db.hideMinimap)

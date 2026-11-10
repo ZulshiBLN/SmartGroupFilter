@@ -37,6 +37,9 @@ read_globals = {
     "UnitIsGroupAssistant", "UnitName", "GetTime", "ERR_DECLINE_GROUP_S", "ERR_ALREADY_IN_GROUP_S",
     "InCombatLockdown", "Minimap", "LFDMicroButton",
     "LOCALIZED_CLASS_NAMES_MALE", "TANK", "HEALER", "DAMAGER",
+    -- The bug report
+    "time", "GetBuildInfo", "GetRealmName", "GetNormalizedRealmName", "GetGuildInfo", "BugGrabber",
+    "UISpecialFrames",
     SlashCmdList = { fields = { SMARTGROUPFILTER = { read_only = false } } },
 }
 
@@ -52,7 +55,9 @@ files["tests/"] = {
     read_globals = {
         "io", "require", "loadfile", "dofile", "os",
         -- What tests/helpers/mock.lua provides to drive the mocked client
-        "FIRE", "CHAT", "RUNSCRIPT", "RUNTIMERS", "CLICK",
+        "FIRE", "CHAT", "RUNSCRIPT", "RUNTIMERS", "CLICK", "SETGLOBAL",
+        -- Named frames the addon creates, read back by name
+        "SmartGroupFilterReport",
     },
 }
 

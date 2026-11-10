@@ -22,6 +22,14 @@ local function Clean(v)
     return v
 end
 
+-- Every readable name a search result showed this session: the bug report filters them out
+-- (Privacy.lua), never prints them
+local seenNames = {}
+
+function ns.SeenNames()
+    return seenNames
+end
+
 -- One search result as the plain entry Logic.lua reads, or nil when the client has none
 function ns.ReadEntry(id)
     local info = C_LFGList.GetSearchResultInfo(id)
@@ -34,6 +42,7 @@ function ns.ReadEntry(id)
         local p = C_LFGList.GetSearchResultPlayerInfo(id, 1)
         if p then
             entry.name = Clean(p.name)
+            if type(entry.name) == "string" then seenNames[entry.name] = true end
             entry.class = Clean(p.classFilename)
             entry.level = Clean(p.level)
             local r = p.lfgRoles
@@ -167,6 +176,7 @@ end
 -- A setting in the panel changed: the filter is on again (after Reset Filter) and filters anew
 function ns.FilterChanged()
     filterOn = true
+    ns.LogSettings()
     ns.RefreshList()
 end
 
@@ -176,6 +186,8 @@ function ns.ResetFilter()
     for _, role in ipairs(ns.D.ROLES) do db.excluded[role] = {} end
     db.allowSameArmor = true
     filterOn = false
+    ns.Log("reset filter")
+    ns.LogSettings()
     ns.SetLevelRange(1, GetMaxPlayerLevel and GetMaxPlayerLevel() or 60)
     ns.RefreshList()
 end

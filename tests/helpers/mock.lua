@@ -415,3 +415,32 @@ end
 function Widget:GetStringWidth() return #(self.text or "") * 7 end
 function Widget:SetFontObject(f) self.fontObject = f end
 function Widget:GetFontObject() return self.fontObject end
+
+---------------------------------------------------------------------------
+-- The bug report (Report.lua, Privacy.lua, Log.lua): the clock, the client build, the names
+-- the client knows, BugGrabber, and the edit boxes and scroll frame of the report window
+---------------------------------------------------------------------------
+STATE.now = 1700000000 -- time(): seconds, as BugGrabber stores an error's time
+function time() return STATE.now end
+function GetBuildInfo() return "1.60.1", "99999", "Nov 1 2026", 16001 end
+STATE.realm, STATE.guild = "Mockrealm", nil
+function GetRealmName() return STATE.realm end
+function GetNormalizedRealmName() return STATE.realm end
+function GetGuildInfo() return STATE.guild end
+UISpecialFrames = {}
+
+-- A global the addon reads but a spec cannot set: busted gives each spec file its own globals
+function SETGLOBAL(name, value) _G[name] = value end
+
+for _, m in ipairs({ "SetMovable", "EnableMouse", "StartMoving", "StopMovingOrSizing", "SetJustifyH",
+    "SetMultiLine", "SetCursorPosition", "SetScrollChild" }) do
+    Widget[m] = noop
+end
+-- An edit box's selection: "all" or "none", as HighlightText() and HighlightText(0, 0) leave it
+function Widget:HighlightText(from, to)
+    self.selection = (from == 0 and to == 0) and "none" or "all"
+end
+function Widget:SetFocus()
+    self.focused = true
+    if self.scripts.OnEditFocusGained then self.scripts.OnEditFocusGained(self) end
+end

@@ -88,3 +88,74 @@ D.GLOW_SCALE = 1.4
 D.GLOW_SECONDS_PER_LOOP = 1
 -- The side tab's icon: the full logo with its own gold ring (Media/Tab.tga)
 D.TAB_ICON = "Interface\\AddOns\\SmartGroupFilter\\Media\\Tab"
+
+---------------------------------------------------------------------------
+-- Bug report (ruleset plan 2026-11-10-extras, phase 4; mechanics from SimpleConjureBar)
+---------------------------------------------------------------------------
+-- Where a bug happened, as the report form offers it; the report carries the key, the form
+-- the text AREA_<key>
+D.REPORT_AREAS = { "FILTER", "PRIORITIES", "BUILD", "PANEL", "MINIMAP", "SETTINGS", "LANGUAGE",
+    "COMBAT", "OTHER" }
+
+-- The settings a report names, sorted: the options, the minimap's place and the schema
+-- version. The rows' order and exclusions are tables, reported apart.
+D.REPORT_SETTINGS = { "dbVersion", "minimapAngle" }
+for key in pairs(D.OPTION_DEFAULTS) do D.REPORT_SETTINGS[#D.REPORT_SETTINGS + 1] = key end
+table.sort(D.REPORT_SETTINGS)
+
+-- The fields a bug report holds, one pattern per kind of line, and nothing else: a spec checks
+-- every line of a report against this list. A new field needs an entry here and a line in
+-- README's privacy section first.
+D.REPORT_FIELDS = {
+    { pattern = "^$" },
+    { pattern = "^## SmartGroupFilter bug report$" },
+    { pattern = "^%*%*Description:%*%* " },                 -- player's text, filtered
+    { pattern = "^%*%*Area:%*%* %u+$" },
+    { pattern = "^%*%*Details:%*%* " },                     -- player's text, filtered
+    { pattern = "^%- Addon version: [%w%.%-]+$" },
+    { pattern = "^%- Client: [%w%.]+ %(build %w+, interface %d+%)$" },
+    { pattern = "^%- Client locale: %a+, addon language: [%a<>:%d]+$" },
+    { pattern = "^%- Character: %u+, level %d+%-%d+, %a+$" }, -- class token, level band, group kind
+    { pattern = "^%- Settings: " },                         -- known keys, allowlisted values
+    { pattern = "^%*%*Lua errors" },
+    { pattern = "^Error %d+ %(x%d+, [%w ,]+, combat: %a+%):$" },
+    { pattern = "^```$" },
+    { pattern = "^msg " },                                  -- error message, filtered
+    { pattern = "^at " },                                   -- stack line, filtered
+    { pattern = "^local " },                                -- locals rebuilt by allowlist
+    { pattern = "^%*%*Last actions %(seconds since load%):%*%*$" },
+    { pattern = "^log " },                                  -- generated, allowlisted values
+    { pattern = "^%*%*State:%*%*$" },
+    { pattern = "^state " },                                -- generated, allowlisted values
+    { pattern = "^%[%.%.%. cut: the report is too long%]$" },
+}
+-- Characters that show nothing - zero-width ones, direction and format marks, fillers,
+-- variation selectors, tag characters - as code point ranges. Inside or beside a name they
+-- hide it: the report drops them, the decoder (tools/decode-report.lua) shows them as <U+XXXX>.
+D.HIDDEN = {
+    { 0xAD, 0xAD }, { 0x34F, 0x34F }, { 0x600, 0x605 }, { 0x61C, 0x61C }, { 0x6DD, 0x6DD },
+    { 0x70F, 0x70F }, { 0x890, 0x891 }, { 0x8E2, 0x8E2 }, { 0x115F, 0x1160 }, { 0x17B4, 0x17B5 },
+    { 0x180B, 0x180F }, { 0x200B, 0x200F }, { 0x2028, 0x202E }, { 0x2060, 0x206F },
+    { 0x3164, 0x3164 }, { 0xFE00, 0xFE0F }, { 0xFEFF, 0xFEFF }, { 0xFFA0, 0xFFA0 },
+    { 0xFFF0, 0xFFFB }, { 0x110BD, 0x110BD }, { 0x110CD, 0x110CD }, { 0x13430, 0x13455 },
+    { 0x1BCA0, 0x1BCA3 }, { 0x1D173, 0x1D17A }, { 0xE0000, 0xE007F }, { 0xE0100, 0xE01EF },
+}
+
+D.REPORT_CUT = "[... cut: the report is too long]"
+D.REPORT_MAX_BYTES = 20000 -- fits a GitHub issue (65,536) also as a code, and stays readable
+-- Strings a report may carry as they are; any other string becomes <text:N>, its length only.
+-- Class and role tokens, the build button's modes and the keys of its reasons join below.
+D.REPORT_SAFE = {
+    "^player$", "^target$", "^focus$", "^mouseover$", "^pet$", "^party%d$", "^raid%d%d?$",
+    "^%-?%d+%.?%d*$", "^true$", "^false$", "^nil$",
+    "^build$", "^refresh$", "^list$", "^none$", "^filter$", "^settings$",
+    "^NEED_LISTING$", "^NOT_LEADER$", "^NOT_LEADER_LIST$", "^NO_OWN_ROLE$", "^GROUP_FULL$",
+    "^NO_CANDIDATE$", "^LIST_OLD$", "^LIST_SELF_TIP$",
+    "^%l%l%u%u$", "^auto$",                                 -- locale codes
+}
+for _, class in ipairs(D.DEFAULT_ORDER.DAMAGER) do D.REPORT_SAFE[#D.REPORT_SAFE + 1] = "^" .. class .. "$" end
+for _, role in ipairs(D.ROLES) do D.REPORT_SAFE[#D.REPORT_SAFE + 1] = "^" .. role .. "$" end
+-- Where bug reports go: the issue form with one field for the code
+-- (.github/ISSUE_TEMPLATE/bug_report.yml). Empty = no link; the window asks the user to send the
+-- report to the addon author instead.
+D.BUG_REPORT_URL = "https://github.com/ZulshiBLN/SmartGroupFilter/issues/new?template=bug_report.yml"

@@ -153,7 +153,7 @@ function ns.UpdateBuildButton()
     -- Not listed: List Self points at Blizzard's eye tab; listing stays Blizzard's (Michel)
     if why == "NEED_LISTING" then
         SetMode("list")
-        button.reason = L.LIST_SELF_TIP
+        button.reason, button.reasonKey = L.LIST_SELF_TIP, "LIST_SELF_TIP"
         button:SetEnabled(true)
         button:SetText(L.LIST_SELF)
         return
@@ -161,13 +161,13 @@ function ns.UpdateBuildButton()
     -- Fresh results may bring a candidate the old ones lack; nothing else a search changes
     if not ListFresh() and (list or why == "NO_CANDIDATE") then
         SetMode("refresh")
-        button.reason = L.LIST_OLD:format(D.LIST_FRESH_SECONDS)
+        button.reason, button.reasonKey = L.LIST_OLD:format(D.LIST_FRESH_SECONDS), "LIST_OLD"
         button:SetEnabled(not (LFGBrowseFrame and LFGBrowseFrame.searching))
         button:SetText(L.REFRESH_LIST)
         return
     end
     SetMode("build")
-    button.reason = why and L[why] or nil
+    button.reason, button.reasonKey = why and L[why] or nil, why
     button:SetEnabled(list ~= nil)
     if list and D.INVITES_PER_CLICK == 1 then
         button:SetText(L.INVITE_NEXT:format(list[1].name, ns.RoleName(list[1].role)))
@@ -187,6 +187,7 @@ local function BuildGroup()
         C_PartyInfo.InviteUnit(c.name)
         placed[c.name] = { role = c.role, class = c.class, level = c.level, ["until"] = now + D.HOLD_SECONDS }
         ns.Print(L.INVITED:format(c.name, ns.RoleName(c.role), c.level))
+        ns.Log(("invite %s %s %s"):format(c.role, ns.SafeValue(c.class), tostring(c.level)))
     end
     -- Look again once the invites have run out: their places may open
     C_Timer.After(D.HOLD_SECONDS + 1, ns.UpdateBuildButton)
@@ -208,6 +209,7 @@ function ns.CreateBuildButton(parent)
     -- After the secure handler: in build mode invite; in refresh mode Blizzard's arrow has
     -- been clicked and the button only shows the search
     button:HookScript("OnClick", function()
+        ns.Log("click build button mode=" .. ns.SafeValue(button.mode))
         if button.mode == "build" then
             BuildGroup()
         else
@@ -241,6 +243,38 @@ function ns.CreateBuildButton(parent)
     ns.OnLanguageChanged(ns.UpdateBuildButton)
     ns.UpdateBuildButton()
     return button
+end
+
+---------------------------------------------------------------------------
+-- The bug report's view of Build Group (Report.lua): the button's mode and the key of its
+-- reason - never its text, which can hold a player's name - and the invited players as role,
+-- class and level. The names, kept apart, only feed the report's filter (Privacy.lua).
+---------------------------------------------------------------------------
+function ns.ReportBuildState()
+    local state = { invited = {}, declined = 0 }
+    if button then
+        state.mode, state.reasonKey, state.enabled = button.mode, button.reasonKey, button:IsEnabled()
+    end
+    for _, p in pairs(placed) do
+        state.invited[#state.invited + 1] = { role = p.role, class = p.class, level = p.level, joined = p.joined and true or false }
+    end
+    local order = {}
+    for i, role in ipairs(D.ROLES) do order[role] = i end
+    table.sort(state.invited, function(a, b)
+        if a.role ~= b.role then return (order[a.role] or 0) < (order[b.role] or 0) end
+        if a.class ~= b.class then return tostring(a.class) < tostring(b.class) end
+        return (tonumber(a.level) or 0) < (tonumber(b.level) or 0)
+    end)
+    for _ in pairs(declined) do state.declined = state.declined + 1 end
+    return state
+end
+
+-- The names of the players SGF invited this session and of those who declined
+function ns.InvitedNames()
+    local names = {}
+    for name in pairs(placed) do names[#names + 1] = name end
+    for name in pairs(declined) do names[#names + 1] = name end
+    return names
 end
 
 ---------------------------------------------------------------------------

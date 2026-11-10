@@ -27,10 +27,14 @@
 Locales.lua
 Data.lua
 Core.lua
+Privacy.lua
+Log.lua
+ReportCode.lua
 Logic.lua
 Filter.lua
 Build.lua
 Settings.lua
+Report.lua
 Panel.lua
 Minimap.lua
 Main.lua
