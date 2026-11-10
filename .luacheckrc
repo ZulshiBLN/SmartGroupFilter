@@ -31,11 +31,11 @@ read_globals = {
     "GetMaxPlayerLevel", "issecretvalue", "UnitClass", "UnitLevel", "C_Timer", "C_XMLUtil",
     -- The panel
     "LFGParentFrame", "UIParent", "GameTooltip", "GetCursorPosition", "PixelUtil", "CreateColor",
-    "LFGParentFrameTab2_OnClick",
+
     -- Build Group
     "C_LFGListRoles", "C_PartyInfo", "GetNumGroupMembers", "IsInGroup", "UnitIsGroupLeader",
     "UnitIsGroupAssistant", "UnitName", "GetTime", "ERR_DECLINE_GROUP_S", "ERR_ALREADY_IN_GROUP_S",
-    "InCombatLockdown", "LFGParentFrameTab1",
+    "InCombatLockdown", "LFGParentFrameTab1", "LFGParentFrameTab2",
     "LOCALIZED_CLASS_NAMES_MALE", "TANK", "HEALER", "DAMAGER",
     SlashCmdList = { fields = { SMARTGROUPFILTER = { read_only = false } } },
 }
@@ -52,7 +52,7 @@ files["tests/"] = {
     read_globals = {
         "io", "require", "loadfile", "dofile", "os",
         -- What tests/helpers/mock.lua provides to drive the mocked client
-        "FIRE", "CHAT", "RUNSCRIPT", "RUNTIMERS",
+        "FIRE", "CHAT", "RUNSCRIPT", "RUNTIMERS", "CLICK",
     },
 }
 

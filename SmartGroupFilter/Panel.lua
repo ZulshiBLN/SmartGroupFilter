@@ -360,7 +360,7 @@ end
 -- the rim is the template's own. Highlighted (Blizzard's "checked" glow) while the panel is
 -- visible (Michel, 2026-11-10). Shown on every page of the window (a child of LFGParentFrame).
 -- On another page a click opens the Group Browser with the panel; on the Group Browser it shows
--- or hides the panel.
+-- or hides the panel - through the secure overlay below.
 local function ToggleTab()
     local tab = CreateFrame("Frame", "SmartGroupFilterTab", LFGParentFrame, "LargeSideTabButtonTemplate")
     ns.tab = tab
@@ -377,36 +377,71 @@ local function ToggleTab()
         if not InCombatLockdown() then panel:SetShown(db.panelShown) end
         if tab.SetChecked then tab:SetChecked(db.panelShown and LFGBrowseFrame:IsShown()) end
     end
-    local function Toggle()
-        if InCombatLockdown() then return end
+
+    -- The tab's clicks go to a secure button laid over it (plan 2026-11-11-list-self). On
+    -- another page it clicks Blizzard's hidden tab button of the Group Browser, so the page
+    -- switch runs in Blizzard's secure code - calling Blizzard's page switch from addon code
+    -- taints what its next search reads (incident 2026-11-11). On the Group Browser it has no
+    -- secure action, and its click shows or hides the panel. A protected frame is anchored to
+    -- its parent alone.
+    local overlay = CreateFrame("Button", "SmartGroupFilterTabButton", tab, "SecureActionButtonTemplate")
+    tab.overlay = overlay
+    overlay:SetPoint("TOPLEFT")
+    overlay:SetPoint("BOTTOMRIGHT")
+    overlay:RegisterForClicks("LeftButtonUp")
+    overlay:SetAttribute("useOnKeyDown", false)
+    local function SetOverlay()
+        if InCombatLockdown() then return end -- set again when combat ends
         if LFGBrowseFrame:IsShown() then
-            db.panelShown = not db.panelShown
+            overlay.mode = "toggle"
+            overlay:SetAttribute("type", nil)
+            overlay:SetAttribute("clickbutton", nil)
         else
+            overlay.mode = "open"
+            overlay:SetAttribute("type", "click")
+            overlay:SetAttribute("clickbutton", LFGParentFrameTab2)
+        end
+    end
+    -- The secure click shows the Group Browser at once, which sets the overlay anew: the mode
+    -- that counts is the one before the click
+    overlay:SetScript("PreClick", function(self) self.clickMode = self.mode end)
+    overlay:SetScript("PostClick", function(self)
+        if InCombatLockdown() then return end
+        if self.clickMode == "open" then
             db.panelShown = true
-            if LFGParentFrameTab2_OnClick then LFGParentFrameTab2_OnClick() end
+        elseif self.clickMode == "toggle" then
+            db.panelShown = not db.panelShown
         end
         Sync()
         ns.RefreshList()
-    end
-    tab.Toggle = Toggle
-    if tab.SetCustomOnMouseUpHandler then
-        tab:SetCustomOnMouseUpHandler(function(_, button, upInside)
-            if button == "LeftButton" and upInside then Toggle() end
-        end)
-    else
-        tab:SetScript("OnMouseUp", function(_, button) if button == "LeftButton" then Toggle() end end)
-    end
-    tab:SetScript("OnEnter", function(self)
+    end)
+    -- The tab no longer gets the mouse: its highlight and the tooltip come from the overlay
+    local highlight = tab.HighlightTexture
+    if highlight and highlight.SetDrawLayer then highlight:SetDrawLayer("OVERLAY") end
+    if highlight then highlight:Hide() end
+    overlay:SetScript("OnEnter", function(self)
+        if highlight then highlight:Show() end
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:AddLine(ns.ADDON_NAME)
         GameTooltip:AddLine(L.TIP_TOGGLE, 1, 1, 1)
         GameTooltip:Show()
     end)
-    tab:SetScript("OnLeave", function() GameTooltip:Hide() end)
-    -- The glow follows the page: off on the other pages, back on the Group Browser
-    LFGBrowseFrame:HookScript("OnShow", Sync)
-    LFGBrowseFrame:HookScript("OnHide", Sync)
-    Sync()
+    overlay:SetScript("OnLeave", function()
+        if highlight then highlight:Hide() end
+        GameTooltip:Hide()
+    end)
+
+    -- The glow and the overlay follow the page; after combat the overlay catches up
+    local function OnPage()
+        Sync()
+        SetOverlay()
+    end
+    LFGBrowseFrame:HookScript("OnShow", OnPage)
+    LFGBrowseFrame:HookScript("OnHide", OnPage)
+    local events = CreateFrame("Frame")
+    events:RegisterEvent("PLAYER_REGEN_ENABLED")
+    events:SetScript("OnEvent", OnPage)
+    OnPage()
 end
 
 local function Create()

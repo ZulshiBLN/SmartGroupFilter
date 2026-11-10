@@ -139,6 +139,8 @@ function CreateFrame(kind, name, parent, template)
     if template == "LargeSideTabButtonTemplate" or template == "LFGVanillaRightTabTemplate" then
         f.Icon = NewWidget("Texture", nil, f)
         function f:SetCustomOnMouseUpHandler(fn) self.mouseUp = fn end
+        f.HighlightTexture = NewWidget("Texture", nil, f)
+        f.HighlightTexture.shown = false
         function f:SetFillToInterior(v) self.fillToInterior = v end
     end
     frames[#frames + 1] = f
@@ -325,9 +327,18 @@ LFGParentFrameTab1 = NewWidget("Button", "LFGParentFrameTab1", LFGParentFrame)
 function LFGParentFrameTab1:Click()
     STATE.tab1Clicks = STATE.tab1Clicks + 1
     LFGBrowseFrame.shown = false
+    if LFGBrowseFrame.scripts.OnHide then LFGBrowseFrame.scripts.OnHide(LFGBrowseFrame) end
 end
 LFGParentFrameTab2 = NewWidget("Button", "LFGParentFrameTab2", LFGParentFrame)
 function LFGParentFrameTab2:Click()
     STATE.tab2ButtonClicks = STATE.tab2ButtonClicks + 1
     LFGBrowseFrame.shown = true
+    if LFGBrowseFrame.scripts.OnShow then LFGBrowseFrame.scripts.OnShow(LFGBrowseFrame) end
+end
+
+-- A player's click on a button: PreClick, OnClick (the secure action), PostClick
+function CLICK(frame, button)
+    for _, name in ipairs({ "PreClick", "OnClick", "PostClick" }) do
+        if frame.scripts[name] then frame.scripts[name](frame, button or "LeftButton", false) end
+    end
 end

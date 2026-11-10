@@ -167,9 +167,13 @@ describe("Build Group", function()
             assert.are.equal(LFGBrowseFrame.RefreshButton, button:GetAttribute("clickbutton"))
             fresh()
             assert.is_nil(button:GetAttribute("type")) -- build mode: no secure action
-            -- SGF never runs Blizzard's search itself: that tainted Blizzard's own Search()
+            -- SGF never runs Blizzard's search or page switch itself: that tainted Blizzard's own
+            -- Search() (incident 2026-11-11)
             for _, file in ipairs(addon.tocFiles()) do
-                assert.is_nil(addon.read("SmartGroupFilter/" .. file):find("LFGBrowse_DoSearch", 1, true), file)
+                local code = addon.read("SmartGroupFilter/" .. file)
+                for _, name in ipairs({ "LFGBrowse_DoSearch", "LFGParentFrameTab1_OnClick", "LFGParentFrameTab2_OnClick" }) do
+                    assert.is_nil(code:find(name, 1, true), file .. ": " .. name)
+                end
             end
         end)
 
