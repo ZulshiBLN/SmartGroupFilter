@@ -172,10 +172,10 @@ end
 
 local function Handle(slider, index)
     local h = CreateFrame("Button", nil, slider)
-    h:SetSize(12, 20)
+    h:SetSize(10, 16) -- as SimpleConjureBar's slider thumb (UI.MakeSlider)
     local tex = h:CreateTexture(nil, "OVERLAY")
     tex:SetAllPoints()
-    Art(tex, "Minimal_SliderBar_Button", 1, 0.82, 0, 1)
+    tex:SetColorTexture(1, 0.82, 0, 1) -- WoW gold
     h:SetScript("OnMouseDown", function(self) self.dragging = true end)
     h:SetScript("OnUpdate", function(self)
         if not self.dragging then return end
@@ -400,6 +400,16 @@ local function Create()
     panel = CreateFrame("Frame", "SmartGroupFilterPanel", LFGBrowseFrame, "PortraitFrameTemplate")
     ns.panel = panel
     panel:SetWidth(WIDTH)
+    -- The sisters' window background: Blizzard's dark, textured dialog background, tiled
+    -- (SimpleConjureBar's settings backdrop), in place of the template's own
+    if panel.Bg then panel.Bg:Hide() end
+    local bg = panel:CreateTexture(nil, "BACKGROUND", nil, 1)
+    bg:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Background", "REPEAT", "REPEAT")
+    if bg.SetHorizTile then bg:SetHorizTile(true) end
+    if bg.SetVertTile then bg:SetVertTile(true) end
+    bg:SetPoint("TOPLEFT", panel, "TOPLEFT", 2, -21)
+    bg:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -2, 2)
+    panel.background = bg
     if panel.SetPortraitToAsset then panel:SetPortraitToAsset(D.LOGO) end
     if panel.CloseButton then panel.CloseButton:Hide() end
     panel:GetTitleText():SetText(ns.ADDON_NAME)
@@ -437,7 +447,7 @@ local function Create()
     bar:SetPoint("LEFT")
     bar:SetPoint("RIGHT")
     bar:SetHeight(6)
-    Art(bar, "Minimal_SliderBar_Left", 0.4, 0.4, 0.4, 1)
+    bar:SetColorTexture(0.25, 0.25, 0.25, 1) -- as SimpleConjureBar's slider track
     slider.handles = { Handle(slider, 1), Handle(slider, 2) }
 
     -- Gold line, then the priority section under its header (Michel, after SCB and SBB)

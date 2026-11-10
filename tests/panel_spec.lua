@@ -243,6 +243,14 @@ describe("the panel", function()
         assert.is_false(db.allowSameArmor)
     end)
 
+    it("looks like the sisters: their dialog background, their gold slider thumbs", function()
+        assert.are.equal("Interface\\DialogFrame\\UI-DialogBox-Background", panel.background.textureFile)
+        local handle = panel.slider.handles[1]
+        assert.are.equal(10, handle.width)
+        assert.are.equal(16, handle.height)
+        assert.are.same({ 1, 0.82, 0, 1 }, handle.children[1].color)
+    end)
+
     it("parts its sections with headers and gold lines: range | priorities | options", function()
         assert.are.equal("Level range", panel.rangeHeader.text)
         assert.are.equal("Priorities", panel.prioHeader.text)
