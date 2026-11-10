@@ -115,6 +115,20 @@ function CreateFrame(kind, name, parent, template)
         f.Portrait:SetPoint("TOPLEFT", f, "TOPLEFT", -5, 7)
         function f:GetPortrait() return self.Portrait end
     end
+    -- A secure action button: its OnClick performs the "click" action on "clickbutton"
+    if template and template:find("SecureActionButtonTemplate") then
+        f.attributes = {}
+        function f:SetAttribute(k, v)
+            if STATE.combat then error("SetAttribute on a secure button in combat") end
+            self.attributes[k] = v
+        end
+        function f:GetAttribute(k) return self.attributes[k] end
+        f.scripts.OnClick = function(self)
+            if self.attributes.type == "click" and self.attributes.clickbutton then
+                self.attributes.clickbutton:Click()
+            end
+        end
+    end
     if template == "LargeSideTabButtonTemplate" or template == "LFGVanillaRightTabTemplate" then
         f.Icon = NewWidget("Texture", nil, f)
         function f:SetCustomOnMouseUpHandler(fn) self.mouseUp = fn end
@@ -287,3 +301,11 @@ function LFGBrowse_DoSearch()
     STATE.searches = STATE.searches + 1
     LFGBrowseFrame.searching = true
 end
+
+-- Combat: STATE.combat
+STATE.combat = false
+function InCombatLockdown() return STATE.combat end
+
+-- Blizzard's refresh arrow in the Group Finder: a click searches
+LFGBrowseFrame.RefreshButton = NewWidget("Button", nil, LFGBrowseFrame)
+function LFGBrowseFrame.RefreshButton:Click() LFGBrowse_DoSearch() end

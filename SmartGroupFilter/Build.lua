@@ -120,18 +120,38 @@ local function ListFresh()
     return age ~= nil and age <= D.LIST_FRESH_SECONDS
 end
 
+-- The button is a secure action button: in refresh mode it clicks Blizzard's own refresh arrow
+-- (type "click"), so the protected search runs in Blizzard's secure code. Calling Blizzard's
+-- search from addon code tainted LFGBrowseFrame.searching and later blocked Blizzard's own
+-- Search() (Michel's BugSack, 2026-11-11; ruleset K5). A secure button cannot change in
+-- combat: there the button keeps what it had.
+local function SetMode(mode)
+    if InCombatLockdown() then return false end
+    if button.mode ~= mode then
+        button.mode = mode
+        if mode == "refresh" and LFGBrowseFrame and LFGBrowseFrame.RefreshButton then
+            button:SetAttribute("type", "click")
+            button:SetAttribute("clickbutton", LFGBrowseFrame.RefreshButton)
+        else
+            button:SetAttribute("type", nil)
+            button:SetAttribute("clickbutton", nil)
+        end
+    end
+    return true
+end
+
 function ns.UpdateBuildButton()
-    if not button then return end
+    if not button or InCombatLockdown() then return end
     local list, why = Plan()
     -- Fresh results may bring a candidate the old ones lack; nothing else a search changes
     if not ListFresh() and (list or why == "NO_CANDIDATE") then
-        button.mode = "refresh"
+        SetMode("refresh")
         button.reason = L.LIST_OLD:format(D.LIST_FRESH_SECONDS)
         button:SetEnabled(not (LFGBrowseFrame and LFGBrowseFrame.searching))
         button:SetText(L.REFRESH_LIST)
         return
     end
-    button.mode = "build"
+    SetMode("build")
     button.reason = why and L[why] or nil
     button:SetEnabled(list ~= nil)
     if list and D.INVITES_PER_CLICK == 1 then
@@ -141,11 +161,6 @@ function ns.UpdateBuildButton()
     end
 end
 
--- The refresh click: Blizzard's own search, with the Group Finder's own filters
-local function RefreshList()
-    if LFGBrowse_DoSearch then LFGBrowse_DoSearch() end
-    ns.UpdateBuildButton()
-end
 
 -- The click: invite and hold the places. Called only from the button's OnClick.
 local function BuildGroup()
@@ -165,12 +180,18 @@ end
 
 -- The button, below the options in the panel (Panel.lua calls this)
 function ns.CreateBuildButton(parent, anchor)
-    button = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
+    button = CreateFrame("Button", "SmartGroupFilterBuildButton", parent,
+        "SecureActionButtonTemplate, UIPanelButtonTemplate")
     button:SetSize(160, 24)
     button:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 4, -12)
     button:SetText(L.BUILD_GROUP)
-    button:SetScript("OnClick", function()
-        if button.mode == "refresh" then RefreshList() else BuildGroup() end
+    -- The secure action on the mouse button's release, whatever the key-down setting
+    button:RegisterForClicks("LeftButtonUp")
+    button:SetAttribute("useOnKeyDown", false)
+    -- After the secure handler: in build mode invite; in refresh mode Blizzard's arrow has
+    -- been clicked and the button only shows the search
+    button:HookScript("OnClick", function()
+        if button.mode == "refresh" then ns.UpdateBuildButton() else BuildGroup() end
     end)
     button:SetMotionScriptsWhileDisabled(true)
     button:SetScript("OnEnter", function(self)

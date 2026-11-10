@@ -155,6 +155,31 @@ describe("Build Group", function()
             assert.are.equal(4, #STATE.invites)
         end)
 
+        it("searches only through a secure click on Blizzard's own refresh arrow", function()
+            assert.truthy(button.template:find("SecureActionButtonTemplate", 1, true))
+            assert.is_nil(button:GetAttribute("type"))
+            STATE.time = STATE.time + 31
+            ns.UpdateBuildButton()
+            assert.are.equal("click", button:GetAttribute("type"))
+            assert.are.equal(LFGBrowseFrame.RefreshButton, button:GetAttribute("clickbutton"))
+            fresh()
+            assert.is_nil(button:GetAttribute("type")) -- build mode: no secure action
+            -- SGF never runs Blizzard's search itself: that tainted Blizzard's own Search()
+            for _, file in ipairs(addon.tocFiles()) do
+                assert.is_nil(addon.read("SmartGroupFilter/" .. file):find("LFGBrowse_DoSearch", 1, true), file)
+            end
+        end)
+
+        it("leaves the secure button alone in combat", function()
+            STATE.combat = true
+            STATE.time = STATE.time + 31
+            assert.has_no.errors(function() ns.UpdateBuildButton() end)
+            assert.are.equal("Build Group", button.text)
+            STATE.combat = false
+            ns.UpdateBuildButton()
+            assert.are.equal("Refresh List", button.text)
+        end)
+
         it("turns back into Refresh List when the results grow old", function()
             assert.are.equal("Build Group", button.text)
             STATE.time = STATE.time + 31

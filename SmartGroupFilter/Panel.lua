@@ -324,7 +324,10 @@ end
 -- The panel
 ---------------------------------------------------------------------------
 -- Right of the side tabs (Blizzard's modern style), else right of the window
+-- The panel holds a secure button (Build.lua), so in combat it may not be moved, shown or
+-- hidden by addon code: these keep what they had until combat ends.
 local function Dock()
+    if InCombatLockdown() then return end
     local tabs = LFGParentFrame.BrowsingTab
     local x = 4
     if tabs and tabs:GetRight() and LFGParentFrame:GetRight() then
@@ -364,10 +367,11 @@ local function ToggleTab()
     if tab.SetFillToInterior then tab:SetFillToInterior(true) end
     tab.tooltipText = ns.ADDON_NAME
     local function Sync()
-        panel:SetShown(db.panelShown)
+        if not InCombatLockdown() then panel:SetShown(db.panelShown) end
         if tab.SetChecked then tab:SetChecked(db.panelShown and LFGBrowseFrame:IsShown()) end
     end
     local function Toggle()
+        if InCombatLockdown() then return end
         if LFGBrowseFrame:IsShown() then
             db.panelShown = not db.panelShown
         else
