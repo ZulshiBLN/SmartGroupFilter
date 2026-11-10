@@ -256,3 +256,146 @@ describe("the choice of invites", function()
         assert.are.equal("War:TANK", names(list))
     end)
 end)
+
+-- The best fill (ruleset plan 2026-11-11-roles-and-places): every case of its -RESEARCH table,
+-- run before the live test, with the fill the plan expects. Levels 30, range 1-60, dungeon 800.
+describe("the best fill, case by case", function()
+    local TH, TD, HD = { tank = true, healer = true }, { tank = true, dps = true }, { healer = true, dps = true }
+    local ALL = { tank = true, healer = true, dps = true }
+    local WIDE = { min = 1, max = 60 }
+
+    local function p(name, class, roles, level, activities)
+        return solo(name, class, level or 30, roles, 0, activities)
+    end
+
+    local function own(class, roles, level) return { class = class, level = level or 30, roles = roles } end
+
+    local function fill(me, candidates, over)
+        local state = { own = me, members = {}, placed = {}, numGroupMembers = 0, candidates = candidates,
+            db = db, range = WIDE, dungeons = { 800 } }
+        for k, v in pairs(over or {}) do state[k] = v end
+        local list, why = ns.ChooseInvites(state)
+        if not list then return "nil " .. why end
+        local out = {}
+        for i, c in ipairs(list) do out[i] = c.name .. ":" .. c.role end
+        return table.concat(out, " ")
+    end
+
+    local function base()
+        return { p("War", "WARRIOR", T), p("Pri", "PRIEST", H), p("Rog", "ROGUE", D), p("Hun", "HUNTER", D),
+            p("Wlk", "WARLOCK", D), p("Mag", "MAGE", D) }
+    end
+
+    it("own role and class (O1-O8)", function()
+        assert.are.equal("War:TANK Pri:HEALER Wlk:DAMAGER Rog:DAMAGER", fill(own("MAGE", D), base()))
+        assert.are.equal("Pri:HEALER Mag:DAMAGER Wlk:DAMAGER Rog:DAMAGER", fill(own("WARRIOR", T), base()))
+        assert.are.equal("War:TANK Mag:DAMAGER Wlk:DAMAGER Rog:DAMAGER", fill(own("PRIEST", H), base()))
+        assert.are.equal("Pri:HEALER Mag:DAMAGER Wlk:DAMAGER Rog:DAMAGER", fill(own("PALADIN", TH), base()))
+        assert.are.equal("Pri:HEALER Mag:DAMAGER Wlk:DAMAGER Rog:DAMAGER", fill(own("DRUID", ALL), base()))
+        assert.are.equal("nil NO_OWN_ROLE", fill(own("HUNTER", {}), base()))
+        assert.are.equal("War:TANK Mag:DAMAGER Wlk:DAMAGER Rog:DAMAGER", fill(own("SHAMAN", HD), base()))
+        assert.are.equal("Pri:HEALER Mag:DAMAGER Wlk:DAMAGER", fill(own("WARRIOR", D), base())) -- class limit
+    end)
+
+    it("the roles candidates signed up for (R1-R10)", function()
+        local me = own("MAGE", D)
+        assert.are.equal("Pal:TANK Pri:HEALER Rog:DAMAGER",
+            fill(me, { p("Pal", "PALADIN", TD), p("Pri", "PRIEST", H), p("Rog", "ROGUE", D) }))
+        -- R2: the hybrid heals, so the tank-only warrior can tank
+        assert.are.equal("War:TANK Pal:HEALER", fill(me, { p("Pal", "PALADIN", TH), p("War", "WARRIOR", T) }))
+        assert.are.equal("Sha:HEALER Wlk:DAMAGER Rog:DAMAGER",
+            fill(me, { p("Sha", "SHAMAN", HD), p("Rog", "ROGUE", D), p("Wlk", "WARLOCK", D), p("Hun", "HUNTER", D) }))
+        assert.are.equal("Pri:HEALER Wlk:DAMAGER Rog:DAMAGER",
+            fill(me, { p("Pri", "PRIEST", HD), p("Rog", "ROGUE", D), p("Wlk", "WARLOCK", D) }))
+        assert.are.equal("War:TANK Rog:DAMAGER NoR:HEALER",
+            fill(me, { p("NoR", "DRUID"), p("War", "WARRIOR", T), p("Rog", "ROGUE", D) }))
+        assert.are.equal("Pri:HEALER NoR:TANK", fill(me, { p("NoR", "DRUID"), p("Pri", "PRIEST", H) }))
+        assert.are.equal("Pal:TANK", fill(me, { p("War", "WARRIOR", T), p("Pal", "PALADIN", T) }))
+        assert.are.equal("Pal:TANK NoR:HEALER", fill(me, { p("NoR", "DRUID"), p("Pal", "PALADIN", TH) }))
+        -- R9: as R2 with a druid, third in the tank row
+        assert.are.equal("Dru:TANK Pal:HEALER", fill(me, { p("Pal", "PALADIN", TH), p("Dru", "DRUID", T) }))
+        -- R10: no-role players strictly last - the warrior only gets what the paladin left
+        assert.are.equal("Pal:TANK NoR:DAMAGER", fill(me, { p("Pal", "PALADIN", TH), p("NoR", "WARRIOR") }))
+    end)
+
+    it("exclusions and row order (X1-X4)", function()
+        local me = own("MAGE", D)
+        db.excluded.TANK.PALADIN = true
+        assert.are.equal("War:TANK Pal:HEALER", fill(me, { p("Pal", "PALADIN", TH), p("War", "WARRIOR", T) }))
+        db.excluded.TANK.WARRIOR, db.excluded.TANK.DRUID = true, true
+        assert.are.equal("Pri:HEALER", fill(me, { p("War", "WARRIOR", T), p("Pri", "PRIEST", H) }))
+        db.excluded.TANK = {}
+        db.excluded.DAMAGER.ROGUE = true
+        assert.are.equal("Wlk:DAMAGER", fill(me, { p("Rog", "ROGUE"), p("Wlk", "WARLOCK", D) }))
+        db.excluded.DAMAGER = {}
+        db.order.TANK = { "DRUID", "WARRIOR", "PALADIN" }
+        assert.are.equal("Dru:TANK",
+            fill(me, { p("Pal", "PALADIN", T), p("War", "WARRIOR", T), p("Dru", "DRUID", T) }))
+    end)
+
+    it("double classes (D1-D2)", function()
+        local c = { p("Mag", "MAGE", D), p("Wlk", "WARLOCK", D), p("Wl2", "WARLOCK", D, 29), p("PalT", "PALADIN", T),
+            p("PalH", "PALADIN", H), p("Rog", "ROGUE", D) }
+        assert.are.equal("PalT:TANK Wlk:DAMAGER Rog:DAMAGER", fill(own("MAGE", D), c))
+        db.allowDouble = true
+        assert.are.equal("PalT:TANK PalH:HEALER Mag:DAMAGER Wlk:DAMAGER", fill(own("MAGE", D), c))
+    end)
+
+    it("same armor class off (A1-A4)", function()
+        db.allowSameArmor = false
+        local c = { p("Pri", "PRIEST", H), p("Dru", "DRUID", H), p("Wlk", "WARLOCK", D), p("Rog", "ROGUE", D),
+            p("War", "WARRIOR", T, 45), p("Pal", "PALADIN", T, 35), p("Hun", "HUNTER", D, 45) }
+        assert.are.equal("Pal:TANK Dru:HEALER Rog:DAMAGER Hun:DAMAGER", fill(own("MAGE", D), c))
+        assert.are.equal("Pal:TANK Pri:HEALER Wlk:DAMAGER Rog:DAMAGER", fill(own("WARRIOR", D, 45), c))
+        assert.are.equal("Pri:HEALER Wlk:DAMAGER Rog:DAMAGER", fill(own("WARRIOR", D, 35), c))
+        assert.are.equal("Pal:TANK Pri:HEALER Wlk:DAMAGER Hun:DAMAGER", fill(own("DRUID", D), c))
+    end)
+
+    it("level and dungeons (L1-L4)", function()
+        local me = own("MAGE", D)
+        assert.are.equal("Dru:TANK", fill(me, { p("War", "WARRIOR", T, 31), p("Pal", "PALADIN", T, 0),
+            p("Dru", "DRUID", T, 26) }, { range = { min = 25, max = 30 } }))
+        local unknown = p("Pal", "PALADIN", T)
+        unknown.activities = nil
+        assert.are.equal("War:TANK", fill(me, { unknown, p("War", "WARRIOR", T) }))
+        assert.are.equal("War:TANK", fill(me, { p("Pal", "PALADIN", T, 30, { 801 }), p("War", "WARRIOR", T) }))
+        assert.are.equal("Pal:TANK", fill(me, { p("Pal", "PALADIN", T, 30, { 800, 801 }) }))
+    end)
+
+    it("the group as it stands (G2-G4)", function()
+        local me = own("MAGE", D)
+        local c = { p("War", "WARRIOR", T), p("Pri", "PRIEST", H), p("Rog", "ROGUE", D), p("Wlk", "WARLOCK", D) }
+        assert.are.equal("War:TANK", fill(me, c, { numGroupMembers = 4, members = {
+            { name = "A", class = "HUNTER", level = 30 }, { name = "B", class = "SHAMAN", level = 30 },
+            { name = "C", class = "DRUID", level = 30 } } }))
+        assert.are.equal("Pri:HEALER Wlk:DAMAGER Rog:DAMAGER",
+            fill(me, c, { placed = { X = { role = "TANK", class = "PALADIN", level = 30 } } }))
+        assert.are.equal("War:TANK Pri:HEALER Rog:DAMAGER", fill(me, c, { numGroupMembers = 2,
+            members = { { name = "Fr", class = "WARLOCK", level = 30 } } }))
+    end)
+
+    it("takes a filled place over an empty one before priority", function()
+        -- tank and healer are both filled either way; the paladin tanks, the first place
+        assert.are.equal("Pal:TANK NoR:HEALER", fill(own("MAGE", D), { p("NoR", "DRUID"), p("Pal", "PALADIN", TH) }))
+        -- one rare place either way: the paladin as tank, not as healer, as tank comes first
+        assert.are.equal("Pal:TANK", fill(own("MAGE", D), { p("Pal", "PALADIN", TH) }))
+    end)
+
+    it("keeps its search small with a hundred candidates", function()
+        local classes = { "PALADIN", "WARRIOR", "DRUID", "PRIEST", "SHAMAN", "ROGUE", "WARLOCK", "HUNTER", "MAGE" }
+        local roleSets = { T, H, D, TH, TD, HD, ALL }
+        local c = {}
+        for i = 1, 100 do
+            c[i] = p("P" .. i, classes[i % #classes + 1], roleSets[i % #roleSets + 1], 20 + i % 11)
+        end
+        local state = { own = own("MAGE", D), members = {}, placed = {}, numGroupMembers = 0, candidates = c,
+            db = db, range = WIDE, dungeons = { 800 } }
+        local list, _, info = ns.ChooseInvites(state)
+        assert.are.equal(4, #list)
+        assert.is_true(info.tried <= 5000, "fills tried: " .. tostring(info.tried))
+        db.allowDouble = true
+        list, _, info = ns.ChooseInvites(state)
+        assert.are.equal(4, #list)
+        assert.is_true(info.tried <= 20000, "fills tried: " .. tostring(info.tried))
+    end)
+end)

@@ -20,8 +20,9 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   corner counts the players shown, and each row's header the players shown who signed up for
   its role - "Tank (3 listed)".
 - Build Group: one click invites the players your group lacks around your own role - one tank,
-  one healer, three damage dealers - only from players listed for your dungeon, by your rows,
-  highest level first, then the longest wait, players without a role last, only for free places.
+  one healer, three damage dealers - only from players listed for your dungeon, filling the most
+  tank and healer places, then the most players; among equal fills by your rows, highest level
+  first, then the longest wait; players without a role last, only for free places.
   Invited players keep their place for two minutes and while they are in the group; a decline,
   a run-out invite or "already in a group" frees the place, and that player is not asked again.
   A list older than 30 seconds is refreshed first with the same button. The chat names each

@@ -23,12 +23,14 @@ builds your five-player group with one click.
   Groups and your own listing stay; delisted entries go. **Reset Filter** shows Blizzard's full
   list until your next change or login. The bottom right corner counts the players shown.
 - **Build Group** invites the players your group lacks around your own role: one tank, one
-  healer, three damage dealers, only from players listed for your dungeon. Each place takes the
-  highest class in its row, then the highest level, then the longest wait; players without a
-  role only fill what is left. Only free places are filled.
+  healer, three damage dealers, only from players listed for your dungeon. It fills the free
+  places so that the most tanks and healers come, then the most players - a paladin listed as
+  tank and healer heals when a warrior can only tank. Among equal fills each place takes the
+  highest class in its row, then the highest level, then the longest wait. Players without a
+  role only fill what is left.
   - **Several dungeons:** listed for more than one, it builds for the one where it finds the
-    most tanks and healers - they are rare - then the most players, and names it in the chat. The group keeps that dungeon while it has members or
-    pending invites.
+    most tanks and healers - they are rare - then the most players, and names it in the chat.
+    The group keeps that dungeon while it has members or pending invites.
   - **Ambiguous sign-ups:** a player listed for several roles or none gets an English whisper
     with the invite ("Tank for Shadowfang Keep?"); one listed for one role but several dungeons
     gets "You want to join for Shadowfang Keep?".

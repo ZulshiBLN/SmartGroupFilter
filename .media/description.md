@@ -15,8 +15,11 @@ it invites the tank, the healer and the damage dealers you are missing.
 
 - **One click, a whole group:** one tank, one healer, three damage dealers around your own
   role - only the places that are still free, only players listed for one of your dungeons.
-- **Your priorities decide:** for each place the class highest in your row, then the highest
-  level, then the longest wait. Players who signed up without a role only fill what is left.
+- **The most tanks and healers:** the places are filled so that the most tanks and healers come
+  - a paladin listed as tank and healer heals when a warrior can only tank.
+- **Your priorities decide:** among equal fills, each place takes the class highest in your row,
+  then the highest level, then the longest wait. Players who signed up without a role only fill
+  what is left.
 - **Nobody twice:** invited players keep their place for two minutes, and while they are in
   your group. Whoever declines, lets the invite run out or is already in a group is not asked
   again - the place goes to the next player.

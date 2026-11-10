@@ -156,29 +156,88 @@ function ns.ChooseInvites(state)
     local limit = D.MAX_SAME_CLASS[db.allowDouble and true or false]
     local ownArmor = ns.ArmorOf(own.class, own.level)
     local chosen, used = {}, {}
+    info.tried = 0 -- complete fills the search weighed, for the specs
 
-    local function Pick(role, pool)
+    -- A role's candidates in priority order: the row's classes in order, the better player of
+    -- a class first, and per class only as many as the class limit lets into a group - no best
+    -- fill needs a worse player of a class (ruleset plan 2026-11-11-roles-and-places)
+    local function Ranked(role, pool)
+        local list = {}
         for _, class in ipairs(db.order[role]) do
-            if not db.excluded[role][class] and (classCount[class] or 0) < limit then
-                local best
+            if not db.excluded[role][class] then
+                local of = {}
                 for _, e in ipairs(pool) do
                     if not used[e.name] and e.class == class and Fits(e, role, db)
-                        and (db.allowSameArmor or ns.ArmorOf(e.class, e.level) ~= ownArmor)
-                        and (not best or Better(e, best)) then
-                        best = e
+                        and (db.allowSameArmor or ns.ArmorOf(e.class, e.level) ~= ownArmor) then
+                        of[#of + 1] = e
                     end
                 end
-                if best then return best end
+                table.sort(of, Better)
+                for i = 1, math.min(#of, limit) do list[#list + 1] = of[i] end
             end
         end
+        return list
     end
 
-    -- Everyone who signed up for a role first; players with no role only for what is left
-    for _, pool in ipairs({ signed, unsigned }) do
+    -- The best fill of the open places from one pool: the most tank and healer places, then the
+    -- most players. The search tries each place's candidates in priority order, the place left
+    -- empty last, and only a strictly better fill replaces the one found - so among equals the
+    -- fill priority would choose stays, a filled place before an empty one (Michel, 2026-11-11:
+    -- one place after another left a healer place empty that a tank-only player could free).
+    local function BestFill(pool)
+        local slots, ranked = {}, {}
         for _, role in ipairs(D.ROLES) do
-            while open[role] > 0 and #chosen < free do
-                local e = Pick(role, pool)
-                if not e then break end
+            ranked[role] = Ranked(role, pool)
+            for _ = 1, open[role] do slots[#slots + 1] = role end
+        end
+        local room = free - #chosen
+        local pick, taken = {}, {}
+        local best, bestRare, bestAll = {}, -1, -1
+        local function Search(i, rare, all, from)
+            if i > #slots then
+                info.tried = info.tried + 1
+                if rare > bestRare or (rare == bestRare and all > bestAll) then
+                    best, bestRare, bestAll = {}, rare, all
+                    for k, e in pairs(pick) do best[k] = e end
+                end
+                return
+            end
+            -- Stop where even filling every place left cannot beat the best fill found
+            local left = math.min(#slots - i + 1, room - all)
+            local rareLeft = 0
+            for k = i, #slots do
+                if slots[k] ~= "DAMAGER" then rareLeft = rareLeft + 1 end
+            end
+            rareLeft = math.min(rareLeft, left)
+            if rare + rareLeft < bestRare or (rare + rareLeft == bestRare and all + left <= bestAll) then return end
+            local role = slots[i]
+            -- Places of one role take candidates in rising order: no fill is weighed twice
+            local nextSame = slots[i + 1] == role
+            if all < room then
+                local list = ranked[role]
+                for k = from, #list do
+                    local e = list[k]
+                    if not taken[e.name] and (classCount[e.class] or 0) < limit then
+                        taken[e.name] = true
+                        classCount[e.class] = (classCount[e.class] or 0) + 1
+                        pick[i] = e
+                        Search(i + 1, rare + (role ~= "DAMAGER" and 1 or 0), all + 1, nextSame and k + 1 or 1)
+                        pick[i] = nil
+                        classCount[e.class] = classCount[e.class] - 1
+                        taken[e.name] = nil
+                    end
+                end
+            end
+            -- This place empty, and so the role's later places
+            local j = i
+            while j <= #slots and slots[j] == role do j = j + 1 end
+            Search(j, rare, all, 1)
+        end
+        Search(1, 0, 0, 1)
+        for i = 1, #slots do
+            local e = best[i]
+            if e then
+                local role = slots[i]
                 used[e.name] = true
                 open[role] = open[role] - 1
                 classCount[e.class] = (classCount[e.class] or 0) + 1
@@ -186,5 +245,10 @@ function ns.ChooseInvites(state)
             end
         end
     end
+
+    -- Everyone who signed up for a role first; players with no role only for what is left,
+    -- strictly (Michel, 2026-11-11)
+    BestFill(signed)
+    BestFill(unsigned)
     return chosen, nil, info
 end
