@@ -1,0 +1,359 @@
+-- SmartGroupFilter - panel
+-- The panel beside Blizzard's player list (ruleset plan 2026-11-10-panel-filter-build, phase 3):
+-- Filter checkbox and count, level range, the three priority rows, the two options. A child of
+-- LFGBrowseFrame, so it shows and hides with the list; docked right of the window's side tabs.
+
+local _, ns = ...
+local D, L = ns.D, ns.L
+
+local db
+ns.OnDBReady(function(d) db = d end)
+
+local WIDTH = 300
+local PAD = 14
+local SLOT = 32        -- an icon's slot in a row, px
+local ICON = 28
+local PER_LINE = 5     -- icons per line; the damage row takes two lines
+local TRACK = 236      -- the level slider's track, px
+
+local panel
+
+---------------------------------------------------------------------------
+-- Helpers
+---------------------------------------------------------------------------
+local function Changed()
+    ns.RefreshList()
+end
+
+local function Label(parent, key, font)
+    local fs = parent:CreateFontString(nil, "OVERLAY", font or "GameFontNormal")
+    ns.SetL(fs, key)
+    return fs
+end
+
+local function Check(parent, key, getter, setter)
+    local cb = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
+    cb:SetSize(24, 24)
+    cb.label = Label(cb, key, "GameFontHighlight")
+    cb.label:SetPoint("LEFT", cb, "RIGHT", 2, 0)
+    cb:SetChecked(getter())
+    cb:SetScript("OnClick", function(self)
+        setter(self:GetChecked() and true or false)
+        Changed()
+    end)
+    return cb
+end
+
+-- An atlas from Blizzard's art; a plain colour when this client lacks it (SetAtlas answers false)
+local function Art(tex, atlas, r, g, b, a)
+    if not tex:SetAtlas(atlas) then tex:SetColorTexture(r, g, b, a) end
+end
+
+local function ClassName(class)
+    local client = LOCALIZED_CLASS_NAMES_MALE and LOCALIZED_CLASS_NAMES_MALE[class]
+    return ns.LocalName(client, "CLASS_" .. class)
+end
+
+---------------------------------------------------------------------------
+-- Level range: two fields and a slider with two handles
+---------------------------------------------------------------------------
+local function MaxLevel()
+    return GetMaxPlayerLevel and GetMaxPlayerLevel() or 60
+end
+
+local function ShowRange(from, to)
+    panel.fromBox:SetText(tostring(from))
+    panel.toBox:SetText(tostring(to))
+    local span = math.max(1, MaxLevel() - 1)
+    for i, v in ipairs({ from, to }) do
+        local h = panel.slider.handles[i]
+        h:ClearAllPoints()
+        h:SetPoint("CENTER", panel.slider, "LEFT", (v - 1) / span * TRACK, 0)
+    end
+end
+
+local function RefreshRange()
+    local r = ns.LevelRange()
+    ShowRange(r.min, r.max)
+end
+
+local function ApplyRange(from, to)
+    ns.SetLevelRange(from, to)
+    RefreshRange()
+    Changed()
+end
+
+local function TypedLevel(box)
+    local n = tonumber(box:GetText())
+    if not n then return nil end
+    return math.max(1, math.min(MaxLevel(), math.floor(n)))
+end
+
+local function LevelBox(parent, isFrom)
+    local box = CreateFrame("EditBox", nil, parent, "InputBoxTemplate")
+    box:SetSize(36, 20)
+    box:SetAutoFocus(false)
+    box:SetNumeric(true)
+    box:SetMaxLetters(2)
+    local function Apply(self)
+        local r = ns.LevelRange()
+        local v = TypedLevel(self)
+        if v then
+            if isFrom then ApplyRange(v, r.max) else ApplyRange(r.min, v) end
+        else
+            RefreshRange()
+        end
+        self:ClearFocus()
+    end
+    box:SetScript("OnEnterPressed", Apply)
+    box:SetScript("OnEscapePressed", function(self) RefreshRange() self:ClearFocus() end)
+    return box
+end
+
+-- The level under the cursor on the slider's track
+local function LevelAtCursor()
+    local x = GetCursorPosition() / UIParent:GetEffectiveScale()
+    local width = panel.slider:GetWidth()
+    if width <= 0 then width = TRACK end
+    local f = (x - panel.slider:GetLeft()) / width
+    f = math.max(0, math.min(1, f))
+    return 1 + math.floor(f * (MaxLevel() - 1) + 0.5)
+end
+
+local function Handle(slider, index)
+    local h = CreateFrame("Button", nil, slider)
+    h:SetSize(12, 20)
+    local tex = h:CreateTexture(nil, "OVERLAY")
+    tex:SetAllPoints()
+    Art(tex, "Minimal_SliderBar_Button", 1, 0.82, 0, 1)
+    h:SetScript("OnMouseDown", function(self) self.dragging = true end)
+    h:SetScript("OnUpdate", function(self)
+        if not self.dragging then return end
+        local r = ns.LevelRange()
+        local v = LevelAtCursor()
+        local from, to = r.min, r.max
+        if index == 1 then from = math.min(v, to) else to = math.max(v, from) end
+        self.pending = { from, to }
+        ShowRange(from, to)
+    end)
+    h:SetScript("OnMouseUp", function(self)
+        self.dragging = false
+        if self.pending then
+            ApplyRange(self.pending[1], self.pending[2])
+            self.pending = nil
+        end
+    end)
+    return h
+end
+
+---------------------------------------------------------------------------
+-- Priority rows
+---------------------------------------------------------------------------
+local ROLE_TEXT = {
+    TANK = function() return ns.LocalName(TANK, "ROLE_TANK") end,
+    HEALER = function() return ns.LocalName(HEALER, "ROLE_HEALER") end,
+    DAMAGER = function() return ns.LocalName(DAMAGER, "ROLE_DAMAGE") end,
+}
+
+-- The slot index (1..n) under screen point x, y in a row, or nil outside it
+function ns.SlotAt(row, x, y)
+    local n = #db.order[row.role]
+    local lines = math.ceil(n / PER_LINE)
+    local col = math.floor((x - row:GetLeft()) / SLOT)
+    local line = math.floor((row:GetTop() - y) / SLOT)
+    if col < 0 or col >= PER_LINE or line < 0 or line >= lines then return nil end
+    local index = line * PER_LINE + col + 1
+    return math.min(index, n)
+end
+
+local function LayoutRow(row)
+    local order = db.order[row.role]
+    for i, class in ipairs(order) do
+        local icon = row.icons[i]
+        icon.class = class
+        icon.index = i
+        icon.texture:SetAtlas(D.CLASS_ATLAS[class])
+        local excluded = db.excluded[row.role][class] and true or false
+        icon.texture:SetDesaturated(excluded)
+        icon.cross:SetShown(excluded)
+        icon:ClearAllPoints()
+        local col, line = (i - 1) % PER_LINE, math.floor((i - 1) / PER_LINE)
+        icon:SetPoint("TOPLEFT", row, "TOPLEFT", col * SLOT, -line * SLOT)
+    end
+end
+
+local function ShowTooltip(icon)
+    GameTooltip:SetOwner(icon, "ANCHOR_RIGHT")
+    GameTooltip:AddLine(ClassName(icon.class))
+    GameTooltip:AddLine(L.TIP_DRAG, 1, 1, 1)
+    if db.excluded[icon.row.role][icon.class] then GameTooltip:AddLine(L.EXCLUDED, 1, 0.2, 0.2) end
+    GameTooltip:Show()
+end
+
+local function Icon(row)
+    local icon = CreateFrame("Button", nil, row)
+    icon.row = row
+    icon:SetSize(ICON, ICON)
+    icon.texture = icon:CreateTexture(nil, "ARTWORK")
+    icon.texture:SetAllPoints()
+    icon.cross = icon:CreateTexture(nil, "OVERLAY")
+    icon.cross:SetAllPoints()
+    Art(icon.cross, "common-icon-redx", 1, 0, 0, 0.4)
+    icon:RegisterForClicks("RightButtonUp")
+    icon:RegisterForDrag("LeftButton")
+    icon:SetScript("OnClick", function(self, button)
+        if button ~= "RightButton" then return end
+        local ex = db.excluded[row.role]
+        ex[self.class] = (not ex[self.class]) or nil
+        LayoutRow(row)
+        Changed()
+        if GameTooltip:IsOwned(self) then ShowTooltip(self) end
+    end)
+    icon:SetScript("OnDragStart", function(self)
+        self.dragging = true
+        self:SetFrameStrata("TOOLTIP")
+        self:SetScript("OnUpdate", function(s)
+            local scale = UIParent:GetEffectiveScale()
+            local x, y = GetCursorPosition()
+            s:ClearAllPoints()
+            s:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x / scale, y / scale)
+        end)
+    end)
+    icon:SetScript("OnDragStop", function(self)
+        self.dragging = false
+        self:SetScript("OnUpdate", nil)
+        self:SetFrameStrata(panel:GetFrameStrata())
+        local scale = UIParent:GetEffectiveScale()
+        local x, y = GetCursorPosition()
+        local to = ns.SlotAt(row, x / scale, y / scale)
+        local order = db.order[row.role]
+        if to and to ~= self.index then
+            local class = table.remove(order, self.index)
+            table.insert(order, to, class)
+            Changed()
+        end
+        LayoutRow(row)
+    end)
+    icon:SetScript("OnEnter", ShowTooltip)
+    icon:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    return icon
+end
+
+local function Row(parent, role, anchor)
+    local label = parent:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    ns.SetL(label, ROLE_TEXT[role])
+    label:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -14)
+    local row = CreateFrame("Frame", nil, parent)
+    row.role = role
+    row.label = label
+    local n = #db.order[role]
+    row:SetSize(PER_LINE * SLOT, math.ceil(n / PER_LINE) * SLOT)
+    row:SetPoint("TOPLEFT", label, "BOTTOMLEFT", 0, -4)
+    row.icons = {}
+    for i = 1, n do row.icons[i] = Icon(row) end
+    LayoutRow(row)
+    return row
+end
+
+---------------------------------------------------------------------------
+-- The panel
+---------------------------------------------------------------------------
+-- Right of the side tabs (Blizzard's modern style), else right of the window
+local function Dock()
+    local tabs = LFGParentFrame.BrowsingTab
+    local x = 4
+    if tabs and tabs:GetRight() and LFGParentFrame:GetRight() then
+        x = tabs:GetRight() - LFGParentFrame:GetRight() + 4
+    end
+    panel:ClearAllPoints()
+    panel:SetPoint("TOPLEFT", LFGParentFrame, "TOPRIGHT", x, 0)
+    panel:SetHeight(LFGParentFrame:GetHeight())
+end
+
+local function UpdateCount(shown, total)
+    panel.count:SetText(L.SHOWN_COUNT:format(shown, total))
+end
+
+local function Create()
+    panel = CreateFrame("Frame", "SmartGroupFilterPanel", LFGBrowseFrame, "PortraitFrameTemplate")
+    ns.panel = panel
+    panel:SetWidth(WIDTH)
+    if panel.SetPortraitShown then panel:SetPortraitShown(false) end
+    if panel.CloseButton then panel.CloseButton:Hide() end
+    panel:GetTitleText():SetText(ns.ADDON_NAME)
+
+    panel.filterCheck = Check(panel, "FILTER",
+        function() return db.filterOn end, function(v) db.filterOn = v end)
+    panel.filterCheck:SetPoint("TOPLEFT", panel, "TOPLEFT", PAD, -30)
+    panel.count = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    panel.count:SetPoint("TOPLEFT", panel.filterCheck, "BOTTOMLEFT", 4, -2)
+
+    local rangeLabel = Label(panel, "LEVEL_RANGE")
+    rangeLabel:SetPoint("TOPLEFT", panel.count, "BOTTOMLEFT", -4, -14)
+    panel.fromBox = LevelBox(panel, true)
+    panel.fromBox:SetPoint("TOPLEFT", rangeLabel, "BOTTOMLEFT", 6, -6)
+    panel.toBox = LevelBox(panel, false)
+    panel.toBox:SetPoint("TOPLEFT", rangeLabel, "BOTTOMLEFT", TRACK - 30, -6)
+    local fromLabel = Label(panel, "LEVEL_FROM", "GameFontHighlightSmall")
+    fromLabel:SetPoint("LEFT", panel.fromBox, "RIGHT", 4, 0)
+    local toLabel = Label(panel, "LEVEL_TO", "GameFontHighlightSmall")
+    toLabel:SetPoint("RIGHT", panel.toBox, "LEFT", -8, 0)
+
+    local slider = CreateFrame("Frame", nil, panel)
+    panel.slider = slider
+    slider:SetSize(TRACK, 20)
+    slider:SetPoint("TOPLEFT", panel.fromBox, "BOTTOMLEFT", -2, -8)
+    local bar = slider:CreateTexture(nil, "BACKGROUND")
+    bar:SetPoint("LEFT")
+    bar:SetPoint("RIGHT")
+    bar:SetHeight(6)
+    Art(bar, "Minimal_SliderBar_Left", 0.4, 0.4, 0.4, 1)
+    slider.handles = { Handle(slider, 1), Handle(slider, 2) }
+
+    panel.rows = {}
+    local anchor = slider
+    for _, role in ipairs(D.ROLES) do
+        local row = Row(panel, role, anchor)
+        panel.rows[role] = row
+        anchor = row
+    end
+
+    panel.doubleCheck = Check(panel, "ALLOW_DOUBLE",
+        function() return db.allowDouble end, function(v) db.allowDouble = v end)
+    panel.doubleCheck:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", -4, -14)
+    panel.armorCheck = Check(panel, "ALLOW_ARMOR",
+        function() return db.allowSameArmor end, function(v) db.allowSameArmor = v end)
+    panel.armorCheck:SetPoint("TOPLEFT", panel.doubleCheck, "BOTTOMLEFT", 0, -2)
+
+    panel:SetScript("OnShow", function()
+        Dock()
+        RefreshRange()
+        UpdateCount(ns.Counts())
+    end)
+    ns.OnListFiltered(function(shown, total)
+        UpdateCount(shown, total)
+        RefreshRange()
+    end)
+    ns.OnLanguageChanged(function() UpdateCount(ns.Counts()) end)
+    Dock()
+    RefreshRange()
+    UpdateCount(ns.Counts())
+end
+
+-- Blizzard's Group Finder may load after this addon: build the panel once both are ready
+local function TryCreate()
+    if panel or not db or not LFGBrowseFrame then return end
+    Create()
+end
+
+local events = CreateFrame("Frame")
+events:RegisterEvent("PLAYER_LOGIN")
+events:RegisterEvent("ADDON_LOADED")
+events:SetScript("OnEvent", function(_, event)
+    if event == "PLAYER_LOGIN" then
+        -- Main.lua reads the settings on PLAYER_LOGIN too; wait until it has
+        ns.OnDBReady(TryCreate)
+    else
+        TryCreate()
+    end
+end)

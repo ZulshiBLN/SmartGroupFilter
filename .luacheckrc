@@ -29,6 +29,9 @@ read_globals = {
     -- Group Finder (Blizzard_LFGVanilla_Browse.lua, Forever 1.60.1)
     "C_LFGList", "LFGBrowseFrame", "LFGBrowseUtil_SortSearchResults", "hooksecurefunc",
     "GetMaxPlayerLevel", "issecretvalue",
+    -- The panel
+    "LFGParentFrame", "UIParent", "GameTooltip", "GetCursorPosition",
+    "LOCALIZED_CLASS_NAMES_MALE", "TANK", "HEALER", "DAMAGER",
     SlashCmdList = { fields = { SMARTGROUPFILTER = { read_only = false } } },
 }
 

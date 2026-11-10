@@ -29,20 +29,104 @@ SlashCmdList = {}
 
 local frames = {}
 
-local function NewFrame()
-    local f = { events = {}, scripts = {} }
-    function f:RegisterEvent(event) self.events[event] = true end
-    function f:UnregisterEvent(event) self.events[event] = nil end
-    function f:SetScript(name, fn) self.scripts[name] = fn end
-    function f:GetScript(name) return self.scripts[name] end
-    return f
+-- A widget: frame, button, texture, font string, edit box - one shape for all. It keeps what
+-- the addon sets (text, shown, checked, points, size, atlas, desaturation) so a spec can read
+-- it back; geometry (left, top, ...) comes from fields a spec may set. Methods the addon calls
+-- that matter to no spec do nothing.
+local Widget = {}
+Widget.__index = Widget
+local function noop() end
+for _, m in ipairs({ "SetAutoFocus", "SetNumeric", "SetMaxLetters", "ClearFocus", "SetAllPoints",
+    "RegisterForClicks", "RegisterForDrag", "SetFrameStrata", "SetPortraitShown" }) do
+    Widget[m] = noop
+end
+function Widget:GetFrameStrata() return "MEDIUM" end
+
+local function NewWidget(kind, name, parent, template)
+    local w = setmetatable({
+        kind = kind, name = name, parent = parent, template = template,
+        events = {}, scripts = {}, points = {}, shown = true, children = {},
+        width = 0, height = 0, left = 0, top = 0, right = 0, bottom = 0, scale = 1,
+    }, Widget)
+    if parent and parent.children then parent.children[#parent.children + 1] = w end
+    if name then _G[name] = w end
+    return w
 end
 
-function CreateFrame()
-    local f = NewFrame()
+function Widget:RegisterEvent(event) self.events[event] = true end
+function Widget:UnregisterEvent(event) self.events[event] = nil end
+function Widget:SetScript(name, fn) self.scripts[name] = fn end
+function Widget:GetScript(name) return self.scripts[name] end
+function Widget:HookScript(name, fn)
+    local old = self.scripts[name]
+    self.scripts[name] = function(...)
+        if old then old(...) end
+        fn(...)
+    end
+end
+function Widget:SetText(s) self.text = s end
+function Widget:GetText() return self.text end
+function Widget:SetFormattedText(fmt, ...) self.text = fmt:format(...) end
+function Widget:Show() self.shown = true end
+function Widget:Hide() self.shown = false end
+function Widget:SetShown(v) self.shown = v and true or false end
+function Widget:IsShown() return self.shown end
+function Widget:SetChecked(v) self.checked = v and true or false end
+function Widget:GetChecked() return self.checked end
+function Widget:SetEnabled(v) self.enabled = v and true or false end
+function Widget:Enable() self.enabled = true end
+function Widget:Disable() self.enabled = false end
+function Widget:IsEnabled() return self.enabled ~= false end
+function Widget:SetPoint(...) self.points[#self.points + 1] = { ... } end
+function Widget:ClearAllPoints() self.points = {} end
+function Widget:SetSize(w, h) self.width, self.height = w, h end
+function Widget:SetWidth(w) self.width = w end
+function Widget:SetHeight(h) self.height = h end
+function Widget:GetWidth() return self.width end
+function Widget:GetHeight() return self.height end
+function Widget:GetLeft() return self.left end
+function Widget:GetRight() return self.right end
+function Widget:GetTop() return self.top end
+function Widget:GetBottom() return self.bottom end
+function Widget:GetEffectiveScale() return self.scale end
+function Widget:SetAtlas(a) self.atlas = a return true end
+function Widget:SetColorTexture(...) self.color = { ... } end
+function Widget:SetDesaturated(v) self.desaturated = v and true or false end
+function Widget:SetNumber(n) self.text = tostring(n) end
+function Widget:GetNumber() return tonumber(self.text) or 0 end
+function Widget:CreateTexture(name) return NewWidget("Texture", name, self) end
+function Widget:CreateFontString(name) return NewWidget("FontString", name, self) end
+function Widget:GetTitleText()
+    self.titleText = self.titleText or NewWidget("FontString", nil, self)
+    return self.titleText
+end
+
+function CreateFrame(kind, name, parent, template)
+    local f = NewWidget(kind or "Frame", name, parent, template)
+    if template and template:find("PortraitFrameTemplate") then
+        f.CloseButton = NewWidget("Button", nil, f)
+    end
     frames[#frames + 1] = f
     return f
 end
+
+UIParent = NewWidget("Frame", "UIParent")
+STATE.cursor = { x = 0, y = 0 }
+function GetCursorPosition() return STATE.cursor.x, STATE.cursor.y end
+
+GameTooltip = NewWidget("GameTooltip", "GameTooltip")
+GameTooltip.lines = {}
+function GameTooltip:SetOwner(owner) self.owner, self.lines = owner, {} end
+function GameTooltip:IsOwned(f) return self.owner == f end
+function GameTooltip:AddLine(s) self.lines[#self.lines + 1] = s end
+function GameTooltip:SetText(s) self.lines = { s } end
+
+-- The client's own names, enUS
+LOCALIZED_CLASS_NAMES_MALE = {
+    WARRIOR = "Warrior", PALADIN = "Paladin", HUNTER = "Hunter", ROGUE = "Rogue",
+    PRIEST = "Priest", SHAMAN = "Shaman", MAGE = "Mage", WARLOCK = "Warlock", DRUID = "Druid",
+}
+TANK, HEALER, DAMAGER = "Tank", "Healer", "Damage"
 
 function FIRE(event, ...)
     for _, f in ipairs(frames) do
@@ -95,12 +179,15 @@ end
 -- Blizzard's sort: the mock keeps STATE.order as it is
 function LFGBrowseUtil_SortSearchResults(results) end
 
-LFGBrowseFrame = {
-    results = {},
-    shown = true,
-    ActivityDropdown = { selectedValues = {} },
-}
-function LFGBrowseFrame:IsShown() return self.shown end
+-- Blizzard's Group Finder window with its side tabs (modern style), and the player list in it
+LFGParentFrame = NewWidget("Frame", "LFGParentFrame", UIParent)
+LFGParentFrame.right, LFGParentFrame.height = 400, 600
+LFGParentFrame.BrowsingTab = NewWidget("CheckButton", nil, LFGParentFrame)
+LFGParentFrame.BrowsingTab.right = 440
+
+LFGBrowseFrame = NewWidget("Frame", "LFGBrowseFrame", LFGParentFrame)
+LFGBrowseFrame.results = {}
+LFGBrowseFrame.ActivityDropdown = { selectedValues = {} }
 -- As Blizzard's: fresh results from the client, sorted, then drawn
 function LFGBrowseFrame:UpdateResultList()
     local results = {}
