@@ -110,81 +110,29 @@ describe("the panel", function()
 
     it("shows and hides the panel with a fourth side tab, remembered, Blizzard's list while hidden", function()
         local tab = ns.tab
-        assert.are.equal(LFGParentFrame, tab.parent) -- on every page of the window
+        assert.are.equal(LFGBrowseFrame, tab.parent) -- on the Group Browser only (Michel)
         assert.are.equal("LargeSideTabButtonTemplate", tab.template)
         assert.are.same({ "TOPLEFT", LFGParentFrame.WhoListingTab, "BOTTOMLEFT", 0, -2 }, tab.points[1])
         assert.are.equal("Interface\\AddOns\\SmartGroupFilter\\Media\\Tab", tab.Icon.textureFile)
         assert.is_true(tab.fillToInterior) -- the logo fills the tab
         assert.is_true(tab.checked) -- highlighted while the panel is visible
-        CLICK(tab.overlay)
+        tab.mouseUp(tab, "LeftButton", true)
         assert.is_false(panel.shown)
         assert.is_false(db.panelShown)
         assert.is_false(tab.checked)
         assert.are.equal("1 2 3", shown())
-        CLICK(tab.overlay)
+        tab.mouseUp(tab, "LeftButton", true)
         assert.is_true(panel.shown)
         assert.is_true(tab.checked)
         assert.are.equal("1 2", shown())
-        assert.are.equal(0, STATE.tab2ButtonClicks) -- on the Group Browser: no page switch
+        assert.are.equal(0, STATE.tab2ButtonClicks) -- SGF switches no page
     end)
 
-    describe("the side tab's secure overlay", function()
-        it("is a secure button over the tab, anchored to the tab alone", function()
-            local overlay = ns.tab.overlay
-            assert.truthy(overlay.template:find("SecureActionButtonTemplate", 1, true))
-            assert.are.equal(ns.tab, overlay.parent)
-            for _, point in ipairs(overlay.points) do assert.is_nil(point[2]) end
-        end)
-
-        it("has no secure action on the Group Browser, clicks Blizzard's tab button elsewhere", function()
-            local overlay = ns.tab.overlay
-            assert.is_nil(overlay:GetAttribute("type"))
-            LFGParentFrameTab1:Click() -- Blizzard's listing page
-            assert.are.equal("click", overlay:GetAttribute("type"))
-            assert.are.equal(LFGParentFrameTab2, overlay:GetAttribute("clickbutton"))
-        end)
-
-        it("opens the Group Browser with the panel from another page, hidden before or not", function()
-            CLICK(ns.tab.overlay) -- panel hidden
-            LFGParentFrameTab1:Click()
-            CLICK(ns.tab.overlay)
-            assert.are.equal(1, STATE.tab2ButtonClicks)
-            assert.is_true(LFGBrowseFrame.shown)
-            assert.is_true(db.panelShown) -- decided by the mode before the click: opened, not toggled
-            assert.is_true(panel.shown)
-        end)
-
-        it("leaves the overlay alone in combat and sets it again when combat ends", function()
-            local overlay = ns.tab.overlay
-            STATE.combat = true
-            assert.has_no.errors(function() LFGParentFrameTab1:Click() end)
-            assert.is_nil(overlay:GetAttribute("type")) -- still the Group Browser's
-            CLICK(overlay)
-            assert.is_true(db.panelShown) -- nothing toggled in combat
-            STATE.combat = false
-            FIRE("PLAYER_REGEN_ENABLED")
-            assert.are.equal("click", overlay:GetAttribute("type"))
-        end)
-
-        it("lights up the tab under the mouse and names itself", function()
-            local overlay = ns.tab.overlay
-            RUNSCRIPT(overlay, "OnEnter")
-            assert.is_true(ns.tab.HighlightTexture.shown)
-            assert.are.equal("SmartGroupFilter", GameTooltip.lines[1])
-            RUNSCRIPT(overlay, "OnLeave")
-            assert.is_false(ns.tab.HighlightTexture.shown)
-        end)
-    end)
-
-    it("highlights the tab only while the panel is visible on the Group Browser", function()
+    it("glows while the panel is shown", function()
         local tab = ns.tab
         assert.is_true(tab.checked)
-        LFGBrowseFrame.shown = false
-        RUNSCRIPT(LFGBrowseFrame, "OnHide")
+        tab.mouseUp(tab, "LeftButton", true)
         assert.is_false(tab.checked)
-        LFGBrowseFrame.shown = true
-        RUNSCRIPT(LFGBrowseFrame, "OnShow")
-        assert.is_true(tab.checked)
     end)
 
     it("starts hidden when it was hidden before", function()

@@ -8,8 +8,7 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
 ### Added
 
 - A panel docked beside the Group Finder's player list, opened and closed with it; a fourth side
-  tab with the SmartGroupFilter logo shows and hides it, and opens the Group Browser from any
-  page of the window.
+  tab with the SmartGroupFilter logo, on the player list, shows and hides it.
 - The filter: the player list shows only the single players within the level range and fitting
   your priority rows; groups and your own listing stay, delisted entries are hidden. Players
   whose class and level arrive after the search are filtered as soon as they do.
@@ -27,8 +26,8 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   frees the place, and that player is not asked again. A list older than 30 seconds is
   refreshed first with the same button. The chat names each invite; the tooltip says why the
   button is greyed out.
-- Not listed yet? The same button reads List Self and opens Blizzard's listing page; choose the
-  dungeon, play style and role there, and once Blizzard has listed you it reads Build Group.
+- Not listed yet? The same button reads List Self and lights up Blizzard's eye tab, where you
+  choose the dungeon, play style and role; once Blizzard has listed you it reads Build Group.
 - `/sgf test` shows in the chat whom Build Group would invite and why, and why every other
   single player is left out - without sending a single invite.
 - The addon loads in every client language and answers `/sgf` with its chat commands; its icon

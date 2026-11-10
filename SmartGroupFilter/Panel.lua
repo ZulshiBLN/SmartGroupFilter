@@ -358,11 +358,12 @@ end
 -- The fourth side tab, below Blizzard's three, from Blizzard's side tab template. The full logo
 -- fills the tab as Blizzard's icons do (SetFillToInterior: 50 px, masked to the tab's shape);
 -- the rim is the template's own. Highlighted (Blizzard's "checked" glow) while the panel is
--- visible (Michel, 2026-11-10). Shown on every page of the window (a child of LFGParentFrame).
--- On another page a click opens the Group Browser with the panel; on the Group Browser it shows
--- or hides the panel - through the secure overlay below.
+-- visible. A child of LFGBrowseFrame: it shows on the Group Browser only and shows or hides the
+-- panel there. SGF cannot switch the Group Finder's pages safely: Blizzard's hidden tab buttons
+-- fail in the modern style, and its page switch run from addon code taints what its search and
+-- its listing read (Michel's choice, 2026-11-11; archive/incidents.md).
 local function ToggleTab()
-    local tab = CreateFrame("Frame", "SmartGroupFilterTab", LFGParentFrame, "LargeSideTabButtonTemplate")
+    local tab = CreateFrame("Frame", "SmartGroupFilterTab", LFGBrowseFrame, "LargeSideTabButtonTemplate")
     ns.tab = tab
     local who = LFGParentFrame.WhoListingTab
     if who then
@@ -375,73 +376,62 @@ local function ToggleTab()
     tab.tooltipText = ns.ADDON_NAME
     local function Sync()
         if not InCombatLockdown() then panel:SetShown(db.panelShown) end
-        if tab.SetChecked then tab:SetChecked(db.panelShown and LFGBrowseFrame:IsShown()) end
+        if tab.SetChecked then tab:SetChecked(db.panelShown) end
     end
-
-    -- The tab's clicks go to a secure button laid over it (plan 2026-11-11-list-self). On
-    -- another page it clicks Blizzard's hidden tab button of the Group Browser, so the page
-    -- switch runs in Blizzard's secure code - calling Blizzard's page switch from addon code
-    -- taints what its next search reads (incident 2026-11-11). On the Group Browser it has no
-    -- secure action, and its click shows or hides the panel. A protected frame is anchored to
-    -- its parent alone.
-    local overlay = CreateFrame("Button", "SmartGroupFilterTabButton", tab, "SecureActionButtonTemplate")
-    tab.overlay = overlay
-    overlay:SetPoint("TOPLEFT")
-    overlay:SetPoint("BOTTOMRIGHT")
-    overlay:RegisterForClicks("LeftButtonUp")
-    overlay:SetAttribute("useOnKeyDown", false)
-    local function SetOverlay()
-        if InCombatLockdown() then return end -- set again when combat ends
-        if LFGBrowseFrame:IsShown() then
-            overlay.mode = "toggle"
-            overlay:SetAttribute("type", nil)
-            overlay:SetAttribute("clickbutton", nil)
-        else
-            overlay.mode = "open"
-            overlay:SetAttribute("type", "click")
-            overlay:SetAttribute("clickbutton", LFGParentFrameTab2)
-        end
-    end
-    -- The secure click shows the Group Browser at once, which sets the overlay anew: the mode
-    -- that counts is the one before the click
-    overlay:SetScript("PreClick", function(self) self.clickMode = self.mode end)
-    overlay:SetScript("PostClick", function(self)
+    local function Toggle()
         if InCombatLockdown() then return end
-        if self.clickMode == "open" then
-            db.panelShown = true
-        elseif self.clickMode == "toggle" then
-            db.panelShown = not db.panelShown
-        end
+        db.panelShown = not db.panelShown
         Sync()
         ns.RefreshList()
-    end)
-    -- The tab no longer gets the mouse: its highlight and the tooltip come from the overlay
-    local highlight = tab.HighlightTexture
-    if highlight and highlight.SetDrawLayer then highlight:SetDrawLayer("OVERLAY") end
-    if highlight then highlight:Hide() end
-    overlay:SetScript("OnEnter", function(self)
-        if highlight then highlight:Show() end
+    end
+    tab.Toggle = Toggle
+    if tab.SetCustomOnMouseUpHandler then
+        tab:SetCustomOnMouseUpHandler(function(_, button, upInside)
+            if button == "LeftButton" and upInside then Toggle() end
+        end)
+    else
+        tab:SetScript("OnMouseUp", function(_, button) if button == "LeftButton" then Toggle() end end)
+    end
+    tab:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:AddLine(ns.ADDON_NAME)
         GameTooltip:AddLine(L.TIP_TOGGLE, 1, 1, 1)
         GameTooltip:Show()
     end)
-    overlay:SetScript("OnLeave", function()
-        if highlight then highlight:Hide() end
-        GameTooltip:Hide()
-    end)
+    tab:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    LFGBrowseFrame:HookScript("OnShow", Sync)
+    Sync()
+end
 
-    -- The glow and the overlay follow the page; after combat the overlay catches up
-    local function OnPage()
-        Sync()
-        SetOverlay()
+-- List Self's pointer: Blizzard's eye tab (the listing page) glows for a few seconds. SGF does
+-- not switch the page itself (see the side tab above).
+local GLOW_SECONDS = 5
+function ns.PointToListing()
+    local target = LFGParentFrame.ListingTab
+    if not target then return end
+    local glow = ns.listingGlow
+    if not glow then
+        glow = CreateFrame("Frame", nil, LFGParentFrame)
+        ns.listingGlow = glow
+        glow:SetAllPoints(target)
+        glow:SetFrameStrata("HIGH")
+        local tex = glow:CreateTexture(nil, "OVERLAY")
+        tex:SetAllPoints()
+        Art(tex, "common-sidetab-hover", 1, 0.82, 0, 0.5)
+        if tex.SetBlendMode then tex:SetBlendMode("ADD") end
+        glow.texture = tex
+        glow:SetScript("OnUpdate", function(self, elapsed)
+            self.t = (self.t or 0) + elapsed
+            self.texture:SetAlpha(0.55 + 0.45 * math.sin(self.t * 6))
+        end)
     end
-    LFGBrowseFrame:HookScript("OnShow", OnPage)
-    LFGBrowseFrame:HookScript("OnHide", OnPage)
-    local events = CreateFrame("Frame")
-    events:RegisterEvent("PLAYER_REGEN_ENABLED")
-    events:SetScript("OnEvent", OnPage)
-    OnPage()
+    glow.t = 0
+    glow:Show()
+    glow.token = (glow.token or 0) + 1
+    local token = glow.token
+    C_Timer.After(GLOW_SECONDS, function()
+        if glow.token == token then glow:Hide() end
+    end)
 end
 
 local function Create()

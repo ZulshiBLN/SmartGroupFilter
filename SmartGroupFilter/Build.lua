@@ -133,10 +133,9 @@ local function SetMode(mode)
     if InCombatLockdown() then return false end
     if button.mode ~= mode then
         button.mode = mode
-        -- refresh: Blizzard's refresh arrow; list: Blizzard's hidden tab button of the listing
-        -- page, whose own OnClick switches the page (plan 2026-11-11-list-self)
-        local target = (mode == "refresh" and LFGBrowseFrame and LFGBrowseFrame.RefreshButton)
-            or (mode == "list" and LFGParentFrameTab1) or nil
+        -- refresh: Blizzard's refresh arrow. List Self has no secure action: SGF cannot switch
+        -- the Group Finder's page safely, it points at Blizzard's eye tab instead
+        local target = mode == "refresh" and LFGBrowseFrame and LFGBrowseFrame.RefreshButton or nil
         if target then
             button:SetAttribute("type", "click")
             button:SetAttribute("clickbutton", target)
@@ -151,7 +150,7 @@ end
 function ns.UpdateBuildButton()
     if not button or InCombatLockdown() then return end
     local list, why = Plan()
-    -- Not listed: List Self opens Blizzard's listing page; listing stays Blizzard's (Michel)
+    -- Not listed: List Self points at Blizzard's eye tab; listing stays Blizzard's (Michel)
     if why == "NEED_LISTING" then
         SetMode("list")
         button.reason = L.LIST_SELF_TIP
@@ -209,7 +208,12 @@ function ns.CreateBuildButton(parent)
     -- After the secure handler: in build mode invite; in refresh mode Blizzard's arrow has
     -- been clicked and the button only shows the search
     button:HookScript("OnClick", function()
-        if button.mode == "build" then BuildGroup() else ns.UpdateBuildButton() end
+        if button.mode == "build" then
+            BuildGroup()
+        else
+            if button.mode == "list" and ns.PointToListing then ns.PointToListing() end
+            ns.UpdateBuildButton()
+        end
     end)
     button:SetMotionScriptsWhileDisabled(true)
     button:SetScript("OnEnter", function(self)

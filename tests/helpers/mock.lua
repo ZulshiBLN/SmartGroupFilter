@@ -36,9 +36,10 @@ local frames = {}
 local Widget = {}
 Widget.__index = Widget
 local function noop() end
-for _, m in ipairs({ "SetAutoFocus", "SetNumeric", "SetMaxLetters", "ClearFocus", "SetAllPoints",
+function Widget:SetAllPoints(rel) self.allPointsTo = rel end
+for _, m in ipairs({ "SetAutoFocus", "SetNumeric", "SetMaxLetters", "ClearFocus",
     "RegisterForClicks", "RegisterForDrag", "SetFrameStrata", "SetPortraitShown", "SetTextColor",
-    "SetMotionScriptsWhileDisabled" }) do
+    "SetMotionScriptsWhileDisabled", "SetBlendMode" }) do
     Widget[m] = noop
 end
 function Widget:GetFrameStrata() return "MEDIUM" end
@@ -229,6 +230,7 @@ LFGParentFrame.right, LFGParentFrame.height = 400, 600
 LFGParentFrame.BrowsingTab = NewWidget("CheckButton", nil, LFGParentFrame)
 LFGParentFrame.BrowsingTab.right = 440
 LFGParentFrame.WhoListingTab = NewWidget("CheckButton", nil, LFGParentFrame)
+LFGParentFrame.ListingTab = NewWidget("Frame", nil, LFGParentFrame)
 
 LFGBrowseFrame = NewWidget("Frame", "LFGBrowseFrame", LFGParentFrame)
 LFGBrowseFrame.results = {}

@@ -261,17 +261,21 @@ describe("Build Group", function()
     end)
 
     describe("List Self", function()
-        it("opens Blizzard's listing page through a secure click when you are not listed", function()
+        it("points at Blizzard's eye tab when you are not listed, switching no page", function()
             STATE.activeEntry = nil
             ns.UpdateBuildButton()
             assert.are.equal("List Self", button.text)
             assert.is_true(button:IsEnabled())
-            assert.are.equal("click", button:GetAttribute("type"))
-            assert.are.equal(LFGParentFrameTab1, button:GetAttribute("clickbutton"))
+            assert.is_nil(button:GetAttribute("type")) -- no secure action: SGF switches no page
             click()
-            assert.are.equal(1, STATE.tab1Clicks)
+            local glow = ns.listingGlow
+            assert.is_true(glow.shown)
+            assert.are.same({ LFGParentFrame.ListingTab }, { glow.allPointsTo })
+            assert.are.equal(0, STATE.tab1Clicks)
             assert.are.equal(0, #STATE.invites)
-            assert.are.equal(0, STATE.searches)
+            STATE.time = STATE.time + 6
+            RUNTIMERS()
+            assert.is_false(glow.shown) -- a few seconds, then gone
         end)
 
         it("reads Build Group once Blizzard has listed you and searched", function()
@@ -341,7 +345,7 @@ describe("Build Group", function()
         STATE.party, STATE.leader, STATE.activeEntry = {}, true, nil
         ns.UpdateBuildButton()
         RUNSCRIPT(button, "OnEnter")
-        assert.are.equal("Opens Blizzard's listing page: choose the dungeon, play style and role there.",
+        assert.are.equal("List yourself on Blizzard's eye tab, top right: choose the dungeon, play style and role there.",
             GameTooltip.lines[2])
     end)
 
