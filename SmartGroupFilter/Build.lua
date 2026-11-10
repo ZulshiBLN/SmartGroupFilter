@@ -172,7 +172,7 @@ local function RowPlace(role, class)
 end
 
 -- Why a single player of the list is not chosen, checked in the order Logic.lua checks
-local function WhyNot(e, state, chosenNames, ownArmor)
+local function WhyNot(e, state, chosenNames, ownArmor, after)
     if e.isDelisted then return "delisted" end
     if not e.name then return "name not readable" end
     if not (e.class and e.level and e.level >= 1) then return "class or level not loaded yet" end
@@ -185,20 +185,57 @@ local function WhyNot(e, state, chosenNames, ownArmor)
     if e.level < r.min or e.level > r.max then
         return ("level %d outside %d-%d"):format(e.level, r.min, r.max)
     end
-    local fits = false
+    local fits = {}
+    local signed = RolesText(e.roles) ~= "no role"
     for _, role in ipairs(D.ROLES) do
-        local signed = RolesText(e.roles) ~= "no role"
         if D.ROLE_CLASSES[role][e.class] and not db.excluded[role][e.class]
             and (not signed or e.roles[D.ROLE_FIELD[role]]) then
-            fits = true
+            fits[#fits + 1] = role
         end
     end
-    if not fits then return "no row takes this class for its role" end
+    if #fits == 0 then return "no row takes this class for its role" end
     if not db.allowSameArmor and ns.ArmorOf(e.class, e.level) == ownArmor then
         return "same armor class as you"
     end
     if chosenNames[e.name] then return nil end
-    return "a higher choice took the place, or the class limit is reached"
+    if not after then return "nothing is chosen" end
+    local count = after.classCount[e.class] or 0
+    if count >= D.MAX_SAME_CLASS[db.allowDouble and true or false] then
+        return ("class limit: %d %s already (you included)"):format(count, e.class)
+    end
+    local open = false
+    for _, role in ipairs(fits) do
+        if after.open[role] > 0 then open = true end
+    end
+    if not open then
+        local names = {}
+        for i, role in ipairs(fits) do names[i] = role:lower() end
+        return table.concat(names, "/") .. " places already filled"
+    end
+    if after.free <= 0 then return "no free place left in the group" end
+    return "not chosen - please report this line"
+end
+
+-- The state after the choice: places still open, free places, players per class
+local function After(state, info, list)
+    local after = { open = {}, free = info.free - #list, classCount = {} }
+    for role, n in pairs(info.open) do after.open[role] = n end
+    local count = after.classCount
+    local function Add(class) if class then count[class] = (count[class] or 0) + 1 end end
+    Add(state.own.class)
+    local inGroup = {}
+    for _, m in ipairs(state.members) do
+        inGroup[m.name] = true
+        Add(m.class)
+    end
+    for name, p in pairs(placed) do
+        if not p.joined and not inGroup[name] then Add(p.class) end
+    end
+    for _, c in ipairs(list) do
+        after.open[c.role] = after.open[c.role] - 1
+        Add(c.class)
+    end
+    return after
 end
 
 function ns.DryRun()
@@ -235,6 +272,17 @@ function ns.DryRun()
     else
         print("  Would invite nobody: " .. L[why])
     end
+    local after = info and After(state, info, list or {})
+    if after then
+        local left = {}
+        for _, role in ipairs(D.ROLES) do
+            if after.open[role] > 0 then left[#left + 1] = ("%s %d"):format(role:lower(), after.open[role]) end
+        end
+        if #left > 0 then
+            print(("  Left open: %s - %s."):format(table.concat(left, ", "),
+                after.free > 0 and "nobody fits" or "no free place left in the group"))
+        end
+    end
     local ownArmor = ns.ArmorOf(own.class, own.level)
     print("  Not chosen:")
     local left = 0
@@ -242,7 +290,7 @@ function ns.DryRun()
     for _, id in ipairs(ids or {}) do
         local e = ns.ReadEntry(id) or {}
         if e.numMembers == 1 and not e.hasSelf then
-            local reason = WhyNot(e, state, chosenNames, ownArmor)
+            local reason = WhyNot(e, state, chosenNames, ownArmor, after)
             if reason then
                 left = left + 1
                 print(("   - %s %s %s (%s): %s"):format(tostring(e.name), tostring(e.class), tostring(e.level),

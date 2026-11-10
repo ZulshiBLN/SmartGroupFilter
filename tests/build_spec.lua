@@ -184,9 +184,21 @@ describe("Build Group", function()
             assert.truthy(out:find("Places to fill: tank 1, healer 1, damage 2.", 1, true))
             assert.truthy(out:find("1. tank: Pal - PALADIN 25, tank, waits 0s, row place 1", 1, true))
             assert.truthy(out:find("4. damager: Rog - ROGUE 25, damager, waits 0s, row place 3", 1, true))
-            assert.truthy(out:find("War WARRIOR 26 (tank): a higher choice took the place", 1, true))
+            assert.truthy(out:find("War WARRIOR 26 (tank): tank places already filled", 1, true))
             assert.truthy(out:find("Old MAGE 35 (damager): level 35 outside 20-30", 1, true))
-            assert.truthy(out:find("NoRole DRUID 25 (no role): a higher choice", 1, true))
+            assert.truthy(out:find("NoRole DRUID 25 (no role): tank/healer/damager places already filled", 1, true))
+            assert.falsy(out:find("Left open", 1, true))
+        end)
+
+        it("names the class limit and the places nobody fits", function()
+            result(7, "Ini", "MAGE", 25, { dps = true })
+            STATE.results[1] = nil
+            STATE.results[2] = nil
+            LFGBrowseFrame:UpdateResultList()
+            SlashCmdList.SMARTGROUPFILTER("test")
+            local out = lines()
+            assert.truthy(out:find("Ini MAGE 25 (damager): class limit: 1 MAGE already (you included)", 1, true))
+            assert.truthy(out:find("Left open: tank 1 - nobody fits.", 1, true))
         end)
 
         it("names exclusions, the armor rule, invited and declined players", function()
