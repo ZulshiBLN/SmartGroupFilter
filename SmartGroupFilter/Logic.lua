@@ -106,6 +106,7 @@ end
 -- Chooses whom Build Group invites. state:
 --   own             { class, level, roles }
 --   members         { { name, class, level } } - the group without the player
+--   memberRoles     name -> role a member chose in Blizzard's role check (optional)
 --   placed          name -> { role, class, level, joined } - players SGF invited
 --   numGroupMembers GetNumGroupMembers(): 0 alone, else the group's size with the player
 --   candidates      entries from the Group Finder list
@@ -138,6 +139,13 @@ function ns.ChooseInvites(state)
             waiting = waiting + 1
             classCount[p.class] = (classCount[p.class] or 0) + 1
         end
+    end
+    -- A member's role known from Blizzard's role check takes its place, as a joined invitee's
+    -- does; one SGF invited counts by his invite above, never twice
+    local roles = state.memberRoles or {}
+    for _, m in ipairs(state.members) do
+        local role = roles[m.name]
+        if role and open[role] and not state.placed[m.name] then open[role] = math.max(0, open[role] - 1) end
     end
     local free = D.GROUP_SIZE - math.max(1, state.numGroupMembers) - waiting
     -- What the choice starts from, for /sgf test

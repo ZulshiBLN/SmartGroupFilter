@@ -399,3 +399,41 @@ describe("the best fill, case by case", function()
         assert.is_true(info.tried <= 20000, "fills tried: " .. tostring(info.tried))
     end)
 end)
+
+-- Members' known roles (ruleset plan 2026-11-11-roles-and-places, phase 2)
+describe("members' known roles", function()
+    local WIDE = { min = 1, max = 60 }
+    local function fill(over)
+        local state = { own = { class = "MAGE", level = 30, roles = D }, members = {}, placed = {},
+            numGroupMembers = 0, db = db, range = WIDE, dungeons = { 800 },
+            candidates = { solo("War", "WARRIOR", 30, T), solo("Pri", "PRIEST", 30, H),
+                solo("Rog", "ROGUE", 30, D), solo("Wlk", "WARLOCK", 30, D) } }
+        for k, v in pairs(over) do state[k] = v end
+        local list = ns.ChooseInvites(state)
+        local out = {}
+        for i, c in ipairs(list) do out[i] = c.name .. ":" .. c.role end
+        return table.concat(out, " ")
+    end
+    local FRIEND = { { name = "Fr", class = "PALADIN", level = 30 } }
+
+    it("take their role's place: a friend who tanks brings no second tank", function()
+        assert.are.equal("Pri:HEALER Wlk:DAMAGER Rog:DAMAGER",
+            fill({ numGroupMembers = 2, members = FRIEND, memberRoles = { Fr = "TANK" } }))
+    end)
+
+    it("count only for members still in the group", function()
+        assert.are.equal("War:TANK Pri:HEALER Wlk:DAMAGER Rog:DAMAGER", fill({ memberRoles = { Fr = "TANK" } }))
+    end)
+
+    it("count a member SGF invited by his invite, never twice", function()
+        local placed = { Fr = { role = "TANK", class = "PALADIN", level = 30, joined = true } }
+        assert.are.equal("Pri:HEALER Wlk:DAMAGER Rog:DAMAGER",
+            fill({ numGroupMembers = 2, members = FRIEND, placed = placed, memberRoles = { Fr = "HEALER" } }))
+    end)
+
+    it("fill a role twice when two members chose it, the rest as usual", function()
+        local two = { { name = "A", class = "PALADIN", level = 30 }, { name = "B", class = "DRUID", level = 30 } }
+        assert.are.equal("Pri:HEALER Wlk:DAMAGER",
+            fill({ numGroupMembers = 3, members = two, memberRoles = { A = "TANK", B = "TANK" } }))
+    end)
+end)

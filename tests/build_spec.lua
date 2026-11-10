@@ -657,3 +657,91 @@ describe("Build Group", function()
         assert.are.equal("Pal Pri Wlk Rog", table.concat(STATE.invites, " "))
     end)
 end)
+
+-- Whom Check Roles asks and what they answered (ruleset plan 2026-11-11-roles-and-places,
+-- phase 2): the members present when SGF first acts in the group; answers by event
+describe("members' roles", function()
+    local function roles()
+        local asked, known = ns.BuildDev.Roles()
+        local a, k = {}, {}
+        for name in pairs(asked or {}) do a[#a + 1] = name end
+        for name, role in pairs(known) do k[#k + 1] = name .. "=" .. role end
+        table.sort(a)
+        table.sort(k)
+        return asked and table.concat(a, " ") or "not fixed", table.concat(k, " ")
+    end
+
+    local function join(...)
+        STATE.party = {}
+        for i, name in ipairs({ ... }) do STATE.party[i] = { name = name, class = "HUNTER", level = 25 } end
+        FIRE("GROUP_ROSTER_UPDATE")
+    end
+
+    it("asks the members present when SGF first looks at a group", function()
+        join("Fr")
+        assert.are.equal("Fr", (roles()))
+        join("Fr", "Late") -- joins after: never asked
+        assert.are.equal("Fr", (roles()))
+    end)
+
+    it("asks nobody when the first click came alone", function()
+        click()
+        assert.are.equal("", (roles()))
+        join("Pal") -- SGF invited him
+        join("Pal", "Late")
+        assert.are.equal("", (roles()))
+    end)
+
+    it("fixes the set on promotion to leader: before, SGF does not look", function()
+        STATE.leader = false
+        join("Fr")
+        assert.are.equal("not fixed", (roles()))
+        join("Fr", "Two")
+        STATE.leader = true
+        FIRE("PARTY_LEADER_CHANGED")
+        assert.are.equal("Fr Two", (roles()))
+    end)
+
+    it("records the answers of those asked only, the new role from the event's fourth argument", function()
+        join("Fr", "Two")
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "HEALER")
+        join("Fr", "Two", "Late")
+        FIRE("ROLE_CHANGED_INFORM", "Late", "Me", "NONE", "TANK")
+        local _, known = roles()
+        assert.are.equal("Fr=HEALER", known)
+    end)
+
+    it("forgets a role set back to none, skips a secret name and the player's own answer", function()
+        join("Fr")
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "TANK")
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "TANK", "NONE")
+        assert.are.equal("", select(2, roles()))
+        STATE.secret["Fr"] = true
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "TANK")
+        STATE.secret["Fr"] = nil
+        FIRE("ROLE_CHANGED_INFORM", ns.FullUnitName("player"), "Me", "NONE", "TANK")
+        assert.are.equal("", select(2, roles()))
+    end)
+
+    it("knows an answer by the name with or without the realm", function()
+        join("Fr-Realm")
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "HEALER")
+        assert.are.equal("Fr-Realm=HEALER", select(2, roles()))
+    end)
+
+    it("invites around the known roles", function()
+        join("Fr")
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "TANK")
+        fresh()
+        click()
+        assert.are.equal("Pri Wlk Rog", table.concat(STATE.invites, " ")) -- no tank; a hunter member: Hun not
+    end)
+
+    it("forgets everything once the player is alone with no invite pending", function()
+        join("Fr")
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "TANK")
+        join()
+        assert.are.equal("not fixed", (roles()))
+        assert.are.equal("", select(2, roles()))
+    end)
+end)

@@ -108,6 +108,50 @@ function ns.DungeonName(id)
     return type(name) == "string" and name or ("#" .. tostring(id))
 end
 
+-- Check Roles (ruleset plan 2026-11-11-roles-and-places): the members to ask are fixed when SGF
+-- first acts in a group - its first click, or its first look that finds members - as the
+-- members then present that SGF did not invite. Their answers to Blizzard's role check count;
+-- both are forgotten once the player is alone with no invite pending. Session only.
+local asked            -- name -> true; nil until fixed
+local memberRoles = {} -- name -> "TANK", "HEALER" or "DAMAGER"
+
+local function FixAsked(members)
+    if asked then return end
+    asked = {}
+    for _, m in ipairs(members) do
+        if not placed[m.name] then asked[m.name] = true end
+    end
+end
+
+local function ForgetIfAlone()
+    if GetNumGroupMembers() > 0 then return end
+    for _, p in pairs(placed) do
+        if not p.joined then return end
+    end
+    asked, memberRoles = nil, {}
+end
+
+-- A member by the name an event gives, with or without his realm
+local function MemberNamed(name)
+    for _, m in ipairs(Members()) do
+        if m.name == name or m.name:match("^([^%-]+)") == name or name:match("^([^%-]+)") == m.name then
+            return m.name
+        end
+    end
+end
+
+-- ROLE_CHANGED_INFORM: Blizzard's RolePoll.lua reads changed, from, oldRole, newRole. Only the
+-- members asked count; the player's own answer names no party unit, so it never does - his role
+-- comes from his listing. "NONE" makes a role unknown again.
+local function OnRoleChanged(changed, newRole)
+    if type(changed) ~= "string" or (issecretvalue and issecretvalue(changed)) then return end
+    local name = MemberNamed(changed)
+    if not (name and asked and asked[name]) then return end
+    memberRoles[name] = D.PLACES[newRole] and newRole or nil
+    ns.Log("role answer " .. tostring(memberRoles[name] or "none"))
+    ns.UpdateBuildButton()
+end
+
 local function Candidates()
     local list = {}
     local _, ids = C_LFGList.GetFilteredSearchResults()
@@ -121,6 +165,9 @@ end
 -- What the next click would do: a list of { name, role, class, level }, or nil and the key of
 -- the reason it can do nothing; then the state the choice was made from and its start (Logic)
 local function Plan()
+    local members = Members()
+    Prune(members)
+    ForgetIfAlone()
     -- A full group is delisted by the game: say it is full, not that the listing is missing
     if GetNumGroupMembers() >= D.GROUP_SIZE then return nil, "GROUP_FULL" end
     if not C_LFGList.HasActiveEntryInfo() then
@@ -131,13 +178,12 @@ local function Plan()
     if IsInGroup() and not (UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")) then
         return nil, "NOT_LEADER"
     end
-    local members = Members()
-    Prune(members)
+    if #members > 0 then FixAsked(members) end
     local _, class = UnitClass("player")
     local state = {
         own = { class = class, level = UnitLevel("player"), roles = C_LFGListRoles.GetRoles() },
         members = members, placed = placed, numGroupMembers = GetNumGroupMembers(),
-        candidates = Candidates(), db = db, range = ns.LevelRange(),
+        candidates = Candidates(), db = db, range = ns.LevelRange(), memberRoles = memberRoles,
     }
     -- The target a click keeps, or the one it would choose - read here, stored by the click only
     local own = OwnDungeons()
@@ -257,6 +303,7 @@ end
 local function BuildGroup()
     local list, _, state = Plan()
     if not list then return ns.UpdateBuildButton() end
+    FixAsked(state.members) -- alone at the first click: nobody to ask
     target = state.target
     ns.Print(L.BUILDING_FOR:format(ns.DungeonName(target)))
     ns.Log("target " .. tostring(target))
@@ -401,7 +448,10 @@ events:RegisterEvent("LFG_LIST_ACTIVE_ENTRY_UPDATE")
 events:RegisterEvent("CHAT_MSG_SYSTEM")
 events:RegisterEvent("LFG_LIST_SEARCH_RESULTS_RECEIVED")
 events:RegisterEvent("LFG_LIST_SEARCH_FAILED") -- the button is clickable again
-events:SetScript("OnEvent", function(_, event, msg)
+events:RegisterEvent("ROLE_CHANGED_INFORM")
+events:RegisterEvent("PARTY_LEADER_CHANGED") -- promoted: SGF looks at the group from now on
+events:SetScript("OnEvent", function(_, event, ...)
+    local msg = ...
     if event == "LFG_LIST_SEARCH_RESULTS_RECEIVED" then
         lastResults = GetTime()
         -- The button turns back into Refresh List once these results grow old
@@ -413,6 +463,10 @@ events:SetScript("OnEvent", function(_, event, msg)
         if name then OnDeclined(name) end
         return
     end
+    if event == "ROLE_CHANGED_INFORM" then
+        local changed, _, _, newRole = ...
+        return OnRoleChanged(changed, newRole)
+    end
     Prune(Members())
     ns.UpdateBuildButton()
 end)
@@ -420,6 +474,7 @@ end)
 -- What the development test (DevTest.lua, never packaged) reads; it calls nothing that sends
 ns.BuildDev = {
     Plan = Plan, ListAge = ListAge, ListFresh = ListFresh, placed = placed, declined = declined,
+    Roles = function() return asked, memberRoles end,
     WhisperFor = function(c, state)
         return WhisperText(c, EntryOf(c.name, state), ns.DungeonName(state.target))
     end,
