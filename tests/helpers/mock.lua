@@ -118,6 +118,13 @@ function CreateFrame(kind, name, parent, template)
     -- A secure action button: its OnClick performs the "click" action on "clickbutton"
     if template and template:find("SecureActionButtonTemplate") then
         f.attributes = {}
+        -- The client's rule: a protected frame is anchored to its parent or nothing
+        function f:SetPoint(point, rel, ...)
+            if type(rel) == "table" and rel ~= self.parent then
+                error("Cannot anchor protected frames to regions")
+            end
+            self.points[#self.points + 1] = { point, rel, ... }
+        end
         function f:SetAttribute(k, v)
             if STATE.combat then error("SetAttribute on a secure button in combat") end
             self.attributes[k] = v

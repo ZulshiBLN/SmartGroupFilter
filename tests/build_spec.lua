@@ -157,6 +157,9 @@ describe("Build Group", function()
 
         it("searches only through a secure click on Blizzard's own refresh arrow", function()
             assert.truthy(button.template:find("SecureActionButtonTemplate", 1, true))
+            -- anchored to its parent only: the client refuses other anchors for it
+            assert.are.equal(1, #button.points)
+            assert.are.equal(ns.panel, button.points[1][2])
             assert.is_nil(button:GetAttribute("type"))
             STATE.time = STATE.time + 31
             ns.UpdateBuildButton()

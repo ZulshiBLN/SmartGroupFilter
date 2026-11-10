@@ -484,7 +484,7 @@ local function Create()
     panel.armorCheck = Check(panel, "ALLOW_ARMOR",
         function() return db.allowSameArmor end, function(v) db.allowSameArmor = v end)
     panel.armorCheck:SetPoint("TOPLEFT", panel.doubleCheck, "BOTTOMLEFT", 0, -2)
-    panel.buildButton = ns.CreateBuildButton(panel, panel.armorCheck)
+    panel.buildButton = ns.CreateBuildButton(panel)
 
     panel:SetScript("OnShow", function()
         Dock()

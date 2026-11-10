@@ -178,12 +178,14 @@ local function BuildGroup()
     ns.UpdateBuildButton()
 end
 
--- The button, below the options in the panel (Panel.lua calls this)
-function ns.CreateBuildButton(parent, anchor)
+-- A protected frame may be anchored to its parent, not to the panel's other controls ("Cannot
+-- anchor protected frames to regions", Michel's test 2026-11-11): bottom left of the panel,
+-- beside the count in the bottom right corner
+function ns.CreateBuildButton(parent)
     button = CreateFrame("Button", "SmartGroupFilterBuildButton", parent,
         "SecureActionButtonTemplate, UIPanelButtonTemplate")
     button:SetSize(160, 24)
-    button:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 4, -12)
+    button:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", 14, 8)
     button:SetText(L.BUILD_GROUP)
     -- The secure action on the mouse button's release, whatever the key-down setting
     button:RegisterForClicks("LeftButtonUp")
