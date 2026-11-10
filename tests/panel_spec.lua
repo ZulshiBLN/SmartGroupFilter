@@ -100,7 +100,7 @@ describe("the panel", function()
         assert.are.equal(LFGParentFrame, tab.parent) -- on every page of the window
         assert.are.equal("LFGVanillaRightTabTemplate", tab.template) -- Blizzard's tabs' own
         assert.are.same({ "TOPLEFT", LFGParentFrame.WhoListingTab, "BOTTOMLEFT", 0, -2 }, tab.points[1])
-        assert.are.equal("Interface\\AddOns\\SmartGroupFilter\\Media\\Tab", tab.Icon.textureFile)
+        assert.are.equal("Interface\\AddOns\\SmartGroupFilter\\Media\\Logo", tab.Icon.textureFile)
         assert.is_true(tab.fillToInterior) -- the icon covers the gold-rimmed background
         tab.mouseUp(tab, "LeftButton", true)
         assert.is_false(panel.shown)

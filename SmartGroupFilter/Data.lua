@@ -69,5 +69,3 @@ D.OPTION_DEFAULTS = { filterOn = true, allowDouble = false, allowSameArmor = tru
 
 -- The project's logo, shipped as Media/Logo.tga: the panel's portrait and its side tab's icon
 D.LOGO = "Interface\\AddOns\\SmartGroupFilter\\Media\\Logo"
--- The side tab's icon: the logo inside a black edge, as Blizzard's side tab icons have
-D.TAB_ICON = "Interface\\AddOns\\SmartGroupFilter\\Media\\Tab"

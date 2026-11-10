@@ -368,10 +368,9 @@ local function ToggleTab()
     else
         tab:SetPoint("TOPLEFT", LFGParentFrame, "TOPRIGHT", 0, -200)
     end
-    -- As Blizzard's own tabs: the icon fills the tab's interior (50 px, masked to the tab's
-    -- shape) and so covers the template's gold-rimmed background; the black edge is part of
-    -- the icon (Media/Tab.tga), as in Blizzard's INV_SideTab icons (SidePanelTabButtonMixin)
-    if tab.Icon then tab.Icon:SetTexture(D.TAB_ICON) end
+    -- As Blizzard's own tabs: the logo fills the tab's interior (50 px, masked to the tab's
+    -- shape; SidePanelTabButtonMixin). The tab's rim is the template's own and stays.
+    if tab.Icon then tab.Icon:SetTexture(D.LOGO) end
     if tab.SetFillToInterior then tab:SetFillToInterior(true) end
     tab.tooltipText = ns.ADDON_NAME
     local function Sync()
