@@ -67,6 +67,10 @@ D.HOLD_SECONDS = 120
 -- (Michel, 2026-11-11)
 D.LIST_FRESH_SECONDS = 30
 
+-- After a Check Roles click, how long answers are awaited before a member's assigned role
+-- counts, in seconds: confirming the preselected role sends no event (Michel, 2026-11-11)
+D.ROLE_WAIT = 15
+
 -- The whisper to a player whose sign-up is ambiguous (ruleset plan 2026-11-11-build-dungeon).
 -- English always - the receiver's language is unknown - so not in Locales.lua; the dungeon's
 -- name comes from the client.

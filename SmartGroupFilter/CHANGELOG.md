@@ -31,6 +31,7 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   healers, then the most players, and names it in the chat; the group keeps it while it has members or pending invites.
 - Already in a group before the first Build Group, the button reads Check Roles and runs
   Blizzard's role check; once every member chose, it reads Build Group and their roles count.
+  A member who just confirms his role counts with it 15 seconds after the click.
   Asked once, until you are alone again - declines and run-out invites never bring it back.
 - A player listed for several roles or none gets an English whisper with the invite, "Tank for
   Shadowfang Keep?"; one listed for one role but several dungeons gets "You want to join for

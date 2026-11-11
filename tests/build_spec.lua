@@ -856,3 +856,137 @@ describe("Check Roles", function()
         assert.truthy(out:find("Two: no answer", 1, true))
     end)
 end)
+
+-- The role a member confirmed unchanged sends no event (Michel's test, 2026-11-11): 15 s after
+-- a Check Roles click the role assigned to him counts (ruleset plan 2026-11-11-roles-and-places,
+-- phase 5)
+describe("assigned roles after Check Roles", function()
+    -- join({ "Fr", "DAMAGER" }, ...): the members and the role assigned to each
+    local function join(...)
+        STATE.party = {}
+        for i, m in ipairs({ ... }) do
+            STATE.party[i] = { name = m[1], assigned = m[2], class = "HUNTER", level = 25 }
+        end
+        FIRE("GROUP_ROSTER_UPDATE")
+    end
+
+    local function chat()
+        return table.concat(CHAT, "\n")
+    end
+
+    local function logged(text)
+        local n = 0
+        for _, line in ipairs(ns.LogLines()) do
+            if line:find(text, 1, true) then n = n + 1 end
+        end
+        return n
+    end
+
+    before_each(function()
+        for i = #CHAT, 1, -1 do CHAT[i] = nil end
+        STATE.timers, STATE.delays = {}, {}
+    end)
+
+    it("takes the assigned role 15 s after the click and turns into Build Group", function()
+        join({ "Fr", "DAMAGER" })
+        click()
+        assert.are.equal(ns.D.ROLE_WAIT, STATE.delays[#STATE.delays])
+        assert.are.equal(15, ns.D.ROLE_WAIT)
+        assert.are.equal("Check Roles", button.text)
+        RUNTIMERS()
+        local _, known = ns.BuildDev.Roles()
+        assert.are.equal("DAMAGER", known.Fr)
+        fresh()
+        assert.are.equal("Build Group", button.text)
+        assert.are.equal(1, logged("role assigned DAMAGER"))
+        SlashCmdList.SMARTGROUPFILTER("test")
+        assert.truthy(chat():find("Fr: damager (assigned)", 1, true))
+    end)
+
+    it("reads nothing before the first click", function()
+        join({ "Fr", "DAMAGER" })
+        RUNTIMERS()
+        assert.are.equal("Check Roles", button.text)
+        assert.is_nil(select(2, ns.BuildDev.Roles()).Fr)
+    end)
+
+    it("lets a later answer win and drops the mark", function()
+        join({ "Fr", "DAMAGER" })
+        click()
+        RUNTIMERS()
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "DAMAGER", "TANK")
+        SlashCmdList.SMARTGROUPFILTER("test")
+        assert.truthy(chat():find("Fr: tank", 1, true))
+        assert.falsy(chat():find("(assigned)", 1, true))
+    end)
+
+    it("keeps an answer given during the wait", function()
+        join({ "Fr", "DAMAGER" })
+        click()
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "DAMAGER", "HEALER")
+        RUNTIMERS()
+        local _, known = ns.BuildDev.Roles()
+        assert.are.equal("HEALER", known.Fr)
+    end)
+
+    it("leaves NONE and a secret role unknown", function()
+        join({ "Fr", "NONE" }, { "Two", "HEALER" })
+        STATE.secret.HEALER = true
+        click()
+        RUNTIMERS()
+        STATE.secret.HEALER = nil
+        assert.are.equal("Check Roles", button.text)
+        local _, known = ns.BuildDev.Roles()
+        assert.is_nil(known.Fr)
+        assert.is_nil(known.Two)
+    end)
+
+    it("applies only the last click's wait", function()
+        join({ "Fr", "DAMAGER" })
+        click()
+        click()
+        RUNTIMERS()
+        assert.are.equal(1, logged("role assigned DAMAGER"))
+    end)
+
+    it("ignores a wait from an earlier group", function()
+        join({ "Fr", "DAMAGER" })
+        click()
+        join()
+        join({ "Other", "TANK" })
+        RUNTIMERS()
+        assert.are.equal("Check Roles", button.text)
+        local _, known = ns.BuildDev.Roles()
+        assert.is_nil(known.Other)
+    end)
+
+    it("never reads a member who joined later or one who left", function()
+        join({ "Fr", "DAMAGER" }, { "Two", "HEALER" })
+        click()
+        join({ "Fr", "DAMAGER" }, { "Late", "TANK" })
+        assert.has_no.errors(RUNTIMERS)
+        local _, known = ns.BuildDev.Roles()
+        assert.are.equal("DAMAGER", known.Fr)
+        assert.is_nil(known.Late)
+        assert.is_nil(known.Two)
+    end)
+
+    it("starts no wait from a click in combat", function()
+        join({ "Fr", "DAMAGER" })
+        STATE.combat = true
+        click()
+        STATE.combat = false
+        RUNTIMERS()
+        assert.are.equal("Check Roles", button.text)
+    end)
+
+    it("counts assigned roles in the report, never names", function()
+        join({ "Fr", "DAMAGER" }, { "Two", "NONE" })
+        click()
+        RUNTIMERS()
+        local state = ns.ReportBuildState()
+        assert.are.equal(2, state.asked)
+        assert.are.equal(1, state.known)
+        assert.are.equal(1, state.assigned)
+    end)
+end)

@@ -316,6 +316,11 @@ function UnitLevel(unit)
     local u = Unit(unit or "player")
     return u and u.level
 end
+-- The role a member chose when he joined, or by Blizzard's role check: STATE.party[i].assigned
+function UnitGroupRolesAssigned(unit)
+    local u = Unit(unit)
+    return u and u.assigned or "NONE"
+end
 -- WoW Forever: a first name and a surname. UnitName gives the first name, GetUnitName(unit,
 -- true) both, UnitFullName the two apart (Michel's dump, 2026-11-11). A unit's name in STATE
 -- is the full one, "First Last".
@@ -365,8 +370,12 @@ end }
 
 -- C_Timer.After queues; RUNTIMERS runs what is due, as the client's next frames would
 STATE.timers = {}
+STATE.delays = {} -- each timer's delay, in the order queued
 C_Timer = {
-    After = function(_, fn) STATE.timers[#STATE.timers + 1] = fn end,
+    After = function(delay, fn)
+        STATE.timers[#STATE.timers + 1] = fn
+        STATE.delays[#STATE.delays + 1] = delay
+    end,
 }
 function RUNTIMERS()
     local due = STATE.timers

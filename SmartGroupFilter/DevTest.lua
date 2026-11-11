@@ -110,11 +110,12 @@ end
 function ns.DryRun()
     local list, why, state, info = B.Plan()
     ns.Print("Build Group test - nothing is sent.")
-    local asked, roles = B.Roles()
+    local asked, roles, assigned = B.Roles()
     local function MemberRoles()
         for _, m in ipairs(state.members) do
             if asked and asked[m.name] then
-                print(("  %s: %s"):format(m.name, roles[m.name] and roles[m.name]:lower() or "no answer"))
+                local role = roles[m.name] and roles[m.name]:lower() or "no answer"
+                print(("  %s: %s%s"):format(m.name, role, assigned[m.name] and " (assigned)" or ""))
             end
         end
     end

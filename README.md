@@ -36,7 +36,8 @@ builds your five-player group with one click.
     gets "You want to join for Shadowfang Keep?".
   - **A group of friends first:** already in a group before your first Build Group, the button
     reads **Check Roles** and runs Blizzard's role check; once every member chose a role it
-    reads Build Group, and their roles count. Asked once - until you are alone again.
+    reads Build Group, and their roles count. Whoever just confirms his role counts with it 15
+    seconds after the click. Asked once - until you are alone again.
   - **Held places:** invited players keep their place for two minutes, and while they are in the
     group; whoever declines, lets the invite run out or is already in a group is not asked again.
   - **The button:** not listed yet, it reads **List Self** and lights up Blizzard's eye tab,

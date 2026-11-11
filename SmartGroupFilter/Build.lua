@@ -112,8 +112,10 @@ end
 -- first acts in a group - its first click, or its first look that finds members - as the
 -- members then present that SGF did not invite. Their answers to Blizzard's role check count;
 -- both are forgotten once the player is alone with no invite pending. Session only.
-local asked            -- name -> true; nil until fixed
-local memberRoles = {} -- name -> "TANK", "HEALER" or "DAMAGER"
+local asked              -- name -> true; nil until fixed
+local memberRoles = {}   -- name -> "TANK", "HEALER" or "DAMAGER"
+local assignedRoles = {} -- name -> true: the role was read after the wait, not answered
+local waits, roleWait = 0, nil -- the current wait's token; an older timer does nothing
 
 local function FixAsked(members)
     if asked then return end
@@ -128,7 +130,7 @@ local function ForgetIfAlone()
     for _, p in pairs(placed) do
         if not p.joined then return end
     end
-    asked, memberRoles = nil, {}
+    asked, memberRoles, assignedRoles, roleWait = nil, {}, {}, nil
 end
 
 -- A member by the name an event gives, with or without his realm
@@ -148,20 +150,42 @@ local function OnRoleChanged(changed, newRole)
     local name = MemberNamed(changed)
     if not (name and asked and asked[name]) then return end
     memberRoles[name] = D.PLACES[newRole] and newRole or nil
+    assignedRoles[name] = nil
     ns.Log("role answer " .. tostring(memberRoles[name] or "none"))
     ns.UpdateBuildButton()
 end
 
--- How many members asked are still in the group, and how many of them answered
+-- The wait ran out: each member asked with no answer takes the role assigned to him - the one
+-- Blizzard's window preselected and he may have confirmed unchanged, which sends no event
+local function ApplyAssigned(token)
+    if token ~= roleWait or not asked then return end
+    roleWait = nil
+    for i = 1, math.max(0, GetNumGroupMembers() - 1) do
+        local unit = "party" .. i
+        local name = ns.FullUnitName(unit)
+        if name and asked[name] and not memberRoles[name] then
+            local role = Clean(UnitGroupRolesAssigned(unit))
+            if role and D.PLACES[role] then
+                memberRoles[name], assignedRoles[name] = role, true
+                ns.Log("role assigned " .. role)
+            end
+        end
+    end
+    ns.UpdateBuildButton()
+end
+
+-- How many members asked are still in the group, how many of them have a role, and how many
+-- of those were read after the wait
 local function RoleCounts(members)
-    local n, known = 0, 0
+    local n, known, assigned = 0, 0, 0
     for _, m in ipairs(members) do
         if asked and asked[m.name] then
             n = n + 1
             if memberRoles[m.name] then known = known + 1 end
+            if assignedRoles[m.name] then assigned = assigned + 1 end
         end
     end
-    return n, known
+    return n, known, assigned
 end
 
 -- The text of a reason key; the role check's names how many answered
@@ -335,6 +359,10 @@ end
 local function AskRoles()
     if InCombatLockdown() then return ns.Print(L.NOT_IN_COMBAT) end
     ns.Log("role check " .. tostring(InitiateRolePoll()))
+    waits = waits + 1
+    roleWait = waits
+    local token = waits
+    C_Timer.After(D.ROLE_WAIT, function() ApplyAssigned(token) end)
 end
 
 -- The click: invite and hold the places. Called only from the button's OnClick.
@@ -422,7 +450,7 @@ end
 function ns.ReportBuildState()
     local state = { invited = {}, declined = 0 }
     state.target = KeptTarget(OwnDungeons(), Members())
-    state.asked, state.known = RoleCounts(Members())
+    state.asked, state.known, state.assigned = RoleCounts(Members())
     if button then
         state.mode, state.reasonKey, state.enabled = button.mode, button.reasonKey, button:IsEnabled()
     end
@@ -516,7 +544,7 @@ end)
 -- What the development test (DevTest.lua, never packaged) reads; it calls nothing that sends
 ns.BuildDev = {
     Plan = Plan, ListAge = ListAge, ListFresh = ListFresh, placed = placed, declined = declined,
-    Roles = function() return asked, memberRoles end,
+    Roles = function() return asked, memberRoles, assignedRoles end,
     WhisperFor = function(c, state)
         return WhisperText(c, EntryOf(c.name, state), ns.DungeonName(state.target))
     end,
