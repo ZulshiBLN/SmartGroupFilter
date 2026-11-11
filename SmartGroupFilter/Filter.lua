@@ -17,8 +17,12 @@ end)
 local filterOn = true
 
 -- A secret value is unreadable: it counts as missing (ruleset code.md, "Secret values")
+local function IsSecret(v)
+    return v ~= nil and issecretvalue ~= nil and issecretvalue(v) == true
+end
+
 local function Clean(v)
-    if v ~= nil and issecretvalue and issecretvalue(v) then return nil end
+    if IsSecret(v) then return nil end
     return v
 end
 
@@ -33,6 +37,7 @@ end
 -- One search result as the plain entry Logic.lua reads, or nil when the client has none
 -- The dungeons a result is listed for, or nil while any of them is missing or secret
 function ns.ReadActivities(ids)
+    ids = Clean(ids) -- in an instance the whole list is secret: measuring it errors
     if type(ids) ~= "table" or #ids == 0 then return nil end
     local list = {}
     for i, v in ipairs(ids) do
@@ -43,9 +48,14 @@ function ns.ReadActivities(ids)
     return list
 end
 
+-- nil, "secret" while the client hides the result: in an instance every field is a secret
+-- (Michel's BugSack, 2026-11-11)
 function ns.ReadEntry(id)
     local info = C_LFGList.GetSearchResultInfo(id)
     if not info then return nil end
+    if IsSecret(info) or IsSecret(info.numMembers) or IsSecret(info.hasSelf) or IsSecret(info.isDelisted) then
+        return nil, "secret"
+    end
     local entry = {
         id = id, numMembers = info.numMembers, hasSelf = info.hasSelf,
         isDelisted = info.isDelisted, age = Clean(info.age),
@@ -79,9 +89,8 @@ end
 -- The activities the list is for: the own listing's, else those chosen in Blizzard's dropdown
 local function Activities()
     local entry = C_LFGList.GetActiveEntryInfo()
-    if entry and type(entry.activityIDs) == "table" and #entry.activityIDs > 0 then
-        return entry.activityIDs
-    end
+    local own = entry and ns.ReadActivities(entry.activityIDs)
+    if own then return own end
     local dropdown = LFGBrowseFrame and LFGBrowseFrame.ActivityDropdown
     local selected = dropdown and dropdown.selectedValues
     if type(selected) == "table" then return selected end
@@ -158,14 +167,29 @@ function ns.FilterActive()
     return db and filterOn and db.panelShown or false
 end
 
+local listSecret = false -- logged once per change, not at every update in an instance
+
 local function Filter(results)
     if type(results) ~= "table" or not db then return end
+    -- Secret results (in an instance): the table stays as Blizzard made it. Removing from it
+    -- would hand Blizzard's drawing values written by this addon, and it fails on the secrets.
+    local entries = {}
+    for i = 1, #results do
+        local entry, why = ns.ReadEntry(results[i])
+        if why == "secret" then
+            if not listSecret then ns.Log("list secret: untouched") end
+            listSecret = true
+            return
+        end
+        entries[i] = entry
+    end
+    listSecret = false
     local active = ns.FilterActive()
     local range, ownArmor = ns.LevelRange(), ns.OwnArmor()
     local shown, total = 0, 0
     local counts = { TANK = 0, HEALER = 0, DAMAGER = 0 }
     for i = #results, 1, -1 do
-        local entry = ns.ReadEntry(results[i])
+        local entry = entries[i]
         local single = IsSingle(entry)
         if single then total = total + 1 end
         if active and entry and not ns.Passes(entry, db, range, ownArmor) then

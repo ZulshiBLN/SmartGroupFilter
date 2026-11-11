@@ -82,6 +82,31 @@ describe("the filter", function()
         assert.is_nil(ns.ReadEntry(2).activities)
     end)
 
+    -- In an instance the client gives every field of a result as a secret; the hook must
+    -- neither error nor touch the table, or Blizzard's own drawing runs tainted and fails
+    -- on the secrets (Michel's BugSack, 2026-11-11)
+    it("leaves Blizzard's list untouched while the results are secret", function()
+        result(1, "MAGE", 35, { dps = true })
+        result(2, "MAGE", 25, { dps = true }, { isDelisted = true })
+        for _, r in pairs(STATE.results) do
+            for k in pairs(r.info) do r.info[k] = SECRET() end
+        end
+        assert.has_no.errors(function() LFGBrowseFrame:UpdateResultList() end)
+        assert.are.equal("1 2", shown())
+        assert.is_nil(ns.ReadEntry(1))
+        assert.has_no.errors(function() FIRE("LFG_LIST_SEARCH_RESULT_UPDATED", 1) end)
+        assert.has_no.errors(ns.UpdateBuildButton)
+    end)
+
+    it("reads a secret list of dungeons as unknown, the own listing's too", function()
+        result(1, "MAGE", 25, { dps = true }, { activityIDs = SECRET() })
+        assert.is_nil(ns.ReadEntry(1).activities)
+        assert.is_nil(ns.ReadActivities(SECRET()))
+        STATE.activeEntry = { activityIDs = SECRET() }
+        assert.has_no.errors(ns.LevelRange)
+        assert.has_no.errors(function() LFGBrowseFrame:UpdateResultList() end)
+    end)
+
     it("counts the single players shown and all of them", function()
         result(1, "MAGE", 25, { dps = true })
         result(2, "MAGE", 35, { dps = true })

@@ -230,7 +230,20 @@ STATE.activeEntry = nil -- GetActiveEntryInfo's table while the player is listed
 STATE.maxLevel = 60
 STATE.secret = {}       -- values issecretvalue reports as secret
 
-function issecretvalue(v) return STATE.secret[v] == true end
+-- A secret value as the client gives one in an instance (Michel's BugSack, 2026-11-11):
+-- measuring, indexing, comparing or joining it errors, as in the client
+local secrets = setmetatable({}, { __mode = "k" })
+function SECRET()
+    local p = newproxy(true)
+    local mt = getmetatable(p)
+    local function fail() error("attempt to use a secret value", 2) end
+    mt.__index, mt.__len, mt.__lt, mt.__le, mt.__concat, mt.__add, mt.__call =
+        fail, fail, fail, fail, fail, fail, fail
+    secrets[p] = true
+    return p
+end
+
+function issecretvalue(v) return STATE.secret[v] == true or secrets[v] == true end
 function GetMaxPlayerLevel() return STATE.maxLevel end
 
 C_LFGList = {
