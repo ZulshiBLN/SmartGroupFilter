@@ -4,8 +4,10 @@
 -- (LFDMicroButton) through a secure action, so the window opens in Blizzard's own code - as
 -- that button and its key do, on the listing page. A right-click opens SGF's settings.
 --
--- The button is parented and anchored to UIParent: a protected child would make the minimap
--- protected, and minimap addons could no longer change it in combat. It is placed from the
+-- The button is parented and anchored to UIParent: a protected child makes the minimap
+-- protected - Michel's test, Minimap:IsProtected() true with this button as its child, hidden
+-- too - and minimap addons could no longer change it in combat. So minimap button collectors
+-- that read Minimap:GetChildren() (EllesmereUI) miss it; there the AddOn menu entry serves. It is placed from the
 -- minimap's centre; in combat it is neither moved, shown, hidden nor dragged - a placement
 -- combat skipped follows when combat ends.
 
