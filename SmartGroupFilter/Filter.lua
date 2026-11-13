@@ -205,9 +205,13 @@ local function Filter(results)
     for _, fn in ipairs(listeners) do fn(shown, total) end
 end
 
--- Rebuilds Blizzard's list from the results the client already has - no new search
+-- Rebuilds Blizzard's list from the results the client already has - no new search. Not while
+-- the player has no roles: Blizzard's sort indexes them unchecked and errors (Michel's BugSack,
+-- 2026-11-13, a character who never chose one); the list stays as Blizzard last drew it.
 function ns.RefreshList()
-    if LFGBrowseFrame and LFGBrowseFrame:IsShown() then LFGBrowseFrame:UpdateResultList() end
+    if not (LFGBrowseFrame and LFGBrowseFrame:IsShown()) then return end
+    if C_LFGListRoles.GetRoles() == nil then return end
+    LFGBrowseFrame:UpdateResultList()
 end
 
 -- A setting in the panel changed: the filter is on again (after Reset Filter) and filters anew

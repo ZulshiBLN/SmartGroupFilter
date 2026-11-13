@@ -250,3 +250,17 @@ describe("the level range", function()
         assert.are.equal(25, r.max)
     end)
 end)
+
+-- Blizzard's sort errors while the player has no roles (Michel's BugSack, 2026-11-13): SGF
+-- never rebuilds the list then - Blizzard's own redraws stay Blizzard's
+describe("a character without roles", function()
+    it("gets no list rebuild from SGF until a role is chosen", function()
+        LFGBrowseFrame:UpdateResultList()
+        local before = table.concat(LFGBrowseFrame.results, " ")
+        STATE.ownRoles = nil
+        assert.has_no.errors(function() ns.RefreshList() end)
+        assert.are.equal(before, table.concat(LFGBrowseFrame.results, " "))
+        STATE.ownRoles = { tank = false, healer = false, dps = true }
+        assert.has_no.errors(function() ns.RefreshList() end)
+    end)
+end)

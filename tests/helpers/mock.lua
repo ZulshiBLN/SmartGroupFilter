@@ -304,6 +304,11 @@ function LFGBrowseFrame:UpdateResultList()
     local results = {}
     for i, id in ipairs(STATE.order) do results[i] = id end
     self.totalResults, self.results = #results, results
+    -- Blizzard's sort indexes the player's roles unchecked; a character who never chose one has
+    -- none, and it errors (Michel's BugSack, 2026-11-13, a fresh warlock)
+    if C_LFGListRoles.GetRoles() == nil then
+        error("attempt to index local 'playerRoles' (a nil value)")
+    end
     LFGBrowseUtil_SortSearchResults(self.results)
 end
 
