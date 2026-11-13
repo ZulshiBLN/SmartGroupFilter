@@ -62,6 +62,8 @@ D.MAX_SAME_CLASS = { [false] = 1, [true] = 2 }
 
 -- How long an invited player keeps his place before he joins, in seconds
 D.HOLD_SECONDS = 120
+-- How many players one click invites: one click may send several invites (checked in game)
+D.INVITES_PER_CLICK = 5
 
 -- Search results older than this, in seconds, are searched anew before Build Group invites
 -- (Michel, 2026-11-11)

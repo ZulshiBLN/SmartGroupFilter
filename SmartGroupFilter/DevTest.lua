@@ -157,7 +157,7 @@ function ns.DryRun()
     local chosenNames = {}
     if list then
         print(("  A click would print: %s"):format(L.BUILDING_FOR:format(ns.DungeonName(state.target))))
-        print(("  Would invite (%s):"):format(D.INVITES_PER_CLICK == 1 and "first one per click" or "all in one click"))
+        print("  Would invite (all in one click):")
         for i, c in ipairs(list) do
             chosenNames[c.name] = true
             local e

@@ -149,8 +149,9 @@ local function MaxLevel()
 end
 
 local function ShowRange(from, to)
-    panel.fromBox:SetText(tostring(from))
-    panel.toBox:SetText(tostring(to))
+    -- A box being typed in keeps its digits: a filter pass may come between two keys (review)
+    if not panel.fromBox:HasFocus() then panel.fromBox:SetText(tostring(from)) end
+    if not panel.toBox:HasFocus() then panel.toBox:SetText(tostring(to)) end
     local span = math.max(1, MaxLevel() - 1)
     for i, v in ipairs({ from, to }) do
         local h = panel.slider.handles[i]
@@ -183,7 +184,9 @@ local function LevelBox(parent, isFrom)
     box:SetNumeric(true)
     box:SetMaxLetters(2)
     -- A typed level past the other one moves the other one along: from 52 with to 12 is 52-52
+    -- Focus goes first, so the applied or restored value is shown
     local function Apply(self)
+        self:ClearFocus()
         local r = ns.LevelRange()
         local v = TypedLevel(self)
         if v then
@@ -191,10 +194,9 @@ local function LevelBox(parent, isFrom)
         else
             RefreshRange()
         end
-        self:ClearFocus()
     end
     box:SetScript("OnEnterPressed", Apply)
-    box:SetScript("OnEscapePressed", function(self) RefreshRange() self:ClearFocus() end)
+    box:SetScript("OnEscapePressed", function(self) self:ClearFocus() RefreshRange() end)
     return box
 end
 
@@ -376,7 +378,12 @@ local function Dock()
 end
 
 local function UpdateCount(shown, total)
-    panel.count:SetText(L.SHOWN_COUNT:format(shown, total))
+    -- The filter left nobody: Blizzard's own "no results" waits for an empty search (review)
+    if shown == 0 and total > 0 then
+        panel.count:SetText(L.SHOWN_NONE:format(total))
+    else
+        panel.count:SetText(L.SHOWN_COUNT:format(shown, total))
+    end
     local counts = ns.RoleCounts()
     for role, row in pairs(panel.rows) do
         row.count:SetText(L.ROLE_COUNT:format(counts[role] or 0))
@@ -413,7 +420,7 @@ local function ToggleTab()
         if tab.SetChecked then tab:SetChecked(db.panelShown) end
     end
     local function Toggle()
-        if InCombatLockdown() then return end
+        if InCombatLockdown() then return ns.Print(L.NOT_IN_COMBAT) end
         db.panelShown = not db.panelShown
         Sync()
         ns.RefreshList()

@@ -644,19 +644,6 @@ describe("Build Group", function()
             assert.truthy(lines():find("/sgf test", 1, true))
         end)
     end)
-
-    it("invites one player per click in one-per-click mode, naming the next on the button", function()
-        ns.D.INVITES_PER_CLICK = 1
-        ns.UpdateBuildButton()
-        assert.are.equal("Invite: Pal (Tank)", button.text)
-        click()
-        assert.are.equal("Pal", table.concat(STATE.invites, " "))
-        assert.are.equal("Invite: Pri (Healer)", button.text)
-        click()
-        click()
-        click()
-        assert.are.equal("Pal Pri Wlk Rog", table.concat(STATE.invites, " "))
-    end)
 end)
 
 -- Whom Check Roles asks and what they answered (ruleset plan 2026-11-11-roles-and-places,

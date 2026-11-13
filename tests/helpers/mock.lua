@@ -37,7 +37,7 @@ local Widget = {}
 Widget.__index = Widget
 local function noop() end
 function Widget:SetAllPoints(rel) self.allPointsTo = rel end
-for _, m in ipairs({ "SetAutoFocus", "SetNumeric", "SetMaxLetters", "ClearFocus",
+for _, m in ipairs({ "SetAutoFocus", "SetNumeric", "SetMaxLetters",
     "RegisterForClicks", "RegisterForDrag", "SetFrameStrata", "SetPortraitShown", "SetTextColor",
     "SetMotionScriptsWhileDisabled", "SetBlendMode", "SetHighlightTexture" }) do
     Widget[m] = noop
@@ -513,6 +513,8 @@ end
 function Widget:HighlightText(from, to)
     self.selection = (from == 0 and to == 0) and "none" or "all"
 end
+function Widget:HasFocus() return self.focused == true end
+function Widget:ClearFocus() self.focused = false end
 function Widget:SetFocus()
     self.focused = true
     if self.scripts.OnEditFocusGained then self.scripts.OnEditFocusGained(self) end

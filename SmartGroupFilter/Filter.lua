@@ -34,7 +34,6 @@ function ns.SeenNames()
     return seenNames
 end
 
--- One search result as the plain entry Logic.lua reads, or nil when the client has none
 -- The dungeons a result is listed for, or nil while any of them is missing or secret
 function ns.ReadActivities(ids)
     ids = Clean(ids) -- in an instance the whole list is secret: measuring it errors
@@ -48,6 +47,7 @@ function ns.ReadActivities(ids)
     return list
 end
 
+-- One search result as the plain entry Logic.lua reads, or nil when the client has none;
 -- nil, "secret" while the client hides the result: in an instance every field is a secret
 -- (Michel's BugSack, 2026-11-11)
 function ns.ReadEntry(id)

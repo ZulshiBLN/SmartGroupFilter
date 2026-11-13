@@ -13,10 +13,6 @@ local D, L = ns.D, ns.L
 local db
 ns.OnDBReady(function(d) db = d end)
 
--- How many players one click invites. Whether the client lets one click send several invites
--- is checked in game first (plan, phase 4); 1 = one per click, the button naming whom next.
-D.INVITES_PER_CLICK = D.INVITES_PER_CLICK or 5
-
 local placed = {}   -- name -> { role, class, level, until, joined }
 -- The dungeon (activityID) the group is built for, chosen by a click only (ruleset plan
 -- 2026-11-11-build-dungeon). It holds while SGF's invites are pending or the group has
@@ -338,11 +334,7 @@ function ns.UpdateBuildButton()
     SetMode("build")
     button.reason, button.reasonKey = why and L[why] or nil, why
     button:SetEnabled(list ~= nil)
-    if list and D.INVITES_PER_CLICK == 1 then
-        button:SetText(L.INVITE_NEXT:format(list[1].name, ns.RoleName(list[1].role)))
-    else
-        button:SetText(L.BUILD_GROUP)
-    end
+    button:SetText(L.BUILD_GROUP)
 end
 
 

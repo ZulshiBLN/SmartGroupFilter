@@ -328,3 +328,58 @@ describe("the window background", function()
         assert.are.equal(1, ns.panel.opacityTexture.alpha)
     end)
 end)
+
+-- The release reviews' panel findings (ruleset plan 2026-11-13-review-fixes, phase 3)
+describe("the panel, after the release reviews", function()
+    local function said(text)
+        for _, line in ipairs(CHAT) do
+            if line:find(text, 1, true) then return true end
+        end
+        return false
+    end
+
+    it("says so when the filter leaves no player of the list", function()
+        RUNSCRIPT(panel, "OnShow")
+        panel.fromBox:SetText("50")
+        RUNSCRIPT(panel.fromBox, "OnEnterPressed")
+        assert.are.equal("", shown())
+        assert.are.equal("0 of 3 players - none fit your filter", panel.count.text)
+    end)
+
+    it("leaves a level being typed alone while the list refreshes", function()
+        RUNSCRIPT(panel, "OnShow")
+        panel.fromBox:SetFocus()
+        panel.fromBox:SetText("2")
+        LFGBrowseFrame:UpdateResultList()
+        assert.are.equal("2", panel.fromBox.text)
+        assert.are.equal("30", panel.toBox.text)
+    end)
+
+    it("shows the clamped value after Enter and the old one after Escape on a focused box", function()
+        RUNSCRIPT(panel, "OnShow")
+        panel.fromBox:SetFocus()
+        panel.fromBox:SetText("abc")
+        RUNSCRIPT(panel.fromBox, "OnEscapePressed")
+        assert.are.equal("20", panel.fromBox.text)
+        assert.is_false(panel.fromBox:HasFocus())
+        panel.toBox:SetFocus()
+        panel.toBox:SetText("0")
+        RUNSCRIPT(panel.toBox, "OnEnterPressed")
+        assert.are.equal("1", panel.toBox.text)
+        assert.is_false(panel.toBox:HasFocus())
+    end)
+
+    it("says Not in combat when its side tab is clicked in combat", function()
+        for i = #CHAT, 1, -1 do CHAT[i] = nil end
+        STATE.combat = true
+        ns.tab.mouseUp(ns.tab, "LeftButton", true)
+        assert.is_true(panel.shown)
+        assert.is_true(said("Not in combat."))
+    end)
+
+    it("has no one-per-click text left in any locale", function()
+        for code, t in pairs(ns.locales) do
+            assert.is_nil(rawget(t, "INVITE_NEXT"), code)
+        end
+    end)
+end)

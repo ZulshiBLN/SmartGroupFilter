@@ -140,10 +140,8 @@ describe("the state snapshot", function()
     it("reports the build button by mode and key, never by its text", function()
         local ns = login()
         listed()
-        ns.D.INVITES_PER_CLICK = 1
         ns.UpdateBuildButton()
         local button = ns.panel.buildButton
-        assert.is_truthy(button:GetText():find("Tankguy", 1, true)) -- the text names him
         local text = report(ns, "BUILD")
         assert.is_nil(text:find("Tankguy", 1, true), text)
         assert.is_truthy(text:find("state build mode=build reason=none enabled=true", 1, true), text)
