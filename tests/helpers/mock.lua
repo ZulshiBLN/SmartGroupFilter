@@ -243,6 +243,15 @@ function SECRET()
     return p
 end
 
+-- A secret table, as the own listing's activityIDs in an instance: a real table holding its
+-- values, named by issecretvalue. Lua 5.1 ignores __len on tables, so a raw # reads its length;
+-- a spec asserts its values never come out (ruleset plan 2026-11-13-review-fixes)
+function SECRET_TABLE(...)
+    local t = { ... }
+    secrets[t] = true
+    return t
+end
+
 function issecretvalue(v) return STATE.secret[v] == true or secrets[v] == true end
 function GetMaxPlayerLevel() return STATE.maxLevel end
 

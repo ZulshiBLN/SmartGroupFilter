@@ -128,6 +128,15 @@ describe("the state snapshot", function()
         assert.is_nil(text:find("Shadowfang", 1, true), text)
     end)
 
+    it("reads a secret own listing as none: an instance hides it", function()
+        local ns = login()
+        listed()
+        STATE.activeEntry = { activityIDs = SECRET_TABLE(800) }
+        local lines = ns.StateSnapshot()
+        assert.is_truthy(contains(lines, "^listing none$"))
+        assert.is_nil(table.concat(lines, " "):find("800", 1, true))
+    end)
+
     it("reports the build button by mode and key, never by its text", function()
         local ns = login()
         listed()

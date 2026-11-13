@@ -38,7 +38,8 @@ function ns.StateSnapshot()
         lines[#lines + 1] = ("invited %s %s %s joined=%s"):format(SV(p.role), SV(p.class), SV(p.level), SV(p.joined))
     end
     local entry = C_LFGList.GetActiveEntryInfo()
-    local ids = entry and type(entry.activityIDs) == "table" and entry.activityIDs or {}
+    -- Through the guarded reader: in an instance the list is secret, and measuring it errors
+    local ids = ns.ReadActivities(entry and entry.activityIDs) or {}
     lines[#lines + 1] = "listing " .. (#ids > 0 and ("activities=" .. Join(ids)) or "none")
     local range = ns.LevelRange()
     lines[#lines + 1] = ("range %s-%s"):format(SV(range.min), SV(range.max))

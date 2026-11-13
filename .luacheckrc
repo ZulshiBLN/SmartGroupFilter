@@ -55,7 +55,7 @@ files["tests/"] = {
     read_globals = {
         "io", "require", "loadfile", "dofile", "os",
         -- What tests/helpers/mock.lua provides to drive the mocked client
-        "FIRE", "CHAT", "RUNSCRIPT", "RUNTIMERS", "CLICK", "SETGLOBAL", "SECRET",
+        "FIRE", "CHAT", "RUNSCRIPT", "RUNTIMERS", "CLICK", "SETGLOBAL", "SECRET", "SECRET_TABLE",
         -- Named frames the addon creates, read back by name
         "SmartGroupFilterReport",
     },
