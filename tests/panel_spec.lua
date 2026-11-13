@@ -67,14 +67,14 @@ describe("the panel", function()
 
     it("counts the single players shown", function()
         assert.are.equal("2 of 3 players", panel.count.text)
-        -- level with the build button's middle (14 above the edge, 24 high)
-        assert.are.same({ "RIGHT", panel, "BOTTOMRIGHT", -14, 26 }, panel.count.points[1])
+        -- centred at the bottom, under the build button: a long count never runs under it
+        -- (Michel, 2026-11-13)
+        assert.are.same({ "BOTTOM", panel, "BOTTOM", 0, 14 }, panel.count.points[1])
     end)
 
-    it("puts the build button in the bottom left corner, looking as far from the edges as Reset Filter", function()
+    it("centres the build button above the count", function()
         assert.are.same({ "TOPRIGHT", panel, "TOPRIGHT", -10, -30 }, panel.resetButton.points[1])
-        -- 14 from the bottom: the frame's lower edge is drawn wider (Michel, in game)
-        assert.are.same({ "BOTTOMLEFT", panel, "BOTTOMLEFT", 10, 14 }, panel.buildButton.points[1])
+        assert.are.same({ "BOTTOM", panel, "BOTTOM", 0, 34 }, panel.buildButton.points[1])
     end)
 
     it("resets to Blizzard's list with Reset Filter, and filters again at the next change", function()

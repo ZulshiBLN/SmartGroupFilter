@@ -517,10 +517,10 @@ local function Create()
     if panel.CloseButton then panel.CloseButton:Hide() end
     panel:GetTitleText():SetText(ns.ADDON_NAME)
 
-    -- The count in the bottom right corner (Michel), Reset Filter at the top right
+    -- The count centred at the very bottom, the build button above it: "none fit your filter"
+    -- ran under the button in the corner (Michel, 2026-11-13). Reset Filter at the top right
     panel.count = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    -- level with the middle of the build button (Build.lua: 14 above the edge, 24 high)
-    panel.count:SetPoint("RIGHT", panel, "BOTTOMRIGHT", -14, 26)
+    panel.count:SetPoint("BOTTOM", panel, "BOTTOM", 0, 14)
     -- The filter view: every filter control is its child, so the settings view (Settings.lua)
     -- hides them in one; the protected build button sits on the panel itself
     local view = CreateFrame("Frame", nil, panel)
