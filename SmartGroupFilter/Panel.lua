@@ -24,7 +24,7 @@ local LayoutRows -- defined with the rows below
 ---------------------------------------------------------------------------
 -- Helpers
 ---------------------------------------------------------------------------
--- A setting changed: the filter is on again and filters anew; the rows show the new state
+-- A setting changed: counted anew; the rows show the new state
 local function Changed()
     ns.FilterChanged()
     LayoutRows()
@@ -149,7 +149,7 @@ local function MaxLevel()
 end
 
 local function ShowRange(from, to)
-    -- A box being typed in keeps its digits: a filter pass may come between two keys (review)
+    -- A box being typed in keeps its digits: a count may come between two keys (review)
     if not panel.fromBox:HasFocus() then panel.fromBox:SetText(tostring(from)) end
     if not panel.toBox:HasFocus() then panel.toBox:SetText(tostring(to)) end
     local span = math.max(1, MaxLevel() - 1)
@@ -423,7 +423,7 @@ local function ToggleTab()
         if InCombatLockdown() then return ns.Print(L.NOT_IN_COMBAT) end
         db.panelShown = not db.panelShown
         Sync()
-        ns.RefreshList()
+        ns.Recount()
     end
     tab.Toggle = Toggle
     if tab.SetCustomOnMouseUpHandler then
@@ -578,9 +578,10 @@ local function Create()
     panel.armorCheck:SetPoint("TOPLEFT", panel.doubleCheck, "BOTTOMLEFT", 0, -2)
     panel.buildButton = ns.CreateBuildButton(panel)
 
+    -- Counting calls the listeners, RefreshAll among them
     panel:SetScript("OnShow", function()
         Dock()
-        RefreshAll()
+        ns.Recount()
     end)
     ns.OnListFiltered(function() RefreshAll() end)
     ns.OnLanguageChanged(function() UpdateCount(ns.Counts()) end)

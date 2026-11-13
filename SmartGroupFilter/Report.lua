@@ -43,10 +43,10 @@ function ns.StateSnapshot()
     lines[#lines + 1] = "listing " .. (#ids > 0 and ("activities=" .. Join(ids)) or "none")
     local range = ns.LevelRange()
     lines[#lines + 1] = ("range %s-%s"):format(SV(range.min), SV(range.max))
-    local shown, total = ns.Counts()
+    local fit, total = ns.Counts()
     local roles = ns.RoleCounts()
-    lines[#lines + 1] = ("list shown=%d total=%d tank=%d healer=%d damage=%d filter=%s"):format(shown, total,
-        roles.TANK or 0, roles.HEALER or 0, roles.DAMAGER or 0, SV(ns.FilterActive()))
+    lines[#lines + 1] = ("list fit=%d total=%d tank=%d healer=%d damage=%d"):format(fit, total,
+        roles.TANK or 0, roles.HEALER or 0, roles.DAMAGER or 0)
     local panel = ns.panel
     lines[#lines + 1] = panel and ("panel visible=%s view=%s"):format(SV(panel:IsVisible()), SV(panel.view or "none"))
         or "panel none"

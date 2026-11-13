@@ -44,7 +44,7 @@ before_each(function()
     result(4, "Wlk", "WARLOCK", 25, { dps = true })
     result(5, "Rog", "ROGUE", 25, { dps = true })
     result(6, "Hun", "HUNTER", 25, { dps = true })
-    LFGBrowseFrame:UpdateResultList()
+    FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
     fresh()
 end)
 
@@ -93,7 +93,7 @@ describe("Build Group", function()
             for i = #CHAT, 1, -1 do CHAT[i] = nil end
             STATE.activeEntry = { activityIDs = { 801, 800 } }
             listedFor(7, "Dru", "DRUID", 25, { dps = true })
-            LFGBrowseFrame:UpdateResultList()
+            FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
             fresh()
         end)
 
@@ -130,7 +130,7 @@ describe("Build Group", function()
         it("is chosen anew once the group is empty and no invite pending", function()
             listedFor(8, "Pa2", "PALADIN", 25, { tank = true })
             listedFor(9, "Sha", "SHAMAN", 25, { healer = true })
-            LFGBrowseFrame:UpdateResultList()
+            FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
             click() -- 800 four, 801 three
             assert.truthy(line("Building a group for Shadowfang Keep."))
             STATE.time = STATE.time + 121 -- nobody came
@@ -159,7 +159,7 @@ describe("Build Group", function()
             SlashCmdList.SMARTGROUPFILTER("test")
             assert.truthy(line("Target dungeon: Shadowfang Keep - a click would choose it."))
             for id = 1, 6 do STATE.results[id].info.activityIDs = { 802 } end
-            LFGBrowseFrame:UpdateResultList()
+            FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
             click()
             assert.are.equal("Dru", table.concat(STATE.invites, " "))
             assert.truthy(line("Building a group for Blackfathom Deeps."))
@@ -223,7 +223,7 @@ describe("Build Group", function()
 
         it("is sent from the click only", function()
             STATE.results[1].player.lfgRoles = { tank = true, dps = true }
-            LFGBrowseFrame:UpdateResultList()
+            FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
             ns.UpdateBuildButton()
             SlashCmdList.SMARTGROUPFILTER("test")
             FIRE("GROUP_ROSTER_UPDATE")
@@ -391,7 +391,7 @@ describe("Build Group", function()
 
         it("offers a refresh when no player fits an old list, not when the group is full", function()
             STATE.order = {}
-            LFGBrowseFrame:UpdateResultList()
+            FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
             STATE.time = STATE.time + 31
             ns.UpdateBuildButton()
             assert.are.equal("Refresh List", button.text)
@@ -533,7 +533,7 @@ describe("Build Group", function()
 
     it("is disabled when no player fits", function()
         STATE.order = {}
-        LFGBrowseFrame:UpdateResultList()
+        FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
         assert.are.equal("No fitting player in the list.", button.reason)
     end)
 
@@ -562,7 +562,7 @@ describe("Build Group", function()
         it("shows whom a click would invite and why, and invites nobody", function()
             result(7, "Old", "MAGE", 35, { dps = true })
             result(8, "NoRole", "DRUID", 25)
-            LFGBrowseFrame:UpdateResultList()
+            FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
             SlashCmdList.SMARTGROUPFILTER("test")
             local out = lines()
             assert.are.equal(0, #STATE.invites)
@@ -580,7 +580,7 @@ describe("Build Group", function()
         it("names players listed for another dungeon and those not loaded yet", function()
             STATE.results[1].info.activityIDs = { 801 }
             STATE.results[2].info.activityIDs = nil
-            LFGBrowseFrame:UpdateResultList()
+            FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
             SlashCmdList.SMARTGROUPFILTER("test")
             local out = lines()
             assert.truthy(out:find("Pal PALADIN 25 (tank, waits 0s): not listed for your dungeon", 1, true))
@@ -589,7 +589,7 @@ describe("Build Group", function()
 
         it("shows the target line and each invite's whisper, and sends none", function()
             STATE.results[1].player.lfgRoles = { tank = true, dps = true }
-            LFGBrowseFrame:UpdateResultList()
+            FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
             SlashCmdList.SMARTGROUPFILTER("test")
             local out = lines()
             assert.truthy(out:find("A click would print: Building a group for Shadowfang Keep.", 1, true))
@@ -602,7 +602,7 @@ describe("Build Group", function()
         it("names how many dungeons a player listed for, when more than one", function()
             STATE.results[4].info.activityIDs = { 800, 801 }
             STATE.results[2].info.activityIDs = { 801, 800, 802 }
-            LFGBrowseFrame:UpdateResultList()
+            FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
             SlashCmdList.SMARTGROUPFILTER("test")
             local out = lines()
             assert.truthy(out:find("3. damager: Wlk - WARLOCK 25, damager, 2 dungeons, waits 0s", 1, true))
@@ -614,7 +614,7 @@ describe("Build Group", function()
             result(7, "Ini", "MAGE", 25, { dps = true })
             STATE.results[1] = nil
             STATE.results[2] = nil
-            LFGBrowseFrame:UpdateResultList()
+            FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
             SlashCmdList.SMARTGROUPFILTER("test")
             local out = lines()
             assert.truthy(out:find("Ini MAGE 25 (damager, waits 0s): class limit: 1 MAGE already counted (you, your group and those chosen)", 1, true))

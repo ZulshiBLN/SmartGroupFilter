@@ -80,9 +80,7 @@ D.WHISPER_ROLE = "%s for %s?"
 D.WHISPER_DUNGEON = "You want to join for %s?"
 D.WHISPER_ROLE_NAMES = { TANK = "Tank", HEALER = "Healer", DAMAGER = "Damage" }
 
--- The panel's options and their defaults. panelShown: the side tab's switch - a hidden panel
--- leaves Blizzard's list as it is. Reset Filter's "off" is not saved: it lasts until the next
--- change in the panel or the next login, so the panel never shows a filter that is not applied.
+-- The panel's options and their defaults. panelShown: the side tab's switch.
 D.OPTION_DEFAULTS = { allowDouble = false, allowSameArmor = true, panelShown = true, hideMinimap = false }
 
 -- The minimap button's place on its circle, degrees; 225 = bottom left, as SimpleConjureBar

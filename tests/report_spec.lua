@@ -44,7 +44,6 @@ local function listed()
     result(3, "Dpsone", "WARLOCK", 25, { dps = true })
     result(4, "Dpstwo", "ROGUE", 25, { dps = true })
     result(5, "Farguy-Farrealm", "HUNTER", 26, { dps = true })
-    LFGBrowseFrame:UpdateResultList()
     LFGBrowseFrame.searching = false
     FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
 end
@@ -106,7 +105,7 @@ describe("the state snapshot", function()
         assert.is_truthy(contains(lines, "^range 20%-30$"))
         local shown, total = ns.Counts()
         local roles = ns.RoleCounts()
-        assert.is_truthy(contains(lines, ("^list shown=%d total=%d tank=%d healer=%d damage=%d filter=true$"):format(
+        assert.is_truthy(contains(lines, ("^list fit=%d total=%d tank=%d healer=%d damage=%d$"):format(
             shown, total, roles.TANK, roles.HEALER, roles.DAMAGER)))
         assert.is_truthy(contains(lines, "^panel visible=true view=filter$"))
         assert.is_truthy(contains(lines, "^combat no$"))

@@ -12,8 +12,10 @@ local function result(id, class, level, roles)
     STATE.order[#STATE.order + 1] = id
 end
 
-local function shown()
-    return table.concat(LFGBrowseFrame.results, " ")
+-- Single players that fit the filter, of all single players
+local function fit()
+    local s, t = ns.Counts()
+    return s .. "/" .. t
 end
 
 local function classesOf(role)
@@ -32,7 +34,7 @@ before_each(function()
     result(1, "WARRIOR", 25, { tank = true })
     result(2, "MAGE", 25, { dps = true })
     result(3, "MAGE", 35, { dps = true })
-    LFGBrowseFrame:UpdateResultList()
+    FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
 end)
 
 describe("the panel", function()
@@ -57,10 +59,10 @@ describe("the panel", function()
     it("counts the players shown for each role beside its header", function()
         assert.are.equal("(1 listed)", panel.rows.TANK.count.text)
         assert.are.equal("(0 listed)", panel.rows.HEALER.count.text)
-        assert.are.equal("(1 listed)", panel.rows.DAMAGER.count.text) -- the level 35 mage is hidden
+        assert.are.equal("(1 listed)", panel.rows.DAMAGER.count.text) -- the level 35 mage does not fit
         result(4, "DRUID", 25, { tank = true, dps = true })
         result(5, "ROGUE", 25, {})
-        LFGBrowseFrame:UpdateResultList()
+        FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
         assert.are.equal("(2 listed)", panel.rows.TANK.count.text) -- both roles count
         assert.are.equal("(2 listed)", panel.rows.DAMAGER.count.text) -- no role counts nowhere
     end)
@@ -77,24 +79,26 @@ describe("the panel", function()
         assert.are.same({ "BOTTOM", panel, "BOTTOM", 0, 34 }, panel.buildButton.points[1])
     end)
 
-    it("resets to Blizzard's list with Reset Filter, and filters again at the next change", function()
+    it("resets the filter with Reset Filter, Blizzard's list untouched throughout", function()
         RUNSCRIPT(panel, "OnShow")
         panel.toBox:SetText("24")
         RUNSCRIPT(panel.toBox, "OnEnterPressed") -- a range set by hand
         RUNSCRIPT(panel.rows.TANK.icons[2], "OnClick", "RightButton") -- warrior out
         panel.armorCheck:SetChecked(false)
         RUNSCRIPT(panel.armorCheck, "OnClick") -- the mages out
-        assert.are.equal("", shown())
+        assert.are.equal("0/3", fit())
         RUNSCRIPT(panel.resetButton, "OnClick")
-        assert.are.equal("1 2 3", shown())
-        assert.are.equal("3 of 3 players", panel.count.text)
+        assert.are.equal("2/3", fit()) -- the level 35 mage is outside the dungeon's range
+        assert.are.equal("2 of 3 players", panel.count.text)
         assert.is_true(panel.armorCheck.checked)
-        -- the dungeon's range again, not 1-60 (Michel, 2026-11-13); the list is Blizzard's anyway
+        -- the dungeon's range again, not 1-60 (Michel, 2026-11-13)
         assert.are.equal("20", panel.fromBox.text)
         assert.are.equal("30", panel.toBox.text)
         assert.is_false(panel.rows.TANK.icons[2].cross.shown)
         RUNSCRIPT(panel.rows.TANK.icons[2], "OnClick", "RightButton")
-        assert.are.equal("2", shown()) -- filtering again, by the dungeon's range
+        assert.are.equal("1/3", fit())
+        assert.are.equal("1 2 3", LISTED())
+        assert.are.equal(0, STATE.listBuilds)
     end)
 
     it("greys the classes of the player's armor while same armor is not allowed", function()
@@ -110,7 +114,7 @@ describe("the panel", function()
         assert.is_false(panel.rows.HEALER.icons[2].texture.desaturated) -- druid: leather
         RUNSCRIPT(healer, "OnEnter")
         assert.are.equal("Same armor class as you", GameTooltip.lines[3])
-        assert.are.equal("1", shown()) -- the mages leave the list too, the warrior stays
+        assert.are.equal("1/3", fit()) -- the mages do not fit, the warrior does
         panel.armorCheck:SetChecked(true)
         RUNSCRIPT(panel.armorCheck, "OnClick")
         assert.is_false(healer.texture.desaturated)
@@ -119,7 +123,7 @@ describe("the panel", function()
         assert.are.equal(1, healer.cross.alpha) -- an exclusion: the full cross
     end)
 
-    it("shows and hides the panel with a fourth side tab, remembered, Blizzard's list while hidden", function()
+    it("shows and hides the panel with a fourth side tab, remembered, Blizzard's list untouched", function()
         local tab = ns.tab
         assert.are.equal(LFGBrowseFrame, tab.parent) -- on the Group Browser only (Michel)
         assert.are.equal("LargeSideTabButtonTemplate", tab.template)
@@ -131,11 +135,12 @@ describe("the panel", function()
         assert.is_false(panel.shown)
         assert.is_false(db.panelShown)
         assert.is_false(tab.checked)
-        assert.are.equal("1 2 3", shown())
+        assert.are.equal("1 2 3", LISTED())
         tab.mouseUp(tab, "LeftButton", true)
         assert.is_true(panel.shown)
         assert.is_true(tab.checked)
-        assert.are.equal("1 2", shown())
+        assert.are.equal("1 2 3", LISTED())
+        assert.are.equal(0, STATE.listBuilds)
         assert.are.equal(0, STATE.tab2ButtonClicks) -- SGF switches no page
     end)
 
@@ -164,11 +169,11 @@ describe("the panel", function()
         assert.is_true(db.excluded.TANK.WARRIOR)
         assert.is_true(warrior.texture.desaturated)
         assert.is_true(warrior.cross.shown)
-        assert.are.equal("2", shown())
+        assert.are.equal("1/3", fit())
         RUNSCRIPT(warrior, "OnClick", "RightButton")
         assert.is_nil(db.excluded.TANK.WARRIOR)
         assert.is_false(warrior.texture.desaturated)
-        assert.are.equal("1 2", shown())
+        assert.are.equal("2/3", fit())
     end)
 
     it("ignores a left-click on a class", function()
@@ -221,10 +226,10 @@ describe("the panel", function()
         panel.toBox:SetText("34")
         RUNSCRIPT(panel.toBox, "OnEnterPressed")
         assert.are.equal(34, ns.LevelRange().max)
-        assert.are.equal("1 2", shown())
+        assert.are.equal("2/3", fit())
         panel.toBox:SetText("36")
         RUNSCRIPT(panel.toBox, "OnEnterPressed")
-        assert.are.equal("1 2 3", shown())
+        assert.are.equal("3/3", fit())
     end)
 
     it("moves the other level along when a typed one passes it", function()
@@ -260,7 +265,7 @@ describe("the panel", function()
         assert.are.equal("36", panel.toBox.text)
         RUNSCRIPT(high, "OnMouseUp")
         assert.are.equal(36, ns.LevelRange().max)
-        assert.are.equal("1 2 3", shown())
+        assert.are.equal("3/3", fit())
         RUNSCRIPT(low, "OnMouseDown")
         STATE.cursor = { x = 100 + 50 * 4, y = 0 } -- level 51, past the high handle
         RUNSCRIPT(low, "OnUpdate")
@@ -346,7 +351,7 @@ describe("the panel, after the release reviews", function()
         RUNSCRIPT(panel, "OnShow")
         panel.fromBox:SetText("50")
         RUNSCRIPT(panel.fromBox, "OnEnterPressed")
-        assert.are.equal("", shown())
+        assert.are.equal("0/3", fit())
         assert.are.equal("0 of 3 players - none fit your filter", panel.count.text)
     end)
 
@@ -354,7 +359,7 @@ describe("the panel, after the release reviews", function()
         RUNSCRIPT(panel, "OnShow")
         panel.fromBox:SetFocus()
         panel.fromBox:SetText("2")
-        LFGBrowseFrame:UpdateResultList()
+        FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
         assert.are.equal("2", panel.fromBox.text)
         assert.are.equal("30", panel.toBox.text)
     end)

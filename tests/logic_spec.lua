@@ -229,7 +229,7 @@ describe("the choice of invites", function()
         assert.are.equal("Pri:HEALER Wlk:DAMAGER Rog:DAMAGER", names(list))
     end)
 
-    it("takes candidates by the filter's rules even when the Filter is off", function()
+    it("takes candidates by the filter's rules after Reset Filter", function()
         ns.ResetFilter()
         local list = choose({ solo("Pal19", "PALADIN", 19, T), solo("War", "WARRIOR", 25, T) })
         assert.are.equal("War:TANK", names(list))

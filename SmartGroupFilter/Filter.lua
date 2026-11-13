@@ -1,9 +1,8 @@
 -- SmartGroupFilter - filter
--- Shortens Blizzard's Group Finder list. Blizzard's LFGBrowseFrame:UpdateResultList() fetches
--- the results, sorts them with the global LFGBrowseUtil_SortSearchResults(self.results) and
--- then draws exactly that table (Blizzard_LFGVanilla_Browse.lua, Forever 1.60.1). The filter
--- posthooks the sort and removes, in place, the entries ns.Passes rejects - Blizzard's code is
--- hooked, never replaced (ruleset K6). Filter off: the table stays untouched.
+-- Reads the Group Finder's results and counts the single players the filter lets through - for
+-- the panel's numbers and Build Group. Blizzard's own list is never touched: calling its build
+-- from addon code made its rows SGF's, and its later protected search and secret reads failed
+-- (ruleset plan 2026-11-13-list-untouched).
 
 local _, ns = ...
 
@@ -12,9 +11,6 @@ ns.OnDBReady(function(d)
     db = d
     db.filterOn = nil -- saved by earlier builds; Reset Filter's "off" is no longer kept
 end)
-
--- Off after Reset Filter, until the next change in the panel; on again at every login
-local filterOn = true
 
 -- A secret value is unreadable: it counts as missing (ruleset code.md, "Secret values")
 local function IsSecret(v)
@@ -136,18 +132,18 @@ function ns.ClearLevelRange()
 end
 
 ---------------------------------------------------------------------------
--- The hook
+-- The count
 ---------------------------------------------------------------------------
 local shownCount, totalCount = 0, 0
 local roleCounts = { TANK = 0, HEALER = 0, DAMAGER = 0 }
 local listeners = {}
 
--- fn(shown, total) runs after every filtering: single players kept and all single players
+-- fn(fit, total) runs after every count: single players that fit and all single players
 function ns.OnListFiltered(fn)
     listeners[#listeners + 1] = fn
 end
 
--- Single players shown, by the roles they signed up for (one with several counts for each;
+-- Single players that fit, by the roles they signed up for (one with several counts for each;
 -- one with none for none) - shown beside the rows' headers (Michel, 2026-11-11)
 function ns.RoleCounts()
     return roleCounts
@@ -167,119 +163,90 @@ function ns.OwnArmor()
     return ns.ArmorOf(class, UnitLevel("player"))
 end
 
--- The filter works while it is on and the panel is shown; else Blizzard's list stays as it is
-function ns.FilterActive()
-    return db and filterOn and db.panelShown or false
-end
-
 local listSecret = false -- logged once per change, not at every update in an instance
 
-local function Filter(results)
-    if type(results) ~= "table" or not db then return end
-    -- Secret results (in an instance): the table stays as Blizzard made it. Removing from it
-    -- would hand Blizzard's drawing values written by this addon, and it fails on the secrets.
+-- The client's results read anew, or nil while they are secret (in an instance)
+local function Count()
+    local _, ids = C_LFGList.GetFilteredSearchResults()
+    local secret = IsSecret(ids)
+    if secret or type(ids) ~= "table" then ids = {} end
     local entries = {}
-    for i = 1, #results do
-        local entry, why = ns.ReadEntry(results[i])
-        if why == "secret" then
-            if not listSecret then ns.Log("list secret: untouched") end
-            listSecret = true
-            return
-        end
+    for i, id in ipairs(ids) do
+        local entry, why = ns.ReadEntry(id)
+        if why == "secret" then secret = true break end
         entries[i] = entry
     end
+    if secret then
+        if not listSecret then ns.Log("list secret: counts kept") end
+        listSecret = true
+        return nil
+    end
     listSecret = false
-    local active = ns.FilterActive()
     local range, ownArmor = ns.LevelRange(), ns.OwnArmor()
     local shown, total = 0, 0
     local counts = { TANK = 0, HEALER = 0, DAMAGER = 0 }
-    for i = #results, 1, -1 do
+    for i = 1, #ids do
         local entry = entries[i]
-        local single = IsSingle(entry)
-        if single then total = total + 1 end
-        if active and entry and not ns.Passes(entry, db, range, ownArmor) then
-            table.remove(results, i)
-        elseif single then
-            shown = shown + 1
-            for role, field in pairs(ns.D.ROLE_FIELD) do
-                if entry.roles and entry.roles[field] then counts[role] = counts[role] + 1 end
+        if IsSingle(entry) then
+            total = total + 1
+            if ns.Passes(entry, db, range, ownArmor) then
+                shown = shown + 1
+                for role, field in pairs(ns.D.ROLE_FIELD) do
+                    if entry.roles and entry.roles[field] then counts[role] = counts[role] + 1 end
+                end
             end
         end
     end
-    shownCount, totalCount, roleCounts = shown, total, counts
-    for _, fn in ipairs(listeners) do fn(shown, total) end
+    return shown, total, counts
 end
 
--- Rebuilds Blizzard's list from the results the client already has - no new search. Not while
--- the client gives no roles: Blizzard's sort indexes them unchecked and errors. Inside an
--- instance GetRoles() is nil although the player is listed as damage (Michel's BugSack,
--- 2026-11-13); the list stays as Blizzard last drew it.
-function ns.RefreshList()
-    if not (LFGBrowseFrame and LFGBrowseFrame:IsShown()) then return end
-    if C_LFGListRoles.GetRoles() == nil then return end
-    LFGBrowseFrame:UpdateResultList()
+-- Counts anew and tells the listeners; secret results keep the counts as they were
+function ns.Recount()
+    if not db then return end
+    local shown, total, counts = Count()
+    if shown then shownCount, totalCount, roleCounts = shown, total, counts end
+    for _, fn in ipairs(listeners) do fn(shownCount, totalCount) end
 end
 
--- A setting in the panel changed: the filter is on again (after Reset Filter) and filters anew
+-- A setting in the panel changed: count anew
 function ns.FilterChanged()
-    filterOn = true
     ns.LogSettings()
-    ns.RefreshList()
+    ns.Recount()
 end
 
--- Reset Filter: Blizzard's own list again - no exclusion, same armor allowed, the filter off
--- until the next change. The rows' order is kept (Michel, 2026-11-10). The level range goes back
--- to the dungeon's, not 1-60 (Michel, 2026-11-13): the list is Blizzard's until a change anyway.
+-- Reset Filter: no exclusion, same armor allowed, the dungeon's level range (Michel,
+-- 2026-11-13). The rows' order is kept (Michel, 2026-11-10).
 function ns.ResetFilter()
     for _, role in ipairs(ns.D.ROLES) do db.excluded[role] = {} end
     db.allowSameArmor = true
-    filterOn = false
     ns.Log("reset filter")
     ns.LogSettings()
     ns.ClearLevelRange()
-    ns.RefreshList()
+    ns.Recount()
 end
 
 ---------------------------------------------------------------------------
--- Late data: the client may hand a single player's class and level over only after the list
--- was drawn, then sends LFG_LIST_SEARCH_RESULT_UPDATED. Is the entry now on the wrong side of
--- the filter, the list is filtered again - once, shortly after, however many updates arrive.
+-- Late data: the client may hand a single player's class and level over only after the results
+-- arrived, then sends LFG_LIST_SEARCH_RESULT_UPDATED - counted once, shortly after, however
+-- many updates arrive.
 ---------------------------------------------------------------------------
-local REFILTER_DELAY = 0.3
-local refilterPending = false
+local RECOUNT_DELAY = 0.3
+local recountPending = false
 
-local function InList(id)
-    for _, v in ipairs(LFGBrowseFrame.results or {}) do
-        if v == id then return true end
-    end
-    return false
-end
-
-local function OnResultUpdated(id)
-    if refilterPending or not ns.FilterActive() or not LFGBrowseFrame then return end
-    local entry = ns.ReadEntry(id)
-    if not IsSingle(entry) then return end
-    local passes = ns.Passes(entry, db, ns.LevelRange(), ns.OwnArmor())
-    if passes == InList(id) then return end
-    refilterPending = true
-    C_Timer.After(REFILTER_DELAY, function()
-        refilterPending = false
-        ns.RefreshList()
+local function OnResultUpdated()
+    if recountPending then return end
+    recountPending = true
+    C_Timer.After(RECOUNT_DELAY, function()
+        recountPending = false
+        ns.Recount()
     end)
 end
 
--- Blizzard's Group Finder loads on demand, after this addon; hook it once it is there
-local hooked = false
-local function Hook()
-    if hooked or not LFGBrowseUtil_SortSearchResults then return end
-    hooksecurefunc("LFGBrowseUtil_SortSearchResults", Filter)
-    hooked = true
-end
-
 local events = CreateFrame("Frame")
-events:RegisterEvent("PLAYER_LOGIN")
-events:RegisterEvent("ADDON_LOADED")
+events:RegisterEvent("LFG_LIST_SEARCH_RESULTS_RECEIVED")
+events:RegisterEvent("LFG_LIST_SEARCH_FAILED")
+events:RegisterEvent("LFG_LIST_ACTIVE_ENTRY_UPDATE")
 events:RegisterEvent("LFG_LIST_SEARCH_RESULT_UPDATED")
-events:SetScript("OnEvent", function(_, event, id)
-    if event == "LFG_LIST_SEARCH_RESULT_UPDATED" then OnResultUpdated(id) else Hook() end
+events:SetScript("OnEvent", function(_, event)
+    if event == "LFG_LIST_SEARCH_RESULT_UPDATED" then OnResultUpdated() else ns.Recount() end
 end)

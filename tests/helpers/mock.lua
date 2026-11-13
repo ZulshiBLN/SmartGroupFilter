@@ -275,16 +275,6 @@ C_LFGList = {
     GetActivityInfoTable = function(id) return STATE.activities[id] end,
 }
 
--- hooksecurefunc for a global function: the original runs first, then the hook
-function hooksecurefunc(name, hook)
-    local original = _G[name]
-    _G[name] = function(...)
-        local r = { original(...) }
-        hook(...)
-        return unpack(r)
-    end
-end
-
 -- Blizzard's sort: the mock keeps STATE.order as it is
 function LFGBrowseUtil_SortSearchResults(results) end
 
@@ -300,7 +290,7 @@ LFGBrowseFrame = NewWidget("Frame", "LFGBrowseFrame", LFGParentFrame)
 LFGBrowseFrame.results = {}
 LFGBrowseFrame.ActivityDropdown = { selectedValues = {} }
 -- As Blizzard's: fresh results from the client, sorted, then drawn
-function LFGBrowseFrame:UpdateResultList()
+local function BuildResultList(self)
     local results = {}
     for i, id in ipairs(STATE.order) do results[i] = id end
     self.totalResults, self.results = #results, results
@@ -310,6 +300,23 @@ function LFGBrowseFrame:UpdateResultList()
         error("attempt to index local 'playerRoles' (a nil value)")
     end
     LFGBrowseUtil_SortSearchResults(self.results)
+end
+
+-- STATE.listBuilds counts calls of the method: addon code's. Blizzard's own build, when new
+-- results arrive (Browse.lua:150 in the probe of 2026-11-13), runs inside the mock uncounted;
+-- this frame is created before the addon's, so Blizzard builds before the addon hears the event
+STATE.listBuilds = 0
+function LFGBrowseFrame:UpdateResultList()
+    STATE.listBuilds = STATE.listBuilds + 1
+    BuildResultList(self)
+end
+local browseEvents = CreateFrame("Frame")
+browseEvents:RegisterEvent("LFG_LIST_SEARCH_RESULTS_RECEIVED")
+browseEvents:SetScript("OnEvent", function() BuildResultList(LFGBrowseFrame) end)
+
+-- What Blizzard's list holds, in its order, as one string
+function LISTED()
+    return table.concat(LFGBrowseFrame.results, " ")
 end
 
 -- The player: STATE.player = { class, level }
