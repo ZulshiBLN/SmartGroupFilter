@@ -36,8 +36,9 @@ builds your five-player group with one click.
     gets "You want to join for Shadowfang Keep?".
   - **A group of friends first:** already in a group before your first Build Group, the button
     reads **Check Roles** and runs Blizzard's role check; once every member chose a role it
-    reads Build Group, and their roles count. Whoever just confirms his role counts with it 15
-    seconds after the click. Asked once - until you are alone again.
+    reads Build Group, and their roles count. Whoever only confirms their role counts with it 15
+    seconds after the click. Asked once - until you are alone again; whoever joins later without
+    your Build Group invite counts with the role chosen on joining.
   - **Held places:** invited players keep their place for two minutes, and while they are in the
     group; whoever declines, lets the invite run out or is already in a group is not asked again.
   - **The button:** not listed yet, it reads **List Self** and lights up Blizzard's eye tab,
@@ -74,9 +75,9 @@ gear in the panel lets you choose another one.
 
 ## Privacy and security
 
-- No addon messages. All it sends are group invites, the Group Finder's own search and one
-  English whisper with an invite when a player's sign-up is ambiguous ("Tank for Shadowfang
-  Keep?") - each from your click.
+- No addon messages. All it sends are group invites, the Group Finder's own search, Blizzard's
+  role check to your own group, and one English whisper with an invite when a player's sign-up
+  is ambiguous ("Tank for Shadowfang Keep?") - each from your click.
 - No dynamic code.
 - Saved settings are validated at login (types and ranges), so damaged files cannot break the
   addon.
@@ -91,12 +92,15 @@ This is not legal advice; it says how bug reports are handled.
 - **Who is responsible** - ZulshiBLN, the author of SmartGroupFilter, Switzerland. Contact
   through GitHub: an issue, or - for anything that should not be public - a private
   vulnerability report on this repository (*Security > Report a vulnerability*).
-- **What it holds** - the addon's and the client's version and language, your class and level
-  band, SmartGroupFilter's settings, your listing's activity IDs, the list's counts, the Build
-  Group button's state, invited players as role, class and level, how many members chose a role, SmartGroupFilter's errors and
-  last actions, and what you type. It removes your character, realm and guild, your group and
-  every name the Group Finder showed since your last login or reload; names it never saw can
-  remain, so write none. "Show content" shows the text before you copy it.
+- **What it holds** - the addon's version, the client's version, build, interface and
+  language, your class and level band, SmartGroupFilter's settings and level range, your
+  listing's activity IDs, the list's counts, the Build Group button's state, invited players as
+  role, class and level, how many members chose a role, whether you are in a group and its size,
+  whether you are in combat, whether the panel is shown, the area you chose, SmartGroupFilter's
+  Lua errors with their message, stack and local values (with BugGrabber), its last actions, and
+  what you type. It removes your character, realm and guild, the names of your group and every
+  name the Group Finder showed since your last login or reload; names it never saw can remain,
+  so write none. "Show content" shows the text before you copy it.
 - **Why** - you choose to send a report; it is used only to fix the bug you report (legitimate
   interest, GDPR Art. 6(1)(f); Swiss FADP). Nothing leaves the game unless you copy and post it.
 - **Who receives it** - GitHub, Inc. (USA) hosts the issue. It is public, and people who watch

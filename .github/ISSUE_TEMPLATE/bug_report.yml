@@ -12,10 +12,15 @@ body:
 
         In the game, type `/sgf bug`, write what happened, choose where it happened, and
         copy the code with Ctrl+C. "Show content" in the window shows everything the code
-        holds: the addon's version and settings, your client, class and level range, errors
-        that name this addon, its last actions and state, and your loaded addons. It is filtered for your character, realm and guild, your current
-        group, target and focus, GUIDs, BattleTags, e-mail addresses and absolute file paths -
-        friends, guild members outside the group or a name written together with other
+        holds: the addon's version, settings and level range, your client's version, build and
+        language, your class and level band, your listing's activity IDs, the list's counts,
+        the Build Group button's state, how many members answered Blizzard's role check,
+        invited players as role, class and level, group size,
+        combat and panel state, the area you chose, this addon's Lua errors with stack and
+        local values, its last actions, and what you type. It is filtered for your character,
+        realm and guild, the names of your group, every name the Group Finder showed this
+        session, the players SmartGroupFilter invited, GUIDs, BattleTags, e-mail addresses and
+        absolute file paths - friends, guild members or a name written together with other
         letters can remain, so check "Show content". The code is not encrypted: anyone can
         read it.
         See [privacy](https://github.com/ZulshiBLN/SmartGroupFilter#privacy-and-security)

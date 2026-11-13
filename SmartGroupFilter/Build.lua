@@ -33,7 +33,7 @@ local function Clean(v)
 end
 
 -- A unit's name as the Group Finder writes it. WoW Forever gave characters surnames:
--- UnitName says "Zulsha", the Group Finder and whispers need "Zulsha Vashtar", which
+-- UnitName says "Testa", the Group Finder and whispers need "Testa Name", which
 -- GetUnitName(unit, true) gives (Michel's dump, 2026-11-11). Without it: name and realm.
 function ns.FullUnitName(unit)
     if GetUnitName then

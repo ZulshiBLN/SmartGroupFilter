@@ -18,8 +18,8 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   options "Allow double classes" and "Allow same armor class" (off: classes of your armor get a
   faint cross and leave the list). Saved per character.
 - Reset Filter shows Blizzard's full list until your next change or login; the bottom right
-  corner counts the players shown, and each row's header the players shown who signed up for
-  its role - "Tank (3 listed)".
+  corner counts the players shown - "none fit your filter" when it leaves nobody - and each
+  row's header the players shown who signed up for its role - "Tank (3 listed)".
 - Build Group: one click invites the players your group lacks around your own role - one tank,
   one healer, three damage dealers - only from players listed for your dungeon, filling the most
   tank and healer places, then the most players; among equal fills by your rows, highest level
@@ -35,6 +35,8 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   Blizzard's role check; once every member chose, it reads Build Group and their roles count.
   A member who only confirms their role counts with it 15 seconds after the click.
   Asked once, until you are alone again - declines and run-out invites never bring it back.
+  A member who joins later without your Build Group invite counts with the role chosen on
+  joining.
 - A player listed for several roles or none gets an English whisper with the invite, "Tank for
   Shadowfang Keep?"; one listed for one role but several dungeons gets "You want to join for
   Shadowfang Keep?".
