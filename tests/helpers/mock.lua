@@ -207,6 +207,13 @@ LOCALIZED_CLASS_NAMES_MALE = {
     PRIEST = "Priest", SHAMAN = "Shaman", MAGE = "Mage", WARLOCK = "Warlock", DRUID = "Druid",
 }
 TANK, HEALER, DAMAGER = "Tank", "Healer", "Damage"
+-- The client's class colours; specs read colorStr from here, never retype it
+RAID_CLASS_COLORS = {}
+for class, hex in pairs({ WARRIOR = "ffc69b6d", PALADIN = "fff48cba", HUNTER = "ffaad372",
+    ROGUE = "fffff468", PRIEST = "ffffffff", SHAMAN = "ff0070dd", MAGE = "ff3fc7eb",
+    WARLOCK = "ff8788ee", DRUID = "ffff7c0a" }) do
+    RAID_CLASS_COLORS[class] = { colorStr = hex }
+end
 
 function FIRE(event, ...)
     for _, f in ipairs(frames) do

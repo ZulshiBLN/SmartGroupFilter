@@ -81,6 +81,9 @@ D.WHISPER_DUNGEON = "You want to join for %s?"
 D.WHISPER_ROLE_NAMES = { TANK = "Tank", HEALER = "Healer", DAMAGER = "Damage" }
 
 -- The panel's options and their defaults. panelShown: the side tab's switch.
+-- A role's tooltip lists at most this many players, then "and N more"
+D.TIP_MAX_PLAYERS = 15
+
 D.OPTION_DEFAULTS = { allowDouble = false, allowSameArmor = true, panelShown = true, hideMinimap = false }
 
 -- The minimap button's place on its circle, degrees; 225 = bottom left, as SimpleConjureBar

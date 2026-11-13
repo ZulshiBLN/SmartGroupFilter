@@ -36,7 +36,7 @@ read_globals = {
     "C_LFGListRoles", "C_PartyInfo", "C_ChatInfo", "SendChatMessage", "InitiateRolePoll", "UnitGroupRolesAssigned", "GetNumGroupMembers", "IsInGroup", "UnitIsGroupLeader",
     "UnitIsGroupAssistant", "UnitName", "GetUnitName", "UnitFullName", "GetTime", "ERR_DECLINE_GROUP_S", "ERR_ALREADY_IN_GROUP_S",
     "InCombatLockdown", "Minimap", "LFDMicroButton",
-    "LOCALIZED_CLASS_NAMES_MALE", "TANK", "HEALER", "DAMAGER",
+    "LOCALIZED_CLASS_NAMES_MALE", "RAID_CLASS_COLORS", "TANK", "HEALER", "DAMAGER",
     -- The bug report
     "time", "GetBuildInfo", "GetRealmName", "GetNormalizedRealmName", "GetGuildInfo", "BugGrabber",
     "UISpecialFrames",

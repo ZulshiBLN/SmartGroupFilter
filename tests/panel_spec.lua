@@ -68,7 +68,7 @@ describe("the panel", function()
     end)
 
     it("counts the single players shown", function()
-        assert.are.equal("2 of 3 players", panel.count.text)
+        assert.are.equal("2 of 3 players fit your filter", panel.count.text)
         -- centred at the bottom, under the build button: a long count never runs under it
         -- (Michel, 2026-11-13)
         assert.are.same({ "BOTTOM", panel, "BOTTOM", 0, 14 }, panel.count.points[1])
@@ -89,7 +89,7 @@ describe("the panel", function()
         assert.are.equal("0/3", fit())
         RUNSCRIPT(panel.resetButton, "OnClick")
         assert.are.equal("2/3", fit()) -- the level 35 mage is outside the dungeon's range
-        assert.are.equal("2 of 3 players", panel.count.text)
+        assert.are.equal("2 of 3 players fit your filter", panel.count.text)
         assert.is_true(panel.armorCheck.checked)
         -- the dungeon's range again, not 1-60 (Michel, 2026-11-13)
         assert.are.equal("20", panel.fromBox.text)
@@ -352,7 +352,7 @@ describe("the panel, after the release reviews", function()
         panel.fromBox:SetText("50")
         RUNSCRIPT(panel.fromBox, "OnEnterPressed")
         assert.are.equal("0/3", fit())
-        assert.are.equal("0 of 3 players - none fit your filter", panel.count.text)
+        assert.are.equal("No player of 3 fits your filter", panel.count.text)
     end)
 
     it("leaves a level being typed alone while the list refreshes", function()
@@ -390,5 +390,67 @@ describe("the panel, after the release reviews", function()
         for code, t in pairs(ns.locales) do
             assert.is_nil(rawget(t, "INVITE_NEXT"), code)
         end
+    end)
+end)
+
+-- Hovering a role's header or count lists the players that fit it (ruleset plan
+-- 2026-11-13-list-untouched, phase 2)
+describe("the role tooltip", function()
+    local function named(id, name, class, level, roles)
+        result(id, class, level, roles)
+        STATE.results[id].player.name = name
+    end
+
+    local function hover(role)
+        RUNSCRIPT(panel.rows[role].hover, "OnEnter")
+        return GameTooltip.lines
+    end
+
+    local function line(level, name, class)
+        local colour = class and RAID_CLASS_COLORS[class].colorStr or "ffffffff"
+        return ("[%s] | |c%s%s|r"):format(level, colour, name)
+    end
+
+    it("sits over the header and the count, in the filter view", function()
+        local hoverFrame = panel.rows.TANK.hover
+        assert.are.equal(panel.filterView, hoverFrame.parent)
+        assert.are.same({ "TOPLEFT", panel.rows.TANK.label, "TOPLEFT", 0, 0 }, hoverFrame.points[1])
+        assert.are.same({ "BOTTOMRIGHT", panel.rows.TANK.count, "BOTTOMRIGHT", 0, 0 }, hoverFrame.points[2])
+        RUNSCRIPT(hoverFrame, "OnEnter")
+        assert.are.equal(hoverFrame, GameTooltip.owner)
+    end)
+
+    it("names the role, then each player that fits it, by level and then name, in class colour", function()
+        named(4, "Bera", "DRUID", 27, { tank = true })
+        named(5, "Alda", "PALADIN", 27, { tank = true, healer = true })
+        named(6, "Cort", "WARRIOR", 19, { tank = true }) -- below the range: does not fit
+        FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
+        assert.are.same({
+            "Tank",
+            line(27, "Alda", "PALADIN"),
+            line(27, "Bera", "DRUID"),
+            line(25, "P1", "WARRIOR"),
+        }, hover("TANK"))
+        assert.are.equal(ns.RoleCounts().TANK, #GameTooltip.lines - 1)
+    end)
+
+    it("shows an unknown class in white and an unknown level as ?, last", function()
+        named(4, "Zed", nil, 0, { tank = true }) -- not loaded yet: fits, data unknown
+        FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
+        local lines = hover("TANK")
+        assert.are.equal(line("?", "Zed"), lines[#lines])
+    end)
+
+    it("shows 15 players at most, then how many more", function()
+        for i = 1, 20 do named(10 + i, ("T%02d"):format(i), "WARRIOR", 25, { tank = true }) end
+        FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
+        local lines = hover("TANK")
+        assert.are.equal(1 + 15 + 1, #lines)
+        assert.are.equal(21, ns.RoleCounts().TANK)
+        assert.are.equal(ns.L.TIP_MORE:format(21 - 15), lines[#lines])
+    end)
+
+    it("is the header alone while no player fits the role", function()
+        assert.are.same({ "Healer" }, hover("HEALER"))
     end)
 end)

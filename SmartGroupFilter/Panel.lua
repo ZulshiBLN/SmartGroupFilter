@@ -336,6 +336,38 @@ local function Icon(row)
     return icon
 end
 
+-- A player's level, or nil while the client has not given it (0 until loaded)
+local function KnownLevel(entry)
+    local level = entry.level
+    if type(level) == "number" and level > 0 then return level end
+    return nil
+end
+
+local function ByLevelThenName(a, b)
+    local la, lb = KnownLevel(a) or -1, KnownLevel(b) or -1
+    if la ~= lb then return la > lb end
+    return tostring(a.name or "") < tostring(b.name or "")
+end
+
+-- The players that fit a role: "[24] | Name", the name in class colour (Michel, 2026-11-13)
+local function RoleTooltip(hover)
+    local list = {}
+    for i, entry in ipairs(ns.RolePlayers(hover.role)) do list[i] = entry end
+    table.sort(list, ByLevelThenName)
+    GameTooltip:SetOwner(hover, "ANCHOR_RIGHT")
+    GameTooltip:AddLine(ROLE_TEXT[hover.role]())
+    for i = 1, math.min(#list, D.TIP_MAX_PLAYERS) do
+        local entry = list[i]
+        local colour = entry.class and RAID_CLASS_COLORS[entry.class]
+        GameTooltip:AddLine(("[%s] | |c%s%s|r"):format(KnownLevel(entry) or "?",
+            colour and colour.colorStr or "ffffffff", entry.name or "?"), 1, 1, 1)
+    end
+    if #list > D.TIP_MAX_PLAYERS then
+        GameTooltip:AddLine(L.TIP_MORE:format(#list - D.TIP_MAX_PLAYERS), 1, 1, 1)
+    end
+    GameTooltip:Show()
+end
+
 local function Row(parent, role, anchor, gap)
     local label = parent:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     ns.SetL(label, ROLE_TEXT[role])
@@ -346,6 +378,15 @@ local function Row(parent, role, anchor, gap)
     -- The players shown for this role, small and white beside the header
     row.count = parent:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     row.count:SetPoint("LEFT", label, "RIGHT", 4, 0)
+    -- Over header and count, a child of the filter view: the settings view hides it too
+    local hover = CreateFrame("Frame", nil, parent)
+    hover.role = role
+    hover:SetPoint("TOPLEFT", label, "TOPLEFT", 0, 0)
+    hover:SetPoint("BOTTOMRIGHT", row.count, "BOTTOMRIGHT", 0, 0)
+    hover:EnableMouse(true)
+    hover:SetScript("OnEnter", RoleTooltip)
+    hover:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    row.hover = hover
     local n = #db.order[role]
     row:SetSize(PER_LINE * SLOT, math.ceil(n / PER_LINE) * SLOT)
     row:SetPoint("TOPLEFT", label, "BOTTOMLEFT", 0, -4)

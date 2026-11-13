@@ -136,6 +136,7 @@ end
 ---------------------------------------------------------------------------
 local shownCount, totalCount = 0, 0
 local roleCounts = { TANK = 0, HEALER = 0, DAMAGER = 0 }
+local rolePlayers = { TANK = {}, HEALER = {}, DAMAGER = {} }
 local listeners = {}
 
 -- fn(fit, total) runs after every count: single players that fit and all single players
@@ -151,6 +152,11 @@ end
 
 function ns.Counts()
     return shownCount, totalCount
+end
+
+-- The entries behind a role's count, for its tooltip
+function ns.RolePlayers(role)
+    return rolePlayers[role] or {}
 end
 
 local function IsSingle(entry)
@@ -185,6 +191,7 @@ local function Count()
     local range, ownArmor = ns.LevelRange(), ns.OwnArmor()
     local shown, total = 0, 0
     local counts = { TANK = 0, HEALER = 0, DAMAGER = 0 }
+    local players = { TANK = {}, HEALER = {}, DAMAGER = {} }
     for i = 1, #ids do
         local entry = entries[i]
         if IsSingle(entry) then
@@ -192,19 +199,22 @@ local function Count()
             if ns.Passes(entry, db, range, ownArmor) then
                 shown = shown + 1
                 for role, field in pairs(ns.D.ROLE_FIELD) do
-                    if entry.roles and entry.roles[field] then counts[role] = counts[role] + 1 end
+                    if entry.roles and entry.roles[field] then
+                        counts[role] = counts[role] + 1
+                        players[role][#players[role] + 1] = entry
+                    end
                 end
             end
         end
     end
-    return shown, total, counts
+    return shown, total, counts, players
 end
 
 -- Counts anew and tells the listeners; secret results keep the counts as they were
 function ns.Recount()
     if not db then return end
-    local shown, total, counts = Count()
-    if shown then shownCount, totalCount, roleCounts = shown, total, counts end
+    local shown, total, counts, players = Count()
+    if shown then shownCount, totalCount, roleCounts, rolePlayers = shown, total, counts, players end
     for _, fn in ipairs(listeners) do fn(shownCount, totalCount) end
 end
 
