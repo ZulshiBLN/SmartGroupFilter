@@ -112,10 +112,13 @@ function ns.DryRun()
     ns.Print("Build Group test - nothing is sent.")
     local asked, roles, assigned = B.Roles()
     local function MemberRoles()
+        local late = state.lateRoles or {}
         for _, m in ipairs(state.members) do
             if asked and asked[m.name] then
                 local role = roles[m.name] and roles[m.name]:lower() or "no answer"
                 print(("  %s: %s%s"):format(m.name, role, assigned[m.name] and " (assigned)" or ""))
+            elseif late[m.name] then
+                print(("  %s: %s (assigned)"):format(m.name, state.memberRoles[m.name]:lower()))
             end
         end
     end

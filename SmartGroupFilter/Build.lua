@@ -58,7 +58,10 @@ local function Members()
         local name = ns.FullUnitName(unit)
         if name then
             local _, class = UnitClass(unit)
-            list[#list + 1] = { name = name, class = Clean(class), level = Clean(UnitLevel(unit)) }
+            list[#list + 1] = {
+                name = name, class = Clean(class), level = Clean(UnitLevel(unit)),
+                assigned = Clean(UnitGroupRolesAssigned(unit)),
+            }
         end
     end
     return list
@@ -188,6 +191,21 @@ local function RoleCounts(members)
     return n, known, assigned
 end
 
+-- The roles a click plans with: the answers of those asked, and each late joiner's - a member
+-- SGF neither asked nor invited - as he chose it on accepting (an invite makes him choose;
+-- Michel's test, 2026-11-11), read anew each time, never kept. Only once the set is fixed.
+local function PlanRoles(members)
+    local roles, late = {}, {}
+    for name, role in pairs(memberRoles) do roles[name] = role end
+    if not asked then return roles, late end
+    for _, m in ipairs(members) do
+        if not asked[m.name] and not placed[m.name] and m.assigned and D.PLACES[m.assigned] then
+            roles[m.name], late[m.name] = m.assigned, true
+        end
+    end
+    return roles, late
+end
+
 -- The text of a reason key; the role check's names how many answered
 function ns.BuildReason(why, state)
     if why == "ROLES_WAITING" then return L.ROLES_WAITING:format(state.known, state.asked) end
@@ -227,10 +245,12 @@ local function Plan()
         return nil, "ROLES_WAITING", { members = members, asked = rolesAsked, known = rolesKnown }
     end
     local _, class = UnitClass("player")
+    local roles, late = PlanRoles(members)
     local state = {
         own = { class = class, level = UnitLevel("player"), roles = C_LFGListRoles.GetRoles() },
         members = members, placed = placed, numGroupMembers = GetNumGroupMembers(),
-        candidates = Candidates(), db = db, range = ns.LevelRange(), memberRoles = memberRoles,
+        candidates = Candidates(), db = db, range = ns.LevelRange(), memberRoles = roles,
+        lateRoles = late,
     }
     -- The target a click keeps, or the one it would choose - read here, stored by the click only
     local own = OwnDungeons()

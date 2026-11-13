@@ -681,7 +681,7 @@ describe("members' roles", function()
     it("asks the members present when SGF first looks at a group", function()
         join("Fr")
         assert.are.equal("Fr", (roles()))
-        join("Fr", "Late") -- joins after: never asked
+        join("Fr", "Late") -- joins after: never asked, counts with his assigned role (late joiners)
         assert.are.equal("Fr", (roles()))
     end)
 
@@ -988,5 +988,90 @@ describe("assigned roles after Check Roles", function()
         assert.are.equal(2, state.asked)
         assert.are.equal(1, state.known)
         assert.are.equal(1, state.assigned)
+    end)
+end)
+
+-- A member who joins without an SGF invite after the asked set is fixed counts with the role he
+-- chose on accepting, read anew each time; he is never asked (ruleset plan
+-- 2026-11-13-review-fixes, phase 1)
+describe("late joiners", function()
+    -- join({ "Fr", "DAMAGER" }, ...): the members and the role assigned to each
+    local function join(...)
+        STATE.party = {}
+        for i, m in ipairs({ ... }) do
+            STATE.party[i] = { name = m[1], assigned = m[2], class = "HUNTER", level = 25 }
+        end
+        FIRE("GROUP_ROSTER_UPDATE")
+    end
+
+    local function chat()
+        return table.concat(CHAT, "\n")
+    end
+
+    before_each(function()
+        for i = #CHAT, 1, -1 do CHAT[i] = nil end
+    end)
+
+    it("count with their assigned role at once: no second tank", function()
+        join({ "Fr", "DAMAGER" })
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "HEALER")
+        join({ "Fr", "DAMAGER" }, { "War2", "TANK" })
+        fresh()
+        assert.are.equal("Build Group", button.text)
+        click()
+        assert.are.equal("Wlk Rog", table.concat(STATE.invites, " "))
+    end)
+
+    it("count with no role while theirs is none or secret", function()
+        join({ "Fr", "DAMAGER" })
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "HEALER")
+        join({ "Fr", "DAMAGER" }, { "Late", "NONE" })
+        assert.is_nil(select(3, ns.BuildDev.Plan()).memberRoles.Late)
+        join({ "Fr", "DAMAGER" }, { "Late", SECRET() })
+        assert.is_nil(select(3, ns.BuildDev.Plan()).memberRoles.Late)
+    end)
+
+    it("are read anew: a changed role counts, nothing is kept", function()
+        join({ "Fr", "DAMAGER" })
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "HEALER")
+        join({ "Fr", "DAMAGER" }, { "Late", "TANK" })
+        assert.are.equal("TANK", select(3, ns.BuildDev.Plan()).memberRoles.Late)
+        STATE.party[2].assigned = "DAMAGER"
+        assert.are.equal("DAMAGER", select(3, ns.BuildDev.Plan()).memberRoles.Late)
+        assert.is_nil(select(2, ns.BuildDev.Roles()).Late)
+    end)
+
+    it("leave a member asked without an answer waiting, and Check Roles never comes for them", function()
+        join({ "Fr", "DAMAGER" })
+        assert.are.equal("Check Roles", button.text)
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "HEALER")
+        join({ "Fr", "DAMAGER" }, { "Late", "TANK" })
+        assert.are.equal("Build Group", button.text)
+    end)
+
+    it("leave a player SGF invited with the place he was invited for", function()
+        click()
+        join({ "Pal", "HEALER" })
+        local state = select(3, ns.BuildDev.Plan())
+        assert.is_nil(state.memberRoles.Pal)
+    end)
+
+    it("wait for the set to be fixed: promoted, the members present are asked", function()
+        STATE.leader = false
+        join({ "Fr", "DAMAGER" }, { "Two", "TANK" })
+        STATE.leader = true
+        FIRE("PARTY_LEADER_CHANGED")
+        assert.are.equal("Check Roles", button.text)
+        local asked = ns.BuildDev.Roles()
+        assert.is_true(asked.Fr and asked.Two)
+    end)
+
+    it("are listed by /sgf test with their role", function()
+        join({ "Fr", "DAMAGER" })
+        FIRE("ROLE_CHANGED_INFORM", "Fr", "Me", "NONE", "HEALER")
+        join({ "Fr", "DAMAGER" }, { "Late", "TANK" })
+        SlashCmdList.SMARTGROUPFILTER("test")
+        assert.truthy(chat():find("Late: tank (assigned)", 1, true))
+        assert.truthy(chat():find("Fr: healer", 1, true))
     end)
 end)
