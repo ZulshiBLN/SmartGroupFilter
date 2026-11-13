@@ -1,28 +1,32 @@
 # SmartGroupFilter
 
 A helper for the Group Finder in World of Warcraft: Forever. It docks a panel beside Blizzard's
-own Looking For Group window, shortens the player list to the single players you need, and
-builds your five-player group with one click.
+own Looking For Group window, finds the single players you need in the player list, and builds
+your five-player group with one click.
 
 **Status: released** - version 1.0.0, for WoW Forever.
 
 ## How it works
 
 - **The panel** sits right of the Group Finder's side tabs and opens with the player list. A
-  fourth side tab with the logo shows and hides it; while it is hidden the list is Blizzard's.
+  fourth side tab with the logo shows and hides it. Blizzard's list always stays as Blizzard
+  shows it.
 - **Level range** - two fields and a slider; it starts at the dungeon you are listed for
   (Shadowfang Keep: 20-30) and keeps a range you set until you list for another dungeon.
 - **Priorities** - one row of class icons per role: tank, healer, damage. Drag an icon to reorder
-  the row; right-click it to exclude the class from that role. Beside each header: how many of
-  the players shown signed up for that role - "Tank (3 listed)".
+  the row; right-click it to exclude the class from that role. Beside each header: how many
+  players fit the filter and signed up for that role - "Tank (3 listed)". Hover the header to
+  see them, "[24] | Name" in class colour.
 - **Options** - *Allow double classes* (off: one player per class in the group, you included;
   on: two). *Allow same armor class* (on; off leaves out players who wear your armor - by class
   and level, as hunters, shamans, warriors and paladins change armor at 40).
-- **The filter** keeps the single players who fit: within the level range, signed up for a role
+- **The filter** picks the single players who fit: within the level range, signed up for a role
   whose row holds their class, or signed up without a role for any role their class can fill.
-  Groups and your own listing stay; delisted entries go. **Reset Filter** shows Blizzard's full
-  list until your next change or login and sets the level range back to your dungeon's. The
-  panel's bottom line, under Build Group, counts the players shown.
+  Groups and your own listing are not counted; delisted players never fit. It does not shorten
+  Blizzard's list: the panel counts and names who fits, and Build Group invites only them.
+  **Reset Filter** clears the exclusions, allows the same armor class again and sets the level
+  range back to your dungeon's. The panel's bottom line, under Build Group, counts the players
+  who fit.
 - **Build Group** invites the players your group lacks around your own role: one tank, one
   healer, three damage dealers, only from players listed for your dungeon. It fills the free
   places so that the most tanks and healers come, then the most players - a paladin listed as

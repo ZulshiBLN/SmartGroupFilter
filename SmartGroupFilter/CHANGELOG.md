@@ -9,18 +9,19 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
 
 - A panel docked beside the Group Finder's player list, opened and closed with it; a fourth side
   tab with the SmartGroupFilter logo, on the player list, shows and hides it.
-- The filter: the player list shows only the single players within the level range and fitting
-  your priority rows; groups and your own listing stay, delisted entries are hidden. Players
-  whose class and level arrive after the search are filtered as soon as they do. Inside an
-  instance, where the game hides the search results from addons, the list stays Blizzard's.
+- The filter: the panel counts the single players within the level range and fitting your
+  priority rows; groups and your own listing are not counted, delisted players never fit.
+  Blizzard's player list stays as Blizzard shows it. Players whose class and level arrive after
+  the search are counted as soon as they do. Inside an instance, where the game hides the search
+  results from addons, the counts stay as they were.
 - The level range as two fields and a slider, starting at the dungeon you are listed for.
 - One priority row of class icons per role - drag to reorder, right-click to exclude - and the
   options "Allow double classes" and "Allow same armor class" (off: classes of your armor get a
-  faint cross and leave the list). Saved per character.
-- Reset Filter shows Blizzard's full list until your next change or login and sets the level
-  range back to your dungeon's; the panel's bottom line counts the players shown - "none fit
-  your filter" when it leaves nobody - and each row's header the players shown who signed up
-  for its role - "Tank (3 listed)".
+  faint cross and do not fit). Saved per character.
+- Reset Filter clears the exclusions, allows the same armor class again and sets the level range
+  back to your dungeon's; the panel's bottom line counts the players who fit - "No player of 12
+  fits your filter" when none does - and each row's header those who signed up for its role -
+  "Tank (3 listed)". Hovering a role's header lists them, "[24] | Name" in class colour.
 - Build Group: one click invites the players your group lacks around your own role - one tank,
   one healer, three damage dealers - only from players listed for your dungeon, filling the most
   tank and healer places, then the most players; among equal fills by your rows, highest level

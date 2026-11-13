@@ -3,9 +3,9 @@
 **Your dungeon group in one click - without scrolling through the whole list.**
 Built for **WoW Forever**. Works for every class.
 
-SmartGroupFilter docks a panel beside Blizzard's own Group Finder window. It shortens the
-player list to the single players who fit your group - and with one click on **Build Group**
-it invites the tank, the healer and the damage dealers you are missing.
+SmartGroupFilter docks a panel beside Blizzard's own Group Finder window. It finds the single
+players in the list who fit your group - and with one click on **Build Group** it invites the
+tank, the healer and the damage dealers you are missing.
 
 ---
 
@@ -35,14 +35,15 @@ it invites the tank, the healer and the damage dealers you are missing.
 ## 🎯 Filter the players you need
 
 - **Priorities:** one row of class icons per role - drag to reorder, right-click to exclude a
-  class from a role. Each row shows how many players are listed for it.
+  class from a role. Each row shows how many players fit it; hover it to see them with their
+  level, in class colour.
 - **Level range:** two fields and a slider, starting at the dungeon you are listed for.
 - **Double classes:** one player per class in your group, or up to two.
 - **Armor class:** leave out players who wear your armor - by class and level, as hunters,
   shamans, warriors and paladins change armor at 40.
-- **Groups stay as they are:** the filter only touches single players. Delisted entries are
-  always hidden.
-- **Reset Filter** brings back Blizzard's full list.
+- **Blizzard's list stays as it is:** the filter only counts single players and never changes
+  the list. Delisted players never fit.
+- **Reset Filter** clears your exclusions and brings back the dungeon's level range.
 
 ## 🧭 Right where you need it
 
