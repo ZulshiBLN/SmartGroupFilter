@@ -4,7 +4,7 @@ A helper for the Group Finder in World of Warcraft: Forever. It docks a panel be
 own Looking For Group window, shortens the player list to the single players you need, and
 builds your five-player group with one click.
 
-**Status: in development** - version 0.1.0, not released yet.
+**Status: released** - version 1.0.0, for WoW Forever.
 
 ## How it works
 
@@ -53,7 +53,10 @@ builds your five-player group with one click.
 
 ## Installation
 
-Not published yet. Once it is, it will be on CurseForge and Wago, and WowUp will find it.
+Install it with WowUp, which finds SmartGroupFilter on its own, or download it from
+[CurseForge](https://www.curseforge.com/wow/addons/smartgroupfilter) or
+[Wago](https://addons.wago.io/addons/smartgroupfilter) and unpack it into
+`Interface\AddOns` of your WoW Forever folder.
 
 ## Chat commands
 

@@ -3,7 +3,7 @@
 This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow
 [Semantic Versioning](https://semver.org/).
 
-## [0.1.0] - Unreleased
+## [1.0.0] - 2026-11-13
 
 ### Added
 
@@ -11,7 +11,8 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   tab with the SmartGroupFilter logo, on the player list, shows and hides it.
 - The filter: the player list shows only the single players within the level range and fitting
   your priority rows; groups and your own listing stay, delisted entries are hidden. Players
-  whose class and level arrive after the search are filtered as soon as they do.
+  whose class and level arrive after the search are filtered as soon as they do. Inside an
+  instance, where the game hides the search results from addons, the list stays Blizzard's.
 - The level range as two fields and a slider, starting at the dungeon you are listed for.
 - One priority row of class icons per role - drag to reorder, right-click to exclude - and the
   options "Allow double classes" and "Allow same armor class" (off: classes of your armor get a
@@ -28,10 +29,11 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   A list older than 30 seconds is refreshed first with the same button. The chat names each
   invite; the tooltip says why the button is greyed out.
 - Listed for several dungeons, Build Group builds for the one where it finds the most tanks and
-  healers, then the most players, and names it in the chat; the group keeps it while it has members or pending invites.
+  healers, then the most players, and names it in the chat; the group keeps it while it has
+  members or pending invites.
 - Already in a group before the first Build Group, the button reads Check Roles and runs
   Blizzard's role check; once every member chose, it reads Build Group and their roles count.
-  A member who just confirms his role counts with it 15 seconds after the click.
+  A member who only confirms their role counts with it 15 seconds after the click.
   Asked once, until you are alone again - declines and run-out invites never bring it back.
 - A player listed for several roles or none gets an English whisper with the invite, "Tank for
   Shadowfang Keep?"; one listed for one role but several dungeons gets "You want to join for

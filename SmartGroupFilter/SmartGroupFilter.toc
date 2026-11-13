@@ -13,7 +13,7 @@
 ## Notes-zhCN: 队伍查找器助手：只显示你需要的单人玩家，一键组建队伍
 ## Notes-zhTW: 隊伍搜尋器助手：只顯示你需要的單人玩家，一鍵組建隊伍
 ## Author: ZulshiBLN
-## Version: 0.1.0
+## Version: 1.0.0
 ## X-License: MIT
 ## X-Curse-Project-ID: 1795082
 ## X-Wago-ID: YK9xql6L

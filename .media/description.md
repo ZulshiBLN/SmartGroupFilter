@@ -3,8 +3,6 @@
 **Your dungeon group in one click - without scrolling through the whole list.**
 Built for **WoW Forever**. Works for every class.
 
-> 🚧 **In development.** The first release is on its way.
-
 SmartGroupFilter docks a panel beside Blizzard's own Group Finder window. It shortens the
 player list to the single players who fit your group - and with one click on **Build Group**
 it invites the tank, the healer and the damage dealers you are missing.
