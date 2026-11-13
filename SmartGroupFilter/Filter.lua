@@ -206,8 +206,9 @@ local function Filter(results)
 end
 
 -- Rebuilds Blizzard's list from the results the client already has - no new search. Not while
--- the player has no roles: Blizzard's sort indexes them unchecked and errors (Michel's BugSack,
--- 2026-11-13, a character who never chose one); the list stays as Blizzard last drew it.
+-- the client gives no roles: Blizzard's sort indexes them unchecked and errors. Inside an
+-- instance GetRoles() is nil although the player is listed as damage (Michel's BugSack,
+-- 2026-11-13); the list stays as Blizzard last drew it.
 function ns.RefreshList()
     if not (LFGBrowseFrame and LFGBrowseFrame:IsShown()) then return end
     if C_LFGListRoles.GetRoles() == nil then return end

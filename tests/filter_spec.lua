@@ -251,10 +251,11 @@ describe("the level range", function()
     end)
 end)
 
--- Blizzard's sort errors while the player has no roles (Michel's BugSack, 2026-11-13): SGF
+-- Blizzard's sort errors while the client gives no roles - inside an instance, though listed
+-- (Michel's BugSack, 2026-11-13): SGF
 -- never rebuilds the list then - Blizzard's own redraws stay Blizzard's
-describe("a character without roles", function()
-    it("gets no list rebuild from SGF until a role is chosen", function()
+describe("no roles from the client", function()
+    it("means no list rebuild from SGF until they are back", function()
         LFGBrowseFrame:UpdateResultList()
         local before = table.concat(LFGBrowseFrame.results, " ")
         STATE.ownRoles = nil
