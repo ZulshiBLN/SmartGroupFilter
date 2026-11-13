@@ -78,6 +78,9 @@ describe("the panel", function()
     end)
 
     it("resets to Blizzard's list with Reset Filter, and filters again at the next change", function()
+        RUNSCRIPT(panel, "OnShow")
+        panel.toBox:SetText("24")
+        RUNSCRIPT(panel.toBox, "OnEnterPressed") -- a range set by hand
         RUNSCRIPT(panel.rows.TANK.icons[2], "OnClick", "RightButton") -- warrior out
         panel.armorCheck:SetChecked(false)
         RUNSCRIPT(panel.armorCheck, "OnClick") -- the mages out
@@ -86,11 +89,12 @@ describe("the panel", function()
         assert.are.equal("1 2 3", shown())
         assert.are.equal("3 of 3 players", panel.count.text)
         assert.is_true(panel.armorCheck.checked)
-        assert.are.equal("1", panel.fromBox.text)
-        assert.are.equal("60", panel.toBox.text)
+        -- the dungeon's range again, not 1-60 (Michel, 2026-11-13); the list is Blizzard's anyway
+        assert.are.equal("20", panel.fromBox.text)
+        assert.are.equal("30", panel.toBox.text)
         assert.is_false(panel.rows.TANK.icons[2].cross.shown)
         RUNSCRIPT(panel.rows.TANK.icons[2], "OnClick", "RightButton")
-        assert.are.equal("2 3", shown())
+        assert.are.equal("2", shown()) -- filtering again, by the dungeon's range
     end)
 
     it("greys the classes of the player's armor while same armor is not allowed", function()

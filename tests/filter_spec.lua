@@ -173,13 +173,14 @@ describe("the filter", function()
         db.order.TANK = { "DRUID", "PALADIN", "WARRIOR" }
         result(1, "MAGE", 25, { dps = true })
         result(2, "MAGE", 45, { dps = true }, { isDelisted = true })
+        ns.SetLevelRange(40, 50) -- set by hand
         ns.ResetFilter()
         assert.are.equal("1 2", shown())
         assert.are.same({}, db.excluded.DAMAGER)
         assert.is_true(db.allowSameArmor)
         assert.are.equal("DRUID PALADIN WARRIOR", table.concat(db.order.TANK, " "))
-        assert.are.equal(1, ns.LevelRange().min)
-        assert.are.equal(60, ns.LevelRange().max)
+        assert.are.equal(20, ns.LevelRange().min) -- the dungeon's range again (Michel, 2026-11-13)
+        assert.are.equal(30, ns.LevelRange().max)
         ns.FilterChanged()
         assert.are.equal("1", shown()) -- filtering again: the delisted entry goes
     end)

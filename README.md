@@ -21,8 +21,8 @@ builds your five-player group with one click.
 - **The filter** keeps the single players who fit: within the level range, signed up for a role
   whose row holds their class, or signed up without a role for any role their class can fill.
   Groups and your own listing stay; delisted entries go. **Reset Filter** shows Blizzard's full
-  list until your next change or login. The panel's bottom line, under Build Group, counts the
-  players shown.
+  list until your next change or login and sets the level range back to your dungeon's. The
+  panel's bottom line, under Build Group, counts the players shown.
 - **Build Group** invites the players your group lacks around your own role: one tank, one
   healer, three damage dealers, only from players listed for your dungeon. It fills the free
   places so that the most tanks and healers come, then the most players - a paladin listed as

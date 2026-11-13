@@ -130,6 +130,11 @@ function ns.SetLevelRange(from, to)
     manual = { key = ActivityKey(Activities()), min = from, max = to }
 end
 
+-- Forgets the range set by hand: the dungeon's range again
+function ns.ClearLevelRange()
+    manual = nil
+end
+
 ---------------------------------------------------------------------------
 -- The hook
 ---------------------------------------------------------------------------
@@ -222,15 +227,16 @@ function ns.FilterChanged()
     ns.RefreshList()
 end
 
--- Reset Filter: Blizzard's own list again - no exclusion, every level, same armor allowed,
--- the filter off until the next change. The rows' order is kept (Michel, 2026-11-10).
+-- Reset Filter: Blizzard's own list again - no exclusion, same armor allowed, the filter off
+-- until the next change. The rows' order is kept (Michel, 2026-11-10). The level range goes back
+-- to the dungeon's, not 1-60 (Michel, 2026-11-13): the list is Blizzard's until a change anyway.
 function ns.ResetFilter()
     for _, role in ipairs(ns.D.ROLES) do db.excluded[role] = {} end
     db.allowSameArmor = true
     filterOn = false
     ns.Log("reset filter")
     ns.LogSettings()
-    ns.SetLevelRange(1, GetMaxPlayerLevel and GetMaxPlayerLevel() or 60)
+    ns.ClearLevelRange()
     ns.RefreshList()
 end
 
