@@ -46,13 +46,13 @@ local function Known(entry)
     return entry.class ~= nil and type(entry.level) == "number" and entry.level >= 1
 end
 
--- Does Blizzard's list keep this entry? range: { min, max }; ownArmor: the player's armor
--- class, which the list leaves out while "Allow same armor class" is off
+-- Does this entry fit the filter? range: { min, max }; ownArmor: the player's armor class,
+-- left out while "Allow same armor class" is off
 function ns.Passes(entry, db, range, ownArmor)
     if entry.isDelisted then return false end
-    if not IsSingle(entry) then return true end -- groups and the own listing stay
-    -- Class or level not loaded yet (the client reports level 0 then): shown as Blizzard
-    -- shows him; Filter.lua filters again once the client updates the result
+    if not IsSingle(entry) then return true end -- groups and the own listing are not judged
+    -- Class or level not loaded yet (the client reports level 0 then): fits until known;
+    -- Filter.lua counts again once the client updates the result
     if not Known(entry) then return true end
     if entry.level < range.min or entry.level > range.max then return false end
     if not db.allowSameArmor and ownArmor and ns.ArmorOf(entry.class, entry.level) == ownArmor then

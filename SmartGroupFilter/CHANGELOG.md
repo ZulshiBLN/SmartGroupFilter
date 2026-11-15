@@ -52,6 +52,7 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
   window background: a slider from invisible to solid for the panel and the bug report.
 - A bug report: `/sgf bug` or the button in the settings opens a window where you describe the
   bug; it shows a code to copy into a GitHub issue. It holds SmartGroupFilter's state and its
-  errors, never another player's name.
+  errors, and removes your character, your group and every name the Group Finder showed; a name
+  it never saw can remain in what you type.
 - The addon loads in every client language and answers `/sgf` with its chat commands; its icon
   in the AddOn list is the SmartGroupFilter logo.

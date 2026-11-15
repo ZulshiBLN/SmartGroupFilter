@@ -420,12 +420,6 @@ function RUNTIMERS()
     for _, fn in ipairs(due) do fn() end
 end
 
--- Templates the client knows: STATE.templates
-STATE.templates = { LFGVanillaRightTabTemplate = true, LargeSideTabButtonTemplate = true }
-C_XMLUtil = {
-    GetTemplateInfo = function(name) return STATE.templates[name] and {} or nil end,
-}
-
 -- Blizzard's switch to the Group Browser page (Blizzard_LFGVanilla_ParentFrame.lua)
 STATE.tab2Clicks = 0
 function LFGParentFrameTab2_OnClick()
