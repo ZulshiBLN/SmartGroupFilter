@@ -20,3 +20,11 @@ The panel docks beside the Group Finder's player list: set a level range, pick t
 **02 – Who fits**
 
 Hover a role's header: its tooltip lists the players who fit, with their level and their name in class colour, highest level first.
+
+## 04-settings-and-languages.jpg
+
+**Title:** Eleven languages, your look
+
+**04 – Settings and languages**
+
+The gear opens the settings: let the addon follow your client's language or pick one of eleven, and set how dark the window background is.
