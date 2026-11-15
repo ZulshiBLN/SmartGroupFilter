@@ -82,7 +82,7 @@ end
 
 -- The dungeon Build Group builds for, of the own dungeons (activityIDs, the listing's order):
 -- the one for which ChooseInvites would fill the most tank and healer places - they are rare,
--- damage dealers are not (Michel, 2026-11-11) - then the most players; a tie goes to the
+-- damage dealers are not (2026-11-11) - then the most players; a tie goes to the
 -- earlier. state as for ChooseInvites, without dungeons.
 function ns.ChooseTarget(state, dungeons)
     if #dungeons <= 1 then return dungeons[1] end
@@ -190,7 +190,7 @@ function ns.ChooseInvites(state)
     -- The best fill of the open places from one pool: the most tank and healer places, then the
     -- most players. The search tries each place's candidates in priority order, the place left
     -- empty last, and only a strictly better fill replaces the one found - so among equals the
-    -- fill priority would choose stays, a filled place before an empty one (Michel, 2026-11-11:
+    -- fill priority would choose stays, a filled place before an empty one (2026-11-11:
     -- one place after another left a healer place empty that a tank-only player could free).
     local function BestFill(pool)
         local slots, ranked = {}, {}
@@ -255,7 +255,7 @@ function ns.ChooseInvites(state)
     end
 
     -- Everyone who signed up for a role first; players with no role only for what is left,
-    -- strictly (Michel, 2026-11-11)
+    -- strictly (2026-11-11)
     BestFill(signed)
     BestFill(unsigned)
     return chosen, nil, info

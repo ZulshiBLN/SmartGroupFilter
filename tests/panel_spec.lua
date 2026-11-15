@@ -70,7 +70,7 @@ describe("the panel", function()
     it("counts the single players shown", function()
         assert.are.equal("2 of 3 players fit your filter", panel.count.text)
         -- centred at the bottom, under the build button: a long count never runs under it
-        -- (Michel, 2026-11-13)
+        -- (2026-11-13)
         assert.are.same({ "BOTTOM", panel, "BOTTOM", 0, 14 }, panel.count.points[1])
     end)
 
@@ -91,7 +91,7 @@ describe("the panel", function()
         assert.are.equal("2/3", fit()) -- the level 35 mage is outside the dungeon's range
         assert.are.equal("2 of 3 players fit your filter", panel.count.text)
         assert.is_true(panel.armorCheck.checked)
-        -- the dungeon's range again, not 1-60 (Michel, 2026-11-13)
+        -- the dungeon's range again, not 1-60 (2026-11-13)
         assert.are.equal("20", panel.fromBox.text)
         assert.are.equal("30", panel.toBox.text)
         assert.is_false(panel.rows.TANK.icons[2].cross.shown)
@@ -125,7 +125,7 @@ describe("the panel", function()
 
     it("shows and hides the panel with a fourth side tab, remembered, Blizzard's list untouched", function()
         local tab = ns.tab
-        assert.are.equal(LFGBrowseFrame, tab.parent) -- on the Group Browser only (Michel)
+        assert.are.equal(LFGBrowseFrame, tab.parent) -- on the Group Browser only
         assert.are.equal("LargeSideTabButtonTemplate", tab.template)
         assert.are.same({ "TOPLEFT", LFGParentFrame.WhoListingTab, "BOTTOMLEFT", 0, -2 }, tab.points[1])
         assert.are.equal("Interface\\AddOns\\SmartGroupFilter\\Media\\Tab", tab.Icon.textureFile)

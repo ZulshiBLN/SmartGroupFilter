@@ -66,11 +66,11 @@ D.HOLD_SECONDS = 120
 D.INVITES_PER_CLICK = 5
 
 -- Search results older than this, in seconds, are searched anew before Build Group invites
--- (Michel, 2026-11-11)
+-- (2026-11-11)
 D.LIST_FRESH_SECONDS = 30
 
 -- After a Check Roles click, how long answers are awaited before a member's assigned role
--- counts, in seconds: confirming the preselected role sends no event (Michel, 2026-11-11)
+-- counts, in seconds: confirming the preselected role sends no event (2026-11-11)
 D.ROLE_WAIT = 15
 
 -- The whisper to a player whose sign-up is ambiguous (ruleset plan 2026-11-11-build-dungeon).
@@ -105,7 +105,7 @@ D.WINDOW_OPACITY_TODAY = 60
 
 -- The project's logo, shipped as Media/Logo.tga: the panel's portrait (cut to the medallion)
 D.LOGO = "Interface\\AddOns\\SmartGroupFilter\\Media\\Logo"
--- The portrait's shift from the template's place, x and y in px: left and up (Michel, in game)
+-- The portrait's shift from the template's place, x and y in px: left and up (in-game test)
 D.PORTRAIT_NUDGE = { -2, 2 }
 -- List Self's pointer on Blizzard's eye tab: the modern client's proc loop, as
 -- SmartBlessingBar's button glow - Blizzard's flipbook atlas of 6 x 5 cells, 30 frames, 1.4

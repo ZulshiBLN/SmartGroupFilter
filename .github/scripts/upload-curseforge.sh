@@ -28,7 +28,7 @@ fi
 project=$(toc_field X-Curse-Project-ID)
 if ! [[ "$project" =~ ^[0-9]+$ ]]; then
     # Until the store project exists a rehearsal checks everything else; a real upload stops
-    # here (Michel, 2026-11-09)
+    # here (2026-11-09)
     [ -n "$dry" ] || fail "no numeric X-Curse-Project-ID in the TOC"
     echo "NOTE: no X-Curse-Project-ID in the TOC yet - a dry run goes on, a release would stop here"
     project="(none yet)"

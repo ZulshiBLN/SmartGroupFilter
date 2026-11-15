@@ -175,7 +175,7 @@ end
 ---------------------------------------------------------------------------
 -- Window background, 0 % invisible to 100 % solid, for the panel and the bug report (ruleset
 -- plan 2026-11-11-window-opacity). Dragging saves and applies at once; the field beside it
--- takes a typed 0-100, anything else shows the previous value again (Michel).
+-- takes a typed 0-100, anything else shows the previous value again.
 ---------------------------------------------------------------------------
 local function OpacitySlider(view, anchor)
     local label = view:CreateFontString(nil, "OVERLAY", "GameFontHighlight")

@@ -854,7 +854,7 @@ describe("Check Roles", function()
     end)
 end)
 
--- The role a member confirmed unchanged sends no event (Michel's test, 2026-11-11): 15 s after
+-- The role a member confirmed unchanged sends no event (in-game test of 2026-11-11): 15 s after
 -- a Check Roles click the role assigned to him counts (ruleset plan 2026-11-11-roles-and-places,
 -- phase 5)
 describe("assigned roles after Check Roles", function()

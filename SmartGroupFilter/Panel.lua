@@ -2,7 +2,7 @@
 -- The panel beside Blizzard's player list (ruleset plan 2026-11-10-panel-filter-build, phase 3):
 -- Reset Filter and the count, level range, the three priority rows, the two options. A child of
 -- LFGBrowseFrame, so it shows and hides with the list; docked right of the window's side tabs.
--- A fourth side tab with the project's logo shows and hides it (Michel, 2026-11-10).
+-- A fourth side tab with the project's logo shows and hides it (2026-11-10).
 
 local _, ns = ...
 local D, L = ns.D, ns.L
@@ -263,7 +263,7 @@ local function LayoutRow(row)
         icon.texture:SetAtlas(D.CLASS_ATLAS[class])
         local excluded = db.excluded[row.role][class] and true or false
         icon.sameArmor = SameArmor(class)
-        -- Excluded: the full red cross; the player's armor: the same cross, fainter (Michel)
+        -- Excluded: the full red cross; the player's armor: the same cross, fainter
         icon.texture:SetDesaturated(excluded or icon.sameArmor)
         icon.cross:SetShown(excluded or icon.sameArmor)
         icon.cross:SetAlpha(excluded and 1 or SAME_ARMOR_ALPHA)
@@ -343,7 +343,7 @@ local function ByLevelThenName(a, b)
     return tostring(a.name or "") < tostring(b.name or "")
 end
 
--- The players that fit a role: "[24] | Name", the name in class colour (Michel, 2026-11-13)
+-- The players that fit a role: "[24] | Name", the name in class colour (2026-11-13)
 local function RoleTooltip(hover)
     local list = {}
     for i, entry in ipairs(ns.RolePlayers(hover.role)) do list[i] = entry end
@@ -437,7 +437,7 @@ end
 -- visible. A child of LFGBrowseFrame: it shows on the Group Browser only and shows or hides the
 -- panel there. SGF cannot switch the Group Finder's pages safely: Blizzard's hidden tab buttons
 -- fail in the modern style, and its page switch run from addon code taints what its search and
--- its listing read (Michel's choice, 2026-11-11; archive/incidents.md).
+-- its listing read (decided 2026-11-11; archive/incidents.md).
 local function ToggleTab()
     local tab = CreateFrame("Frame", "SmartGroupFilterTab", LFGBrowseFrame, "LargeSideTabButtonTemplate")
     ns.tab = tab
@@ -487,7 +487,7 @@ function ns.PointToListing()
     if not glow then
         -- The modern client's proc loop, as SmartBlessingBar's button glow (ns.AttachAnts):
         -- Blizzard's flipbook atlas of 6 x 5 cells, 30 frames, 1.4 times the tab, on a frame of
-        -- SGF's own above Blizzard's tab - the tab itself is not touched (Michel, 2026-11-11)
+        -- SGF's own above Blizzard's tab - the tab itself is not touched (2026-11-11)
         glow = CreateFrame("Frame", nil, LFGParentFrame)
         ns.listingGlow = glow
         glow:SetAllPoints(target)
@@ -541,7 +541,7 @@ local function Create()
     ns.ApplyWindowOpacity(panel, db.windowOpacity)
     if panel.SetPortraitToAsset then panel:SetPortraitToAsset(D.LOGO) end
     -- The template places the portrait a little right of and below the ring's centre for this
-    -- logo (Michel, in game): moved by D.PORTRAIT_NUDGE from wherever the template put it
+    -- logo (in-game test): moved by D.PORTRAIT_NUDGE from wherever the template put it
     local portrait = panel.GetPortrait and panel:GetPortrait()
     if portrait and portrait:GetNumPoints() > 0 then
         local point, rel, relPoint, x, y = portrait:GetPoint(1)
@@ -551,7 +551,7 @@ local function Create()
     panel:GetTitleText():SetText(ns.ADDON_NAME)
 
     -- The count centred at the very bottom, the build button above it: "none fit your filter"
-    -- ran under the button in the corner (Michel, 2026-11-13). Reset Filter at the top right
+    -- ran under the button in the corner (2026-11-13). Reset Filter at the top right
     panel.count = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     panel.count:SetPoint("BOTTOM", panel, "BOTTOM", 0, 14)
     -- The filter view: every filter control is its child, so the settings view (Settings.lua)
@@ -588,7 +588,7 @@ local function Create()
     ns.SliderTrack(slider)
     slider.handles = { Handle(slider, 1), Handle(slider, 2) }
 
-    -- Gold line, then the priority section under its header (Michel, after SCB and SBB)
+    -- Gold line, then the priority section under its header (after SCB and SBB)
     panel.separators = { Separator(view, slider, 12) }
     panel.prioHeader = Header(view, "PRIORITIES")
     panel.prioHeader:SetPoint("TOPLEFT", panel.separators[1], "BOTTOMLEFT", 0, -12)

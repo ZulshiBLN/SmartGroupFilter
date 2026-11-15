@@ -39,7 +39,7 @@ end
 
 -- One search result as the plain entry Logic.lua reads, or nil when the client has none;
 -- nil, "secret" while the client hides the result: in an instance every field is a secret
--- (Michel's BugSack, 2026-11-11)
+-- (a BugSack of 2026-11-11)
 function ns.ReadEntry(id)
     local info = C_LFGList.GetSearchResultInfo(id)
     if not info then return nil end
@@ -162,7 +162,7 @@ function ns.OnCounted(fn)
 end
 
 -- Single players that fit, by the roles they signed up for (one with several counts for each;
--- one with none for none) - shown beside the rows' headers (Michel, 2026-11-11)
+-- one with none for none) - shown beside the rows' headers (2026-11-11)
 function ns.RoleCounts()
     return roleCounts
 end
@@ -253,8 +253,8 @@ function ns.FilterChanged()
     ns.Recount()
 end
 
--- Reset Filter: no exclusion, same armor allowed, the dungeon's level range (Michel,
--- 2026-11-13). The rows' order is kept (Michel, 2026-11-10).
+-- Reset Filter: no exclusion, same armor allowed, the dungeon's level range
+-- (2026-11-13). The rows' order is kept (2026-11-10).
 function ns.ResetFilter()
     for _, role in ipairs(ns.D.ROLES) do db.excluded[role] = {} end
     db.allowSameArmor = true

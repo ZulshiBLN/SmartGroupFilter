@@ -1,4 +1,4 @@
--- /sgf test is for development only (Michel, 2026-11-11): DevTest.lua is loaded by the TOC
+-- /sgf test is for development only (2026-11-11): DevTest.lua is loaded by the TOC
 -- between #@do-not-package@ markers and left out by .pkgmeta, so a release lacks it.
 
 local addon = require("addon")

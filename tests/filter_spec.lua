@@ -174,7 +174,7 @@ describe("the count", function()
         assert.are.equal(1, #STATE.timers)
     end)
 
-    -- In an instance the client gives every field of a result as a secret (Michel's BugSack,
+    -- In an instance the client gives every field of a result as a secret (a BugSack of
     -- 2026-11-11): the counts stay as they were, nothing errors
     it("keeps its counts while the results are secret", function()
         result(1, "MAGE", 25, { dps = true })
@@ -253,7 +253,7 @@ describe("Reset Filter", function()
         assert.are.same({}, db.excluded.DAMAGER)
         assert.is_true(db.allowSameArmor)
         assert.are.equal("DRUID PALADIN WARRIOR", table.concat(db.order.TANK, " "))
-        assert.are.equal(20, ns.LevelRange().min) -- the dungeon's range again (Michel, 2026-11-13)
+        assert.are.equal(20, ns.LevelRange().min) -- the dungeon's range again (2026-11-13)
         assert.are.equal(30, ns.LevelRange().max)
         assert.are.equal("1/2", fit()) -- counted again by the reset filter
     end)

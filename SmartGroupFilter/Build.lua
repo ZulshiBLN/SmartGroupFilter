@@ -5,7 +5,7 @@
 --
 -- Placed players - the ones SGF invited - keep their role's place: while the invite is open
 -- (D.HOLD_SECONDS), then as long as they are in the group. An invite declined or left to run
--- out opens the place again, and that player is not invited again this session (Michel).
+-- out opens the place again, and that player is not invited again this session.
 
 local _, ns = ...
 local D, L = ns.D, ns.L
@@ -30,7 +30,7 @@ local Clean = ns.Clean
 
 -- A unit's name as the Group Finder writes it. WoW Forever gave characters surnames:
 -- UnitName says "Testa", the Group Finder and whispers need "Testa Name", which
--- GetUnitName(unit, true) gives (Michel's dump, 2026-11-11). Without it: name and realm.
+-- GetUnitName(unit, true) gives (dump of 2026-11-11). Without it: name and realm.
 function ns.FullUnitName(unit)
     if GetUnitName then
         local full = Clean(GetUnitName(unit, true))
@@ -184,8 +184,8 @@ local function RoleCounts(members)
 end
 
 -- The roles a click plans with: the answers of those asked, and each late joiner's - a member
--- SGF neither asked nor invited - as he chose it on accepting (an invite makes him choose;
--- Michel's test, 2026-11-11), read anew each time, never kept. Only once the set is fixed.
+-- SGF neither asked nor invited - as they chose it on accepting (an invite makes them choose;
+-- in-game test of 2026-11-11), read anew each time, never kept. Only once the set is fixed.
 local function PlanRoles(members)
     local roles, late = {}, {}
     for name, role in pairs(memberRoles) do roles[name] = role end
@@ -232,7 +232,7 @@ local function Plan()
         return nil, "NOT_LEADER"
     end
     if #members > 0 then FixAsked(members) end
-    -- Check Roles: Build Group waits until every member asked has chosen a role (Michel)
+    -- Check Roles: Build Group waits until every member asked has chosen a role
     local rolesAsked, rolesKnown = RoleCounts(members)
     if rolesKnown < rolesAsked then
         return nil, "ROLES_WAITING", { members = members, asked = rolesAsked, known = rolesKnown }
@@ -264,7 +264,7 @@ end
 
 local button
 
--- Two steps on one button (Michel, 2026-11-11): results older than D.LIST_FRESH_SECONDS are
+-- Two steps on one button (2026-11-11): results older than D.LIST_FRESH_SECONDS are
 -- searched anew first - the search needs a click of its own, and the invites must come from
 -- a click too (ruleset K5), so one click cannot search and then invite.
 local lastResults -- GetTime() when the last search results arrived
@@ -281,7 +281,7 @@ end
 -- The button is a secure action button: in refresh mode it clicks Blizzard's own refresh arrow
 -- (type "click"), so the protected search runs in Blizzard's secure code. Calling Blizzard's
 -- search from addon code tainted LFGBrowseFrame.searching and later blocked Blizzard's own
--- Search() (Michel's BugSack, 2026-11-11; ruleset K5). A secure button cannot change in
+-- Search() (a BugSack of 2026-11-11; ruleset K5). A secure button cannot change in
 -- combat: there the button keeps what it had.
 local function SetMode(mode)
     if InCombatLockdown() then return false end
@@ -304,7 +304,7 @@ end
 function ns.UpdateBuildButton()
     if not button or InCombatLockdown() then return end
     local list, why, state = Plan()
-    -- Not listed: List Self points at Blizzard's eye tab; listing stays Blizzard's (Michel)
+    -- Not listed: List Self points at Blizzard's eye tab; listing stays Blizzard's
     if why == "NEED_LISTING" then
         SetMode("list")
         button.reason, button.reasonKey = L.LIST_SELF_TIP, "LIST_SELF_TIP"
@@ -336,7 +336,7 @@ end
 
 
 -- What to whisper with the invite, or nil: listed for several roles or none - which role;
--- for one role but several dungeons - which dungeon (Michel, 2026-11-11)
+-- for one role but several dungeons - which dungeon (2026-11-11)
 local function WhisperText(c, entry, dungeon)
     local roles = 0
     for _, field in pairs(D.ROLE_FIELD) do
@@ -363,7 +363,7 @@ local function Whisper(c, state)
     ns.Log(("whisper %s %s %s%s"):format(kind, c.role, tostring(state.target), ok and "" or " failed"))
 end
 
--- Blizzard's role check: every member gets its role window when the leader asks (Michel's test,
+-- Blizzard's role check: every member gets its role window when the leader asks (in-game test,
 -- 2026-11-11). From the button's click only (ruleset K5); never in combat.
 local function AskRoles()
     if InCombatLockdown() then return ns.Print(L.NOT_IN_COMBAT) end
@@ -436,7 +436,7 @@ function ns.CreateBuildButton(parent)
     button:SetScript("OnLeave", function() GameTooltip:Hide() end)
     ns.OnCounted(ns.UpdateBuildButton)
     -- Invites run out and lists grow old without an event: look again every second while the
-    -- button is shown (Michel saw it stay greyed after a player was already in a group)
+    -- button is shown (an in-game test saw it stay greyed after a player was already in a group)
     local since = 0
     button:SetScript("OnUpdate", function(_, elapsed)
         since = since + elapsed
@@ -486,7 +486,7 @@ end
 
 -- An active decline: the client's system message ERR_DECLINE_GROUP_S ("%s declines your group
 -- invitation.", in the client's language). The place opens at once, and the player is not
--- invited again this session (Michel, 2026-11-10).
+-- invited again this session (2026-11-10).
 -- ERR_ALREADY_IN_GROUP_S ("%s is already in a group.") counts the same: he cannot come.
 local declinePatterns
 local function Pattern(format)

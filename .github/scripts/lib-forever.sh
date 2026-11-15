@@ -20,7 +20,7 @@ interface_to_version() {
 }
 
 # Picks the version to file under from the versions a site lists (stdin, one
-# per line). Michel's rule of 2026-10-18, as the packager does it: the exact
+# per line). The rule of 2026-10-18, as the packager does it: the exact
 # version; else the highest listed below it; else the highest listed - both
 # with a warning. Nothing listed: fail. Versions compare numerically
 # (sort -V); a string comparison would put 1.100.0 below 1.60.1.

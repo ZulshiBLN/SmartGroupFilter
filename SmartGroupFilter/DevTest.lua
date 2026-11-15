@@ -1,8 +1,8 @@
 -- SmartGroupFilter - development test
 -- /sgf test: what the next click of Build Group would do and why - the target dungeon, the
--- invites and their whispers - sending nothing (Michel, 2026-11-10). Development only: the TOC
+-- invites and their whispers - sending nothing (2026-11-10). Development only: the TOC
 -- loads this file between #@do-not-package@ markers and .pkgmeta leaves it out, so a release
--- has no /sgf test (Michel, 2026-11-11). Technical output, English on purpose (ruleset
+-- has no /sgf test (2026-11-11). Technical output, English on purpose (ruleset
 -- localization.md).
 
 local _, ns = ...

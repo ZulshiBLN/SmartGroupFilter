@@ -275,7 +275,7 @@ local function CreateWindow()
     frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
     frame:SetFrameStrata("DIALOG")
     frame:SetMovable(true)
-    frame:SetClampedToScreen(true) -- dragging stops at the screen's edge (Michel, 2026-11-15)
+    frame:SetClampedToScreen(true) -- dragging stops at the screen's edge (2026-11-15)
     frame:EnableMouse(true)
     frame:RegisterForDrag("LeftButton")
     frame:SetScript("OnDragStart", function(self) if not self.docked then self:StartMoving() end end)
@@ -437,7 +437,7 @@ local function CreateWindow()
 end
 
 -- Docked right of the panel, as tall as it and not movable (the settings' button), or its own
--- window in the middle of the screen (/sgf bug) - Michel, 2026-11-11
+-- window in the middle of the screen (/sgf bug) (2026-11-11)
 local FREE_HEIGHT = 580
 local function Place(docked)
     local panel = ns.panel

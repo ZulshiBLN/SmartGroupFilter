@@ -228,7 +228,7 @@ function RUNSCRIPT(frame, name, ...)
 end
 
 ---------------------------------------------------------------------------
--- Group Finder, as the Forever client (1.60.1) shows it: Michel's dumps of 2026-11-10 and
+-- Group Finder, as the Forever client (1.60.1) shows it: dumps of 2026-11-10 and
 -- Blizzard_LFGVanilla_Browse.lua. STATE.results: id -> { info = GetSearchResultInfo's table,
 -- player = GetSearchResultPlayerInfo(id, 1)'s table, members = a group's player tables, 1 the
 -- leader }; STATE.order: the ids in list order.
@@ -240,7 +240,7 @@ STATE.activeEntry = nil -- GetActiveEntryInfo's table while the player is listed
 STATE.maxLevel = 60
 STATE.secret = {}       -- values issecretvalue reports as secret
 
--- A secret value as the client gives one in an instance (Michel's BugSack, 2026-11-11):
+-- A secret value as the client gives one in an instance (a BugSack of 2026-11-11):
 -- measuring, indexing, comparing or joining it errors, as in the client
 local secrets = setmetatable({}, { __mode = "k" })
 function SECRET()
@@ -306,7 +306,7 @@ local function BuildResultList(self)
     for i, id in ipairs(STATE.order) do results[i] = id end
     self.totalResults, self.results = #results, results
     -- Blizzard's sort indexes the player's roles unchecked; inside an instance the client gives
-    -- none, and it errors (Michel's BugSack, 2026-11-13)
+    -- none, and it errors (a BugSack of 2026-11-13)
     if C_LFGListRoles.GetRoles() == nil then
         error("attempt to index local 'playerRoles' (a nil value)")
     end
@@ -354,7 +354,7 @@ function UnitGroupRolesAssigned(unit)
     return u and u.assigned or "NONE"
 end
 -- WoW Forever: a first name and a surname. UnitName gives the first name, GetUnitName(unit,
--- true) both, UnitFullName the two apart (Michel's dump, 2026-11-11). A unit's name in STATE
+-- true) both, UnitFullName the two apart (dump of 2026-11-11). A unit's name in STATE
 -- is the full one, "First Last".
 local function Split(full)
     local first, last = (full or ""):match("^(%S+)%s+(.+)$")
@@ -387,7 +387,7 @@ C_LFGListRoles = { GetRoles = function() return STATE.ownRoles end }
 STATE.invites = {}
 C_PartyInfo = { InviteUnit = function(name) STATE.invites[#STATE.invites + 1] = name end }
 
--- Blizzard's role check: counted; its answer as the client gave it to the leader (Michel's test)
+-- Blizzard's role check: counted; its answer as the client gave it to the leader (in-game test)
 STATE.rolePolls, STATE.rolePollOk = 0, true
 function InitiateRolePoll()
     STATE.rolePolls = STATE.rolePolls + 1
