@@ -83,16 +83,19 @@ end
 -- Level range: the dungeon's suggestion, or what the player set by hand for it
 ---------------------------------------------------------------------------
 local manual -- { key, min, max } while a hand-set range applies
+local last   -- { key, min, max }: the range last known, kept while the activities are unknown
 
 local function MaxLevel()
     return GetMaxPlayerLevel and GetMaxPlayerLevel() or 60
 end
 
--- The activities the list is for: the own listing's, else those chosen in Blizzard's dropdown
+-- The activities the list is for: the own listing's, else those chosen in Blizzard's dropdown;
+-- nil while the own listing's are secret (in an instance) - unknown, not "none"
 local function Activities()
     local entry = C_LFGList.GetActiveEntryInfo()
-    local own = entry and ns.ReadActivities(entry.activityIDs)
-    if own then return own end
+    local own = entry and entry.activityIDs
+    if IsSecret(own) then return nil end
+    if type(own) == "table" and #own > 0 then return ns.ReadActivities(own) end
     local dropdown = LFGBrowseFrame and LFGBrowseFrame.ActivityDropdown
     local selected = dropdown and dropdown.selectedValues
     if type(selected) == "table" then return selected end
@@ -106,13 +109,10 @@ local function ActivityKey(ids)
     return table.concat(copy, ",")
 end
 
-function ns.LevelRange()
-    local ids = Activities()
-    local key = ActivityKey(ids)
-    if manual and manual.key == key then return { min = manual.min, max = manual.max } end
-    manual = nil
+-- The range for these activities, from their suggestions
+local function Suggested(ids)
     local top = MaxLevel()
-    if #ids == 0 then return { min = 1, max = top } end
+    if #ids == 0 then return 1, top end
     local low, high
     for _, id in ipairs(ids) do
         local a = C_LFGList.GetActivityInfoTable(id)
@@ -123,17 +123,39 @@ function ns.LevelRange()
         low = low and math.min(low, lo) or lo
         high = high and math.max(high, hi) or hi
     end
-    return { min = low, max = high }
+    return low, high
 end
 
--- A range set by hand holds until the activities change
+function ns.LevelRange()
+    local ids = Activities()
+    if ids then
+        local key = ActivityKey(ids)
+        if manual and manual.key ~= key then manual = nil end
+        if manual then
+            last = manual
+        else
+            local low, high = Suggested(ids)
+            last = { key = key, min = low, max = high }
+        end
+    end
+    local r = manual or last
+    if not r then return { min = 1, max = MaxLevel() } end
+    return { min = r.min, max = r.max }
+end
+
+-- A range set by hand holds until the activities change; set while they are unknown, it is for
+-- the ones last known
 function ns.SetLevelRange(from, to)
     if from > to then from, to = to, from end
-    manual = { key = ActivityKey(Activities()), min = from, max = to }
+    local ids = Activities()
+    local key = ids and ActivityKey(ids) or (last and last.key)
+    manual = { key = key, min = from, max = to }
+    last = manual
 end
 
 -- Forgets the range set by hand: the dungeon's range again
 function ns.ClearLevelRange()
+    if last == manual then last = nil end
     manual = nil
 end
 

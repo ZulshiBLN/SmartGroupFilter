@@ -274,6 +274,42 @@ describe("the panel", function()
         assert.are.equal(36, ns.LevelRange().max) -- stopped at the high handle, not swapped
     end)
 
+    it("stops a handle hidden mid-drag: it no longer follows the cursor", function()
+        RUNSCRIPT(panel, "OnShow")
+        local track, high = panel.slider, panel.slider.handles[2]
+        track.left, track.width = 100, 236
+        RUNSCRIPT(high, "OnMouseDown")
+        STATE.cursor = { x = 100 + 35 * 4, y = 0 } -- level 36
+        RUNSCRIPT(high, "OnUpdate")
+        RUNSCRIPT(high, "OnHide") -- the Group Finder closed; no mouse-up arrives
+        STATE.cursor = { x = 100 + 39 * 4, y = 0 } -- level 40
+        RUNSCRIPT(high, "OnUpdate")
+        assert.are_not.equal("40", panel.toBox.text)
+        RUNSCRIPT(high, "OnMouseUp")
+        assert.are.equal(30, ns.LevelRange().max)
+    end)
+
+    -- Blizzard's Group Finder loads on demand: loaded in combat, the build button could be
+    -- neither sized, placed nor given its action
+    it("is built only after combat when Blizzard's Group Finder loads in combat", function()
+        ns = addon.load("enUS")
+        local browse = LFGBrowseFrame
+        SETGLOBAL("LFGBrowseFrame", nil)
+        FIRE("PLAYER_LOGIN")
+        assert.is_nil(ns.panel)
+        STATE.combat = true
+        SETGLOBAL("LFGBrowseFrame", browse)
+        assert.has_no.errors(function() FIRE("ADDON_LOADED", "Blizzard_GroupFinder_VanillaStyle") end)
+        assert.is_nil(ns.panel)
+        STATE.combat = false
+        FIRE("PLAYER_REGEN_ENABLED")
+        assert.is_truthy(ns.panel)
+        local button = ns.panel.buildButton
+        assert.are.equal("BOTTOM", button.points[1][1])
+        assert.are.equal(ns.panel, button.points[1][2])
+        assert.is_truthy(button:GetAttribute("useOnKeyDown") ~= nil)
+    end)
+
     it("sets the two options", function()
         panel.doubleCheck:SetChecked(true)
         RUNSCRIPT(panel.doubleCheck, "OnClick")

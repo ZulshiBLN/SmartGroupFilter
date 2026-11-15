@@ -10,7 +10,7 @@ local L = ns.L
 local db
 ns.OnDBReady(function(d) db = d end)
 
-local PAD = 14
+local PAD = ns.D.PAD
 local DD_WIDTH = 180
 local DD_TEXT_PAD = 50 -- room beside the text: its inset and the arrow
 

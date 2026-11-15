@@ -11,7 +11,7 @@ local db
 ns.OnDBReady(function(d) db = d end)
 
 local WIDTH = 300
-local PAD = 14
+local PAD = D.PAD
 local SLOT = 32        -- an icon's slot in a row, px
 local ICON = 28
 local PER_LINE = 5     -- icons per line; the damage row takes two lines
@@ -221,6 +221,10 @@ local function Handle(slider, index)
         if index == 1 then from = math.min(v, to) else to = math.max(v, from) end
         self.pending = { from, to }
         ShowRange(from, to)
+    end)
+    -- Hidden mid-drag (the Group Finder closed), no mouse-up arrives: the drag ends unapplied
+    h:SetScript("OnHide", function(self)
+        self.dragging, self.pending = false, nil
     end)
     h:SetScript("OnMouseUp", function(self)
         self.dragging = false
@@ -632,13 +636,17 @@ local function Create()
     ns.CreateSettingsView(panel)
 end
 
--- Blizzard's Group Finder may load after this addon: build the panel once both are ready
+local events = CreateFrame("Frame")
+
+-- Blizzard's Group Finder may load after this addon, also in combat: build the panel once both
+-- are ready and combat is over - the build button may not be sized, placed or set in combat
 local function TryCreate()
     if panel or not db or not LFGBrowseFrame then return end
+    if InCombatLockdown() then return events:RegisterEvent("PLAYER_REGEN_ENABLED") end
+    events:UnregisterEvent("PLAYER_REGEN_ENABLED")
     Create()
 end
 
-local events = CreateFrame("Frame")
 events:RegisterEvent("PLAYER_LOGIN")
 events:RegisterEvent("ADDON_LOADED")
 events:SetScript("OnEvent", function(_, event)

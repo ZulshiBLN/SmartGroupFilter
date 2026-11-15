@@ -80,6 +80,9 @@ D.WHISPER_ROLE = "%s for %s?"
 D.WHISPER_DUNGEON = "You want to join for %s?"
 D.WHISPER_ROLE_NAMES = { TANK = "Tank", HEALER = "Healer", DAMAGER = "Damage" }
 
+-- The inset of the panel's and the settings view's content from the window edge, px
+D.PAD = 14
+
 -- A role's tooltip lists at most this many players, then "and N more"
 D.TIP_MAX_PLAYERS = 15
 -- Blizzard's result tooltip names a group's members up to this size (Blizzard_LFGVanilla_Browse.lua);

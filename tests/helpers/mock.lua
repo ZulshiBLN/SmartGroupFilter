@@ -151,8 +151,15 @@ function CreateFrame(kind, name, parent, template)
     -- A secure action button: its OnClick performs the "click" action on "clickbutton"
     if template and template:find("SecureActionButtonTemplate") then
         f.attributes = {}
-        -- The client's rule: a protected frame is anchored to its parent or nothing
+        -- The client's rules: a protected frame is anchored to its parent or nothing, and in
+        -- combat addon code may not size, place or set it
+        local setSize = f.SetSize
+        function f:SetSize(...)
+            if STATE.combat then error("SetSize on a secure button in combat") end
+            return setSize(self, ...)
+        end
         function f:SetPoint(point, rel, ...)
+            if STATE.combat then error("SetPoint on a secure button in combat") end
             if type(rel) == "table" and rel ~= self.parent then
                 error("Cannot anchor protected frames to regions")
             end

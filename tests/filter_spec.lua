@@ -210,6 +210,16 @@ describe("the count", function()
         assert.has_no.errors(ns.UpdateBuildButton)
     end)
 
+    it("keeps a hand-set range while the own listing's dungeons are secret, and after", function()
+        ns.SetLevelRange(25, 28)
+        STATE.activeEntry = { activityIDs = SECRET() }
+        local r = ns.LevelRange()
+        assert.are.same({ 25, 28 }, { r.min, r.max })
+        STATE.activeEntry = { activityIDs = { 800 } } -- out of the instance again
+        r = ns.LevelRange()
+        assert.are.same({ 25, 28 }, { r.min, r.max })
+    end)
+
     it("reads the dungeons a player listed for; a secret one makes them unknown", function()
         result(1, "MAGE", 25, { dps = true }, { activityIDs = { 800, 801 } })
         assert.are.same({ 800, 801 }, ns.ReadEntry(1).activities)
