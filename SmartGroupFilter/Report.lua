@@ -12,8 +12,6 @@ local SetL = ns.SetL
 local db
 ns.OnDBReady(function(d) db = d end)
 
-local MAX_ERRORS = 5       -- newest errors of this addon included in the report
-local MAX_STACK_LINES = 12 -- stack lines per error
 
 ---------------------------------------------------------------------------
 -- State snapshot: what decides a misbehaviour without a Lua error - the build button, the
@@ -81,7 +79,7 @@ local function CollectErrors()
             local text = tostring(e.message or "") .. "\n" .. tostring(e.stack or "")
             if current and text:find(ns.ADDON_NAME, 1, true) then
                 list[#list + 1] = e
-                if #list >= MAX_ERRORS then break end
+                if #list >= D.REPORT_ERRORS then break end
             end
         end
     end
@@ -181,7 +179,7 @@ local function BuildReport(form)
             lines[#lines + 1] = ("Error %d (x%s, %s, combat: %s):"):format(i, type(e.counter) == "number" and e.counter or 1, when, combat)
             lines[#lines + 1] = "```"
             for _, l in ipairs(FirstLines(e.message, 6, "msg", names)) do lines[#lines + 1] = l end
-            for _, l in ipairs(FirstLines(e.stack, MAX_STACK_LINES, "at", names)) do lines[#lines + 1] = l end
+            for _, l in ipairs(FirstLines(e.stack, D.REPORT_STACK_LINES, "at", names)) do lines[#lines + 1] = l end
             for _, l in ipairs(ns.SafeLocals(e.locals, names)) do lines[#lines + 1] = "local " .. l end
             lines[#lines + 1] = "```"
         end
@@ -202,7 +200,6 @@ end
 -- Window
 ---------------------------------------------------------------------------
 local frame
-local MAX_TEXT = 500 -- letters of the description and of the details
 local reopen = false -- combat closed the window: it comes back after
 
 -- The box shows the code, selected for Ctrl+C, or - "Show content" - the readable report,
@@ -249,7 +246,7 @@ local function AddInput(anchor, width)
     box:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 6, -4)
     box:SetSize(width, 22)
     box:SetAutoFocus(false)
-    box:SetMaxLetters(MAX_TEXT)
+    box:SetMaxLetters(D.REPORT_TEXT)
     box:SetScript("OnTextChanged", function(_, userInput) if userInput then Refresh() end end)
     box:SetScript("OnEnterPressed", SelectReport)
     box:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
@@ -460,13 +457,13 @@ local function Place(docked)
     end
 end
 
--- /sgf bug and the settings' button (docked). In combat nothing opens, and only /sgf bug says
--- why.
 -- The window background slider moved: follow it while open (Settings.lua)
 function ns.ApplyReportOpacity()
     if frame then ns.ApplyWindowOpacity(frame, db.windowOpacity) end
 end
 
+-- /sgf bug and the settings' button (docked). In combat nothing opens, and only /sgf bug says
+-- why.
 function ns.OpenBugReport(docked)
     if not frame then CreateWindow() end
     if InCombatLockdown() then

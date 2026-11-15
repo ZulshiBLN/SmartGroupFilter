@@ -112,7 +112,7 @@ describe("the count", function()
         result(3, "MAGE", 36, { dps = true })
         result(4, nil, nil, nil, { numMembers = 3 })
         local counted
-        ns.OnListFiltered(function(s, t) counted = s .. "/" .. t end)
+        ns.OnCounted(function(s, t) counted = s .. "/" .. t end)
         received()
         assert.are.equal("1/3", counted)
     end)

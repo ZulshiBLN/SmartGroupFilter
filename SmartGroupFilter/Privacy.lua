@@ -34,7 +34,7 @@ end
 -- Names the client knows now: the player, realm, guild, group, target, focus, mouseover, the
 -- trade partner. nil when one of them is secret - the filter could not compare it.
 ---------------------------------------------------------------------------
-local function IsSecret(v) return issecretvalue ~= nil and issecretvalue(v) end
+local IsSecret = ns.IsSecret
 
 function ns.KnownNames()
     local names, secret = {}, false
@@ -102,8 +102,8 @@ end
 -- The letters of the scripts that part words with spaces: Latin (without × and ÷), Greek,
 -- Cyrillic, Armenian, Hebrew, Arabic. Any other character - punctuation, spaces, symbols, and
 -- the scripts written without spaces (kana, CJK, Hangul) - ends a word, so a name inside
--- Chinese text or before a Korean particle is still found (ruleset plan
--- 2026-10-25-report-filter-fixes, after SmartBlessingBar's audit).
+-- Chinese text or before a Korean particle is still found (after SmartBlessingBar's
+-- report-filter audit).
 local LETTERS = { { 0xC0, 0xD6 }, { 0xD8, 0xF6 }, { 0xF8, 0x24F }, { 0x370, 0x3FF }, { 0x400, 0x52F },
     { 0x531, 0x556 }, { 0x561, 0x587 }, { 0x5D0, 0x5EA }, { 0x620, 0x64A }, { 0x1E00, 0x1EFF } }
 

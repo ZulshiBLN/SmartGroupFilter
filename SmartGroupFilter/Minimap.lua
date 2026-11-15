@@ -78,7 +78,7 @@ end
 ---------------------------------------------------------------------------
 local function ShowTooltip(self)
     GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-    GameTooltip:AddLine("SmartGroupFilter |cffffffffv" .. ns.VERSION .. "|r")
+    GameTooltip:AddLine(ns.ADDON_NAME .. " |cffffffffv" .. ns.VERSION .. "|r")
     local micro = LFDMicroButton
     if micro and micro.IsEnabled and not micro:IsEnabled() and micro.disabledTooltip then
         local reason = micro.disabledTooltip
@@ -128,7 +128,7 @@ local function Create()
     button:SetScript("OnDragStop", StopDrag)
     -- After the secure action: the right-click opens the settings
     button:SetScript("PostClick", function(_, mouse)
-        if mouse == "RightButton" and ns.OpenSettings then ns.OpenSettings() end
+        if mouse == "RightButton" then ns.OpenSettings() end
     end)
     button:SetScript("OnEnter", ShowTooltip)
     button:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -142,12 +142,12 @@ end
 -- The TOC names the three globals (ruleset code.md allows exactly these).
 ---------------------------------------------------------------------------
 function SmartGroupFilter_OnCompartmentClick()
-    if ns.OpenSettings then ns.OpenSettings() end
+    ns.OpenSettings()
 end
 
 function SmartGroupFilter_OnCompartmentEnter(_, menuButton)
     GameTooltip:SetOwner(menuButton, "ANCHOR_RIGHT")
-    GameTooltip:AddLine("SmartGroupFilter |cffffffffv" .. ns.VERSION .. "|r")
+    GameTooltip:AddLine(ns.ADDON_NAME .. " |cffffffffv" .. ns.VERSION .. "|r")
     GameTooltip:AddLine(L.COMPARTMENT_CLICK, 0, 1, 0)
     GameTooltip:AddLine(L.COMPARTMENT_HINT, 1, 1, 1, true)
     GameTooltip:Show()

@@ -7,20 +7,9 @@
 local _, ns = ...
 
 local db
-ns.OnDBReady(function(d)
-    db = d
-    db.filterOn = nil -- saved by earlier builds; Reset Filter's "off" is no longer kept
-end)
+ns.OnDBReady(function(d) db = d end)
 
--- A secret value is unreadable: it counts as missing (ruleset code.md, "Secret values")
-local function IsSecret(v)
-    return v ~= nil and issecretvalue ~= nil and issecretvalue(v) == true
-end
-
-local function Clean(v)
-    if IsSecret(v) then return nil end
-    return v
-end
+local IsSecret, Clean = ns.IsSecret, ns.Clean
 
 -- Every readable name a search result showed this session: the bug report filters them out
 -- (Privacy.lua), never prints them
@@ -85,7 +74,7 @@ end
 local manual -- { key, min, max } while a hand-set range applies
 local last   -- { key, min, max }: the range last known, kept while the activities are unknown
 
-local function MaxLevel()
+function ns.MaxLevel()
     return GetMaxPlayerLevel and GetMaxPlayerLevel() or 60
 end
 
@@ -111,7 +100,7 @@ end
 
 -- The range for these activities, from their suggestions
 local function Suggested(ids)
-    local top = MaxLevel()
+    local top = ns.MaxLevel()
     if #ids == 0 then return 1, top end
     local low, high
     for _, id in ipairs(ids) do
@@ -139,7 +128,7 @@ function ns.LevelRange()
         end
     end
     local r = manual or last
-    if not r then return { min = 1, max = MaxLevel() } end
+    if not r then return { min = 1, max = ns.MaxLevel() } end
     return { min = r.min, max = r.max }
 end
 
@@ -168,7 +157,7 @@ local rolePlayers = { TANK = {}, HEALER = {}, DAMAGER = {} }
 local listeners = {}
 
 -- fn(fit, total) runs after every count: single players that fit and all single players
-function ns.OnListFiltered(fn)
+function ns.OnCounted(fn)
     listeners[#listeners + 1] = fn
 end
 
@@ -280,13 +269,12 @@ end
 -- arrived, then sends LFG_LIST_SEARCH_RESULT_UPDATED - counted once, shortly after, however
 -- many updates arrive.
 ---------------------------------------------------------------------------
-local RECOUNT_DELAY = 0.3
 local recountPending = false
 
 local function OnResultUpdated()
     if recountPending then return end
     recountPending = true
-    C_Timer.After(RECOUNT_DELAY, function()
+    C_Timer.After(ns.D.RECOUNT_DELAY, function()
         recountPending = false
         ns.Recount()
     end)

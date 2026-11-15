@@ -89,6 +89,9 @@ D.TIP_MAX_PLAYERS = 15
 -- the bug report filters the names it showed
 D.TIP_MEMBERS_MAX = 10
 
+-- Players whose data arrives after the search are counted once, this long after the first update
+D.RECOUNT_DELAY = 0.3
+
 -- The panel's options and their defaults. panelShown: the side tab's switch.
 D.OPTION_DEFAULTS = { allowDouble = false, allowSameArmor = true, panelShown = true, hideMinimap = false }
 
@@ -111,6 +114,7 @@ D.GLOW_ATLAS = "UI-HUD-ActionBar-Proc-Loop-Flipbook"
 D.GLOW_ROWS, D.GLOW_COLUMNS, D.GLOW_FRAMES = 6, 5, 30
 D.GLOW_SCALE = 1.4
 D.GLOW_SECONDS_PER_LOOP = 1
+D.GLOW_SECONDS = 5 -- List Self's pointer: how long Blizzard's eye tab glows
 -- The side tab's icon: the full logo with its own gold ring (Media/Tab.tga)
 D.TAB_ICON = "Interface\\AddOns\\SmartGroupFilter\\Media\\Tab"
 
@@ -168,6 +172,10 @@ D.HIDDEN = {
 
 D.REPORT_CUT = "[... cut: the report is too long]"
 D.REPORT_MAX_BYTES = 20000 -- fits a GitHub issue (65,536) also as a code, and stays readable
+D.REPORT_ERRORS = 5         -- newest errors of this addon included in the report
+D.REPORT_STACK_LINES = 12   -- stack lines per error
+D.REPORT_TEXT = 500         -- letters of the description and of the details
+D.LOG_ENTRIES = 50          -- actions and combats the log keeps
 -- Strings a report may carry as they are; any other string becomes <text:N>, its length only.
 -- Class and role tokens, the build button's modes and the keys of its reasons join below.
 D.REPORT_SAFE = {

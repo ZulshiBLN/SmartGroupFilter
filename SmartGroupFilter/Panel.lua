@@ -65,10 +65,6 @@ local function Header(parent, key)
     return h
 end
 
--- A gold line as in SimpleConjureBar's settings (UI.AddSeparator): 2 px, strong in the middle,
--- fading to both ends. Placed `gap` px below `anchor`, centred in the panel.
-local SEP_HEIGHT = 2
-local SEP_R, SEP_G, SEP_B = 1, 0.82, 0
 ---------------------------------------------------------------------------
 -- Window background, invisible to solid (ruleset plan 2026-11-11-window-opacity, as the
 -- sisters do it). The dialog texture lets the game show through and never turns solid on its
@@ -103,6 +99,10 @@ function ns.SliderThumb(slider)
     return h
 end
 
+-- A gold line as in SimpleConjureBar's settings (UI.AddSeparator): 2 px, strong in the middle,
+-- fading to both ends. Placed `gap` px below `anchor`, centred in the panel.
+local SEP_HEIGHT = 2
+local SEP_R, SEP_G, SEP_B = 1, 0.82, 0
 local function Separator(parent, anchor, gap)
     local line = CreateFrame("Frame", nil, parent)
     line:SetSize(WIDTH - 2 * PAD, SEP_HEIGHT)
@@ -144,15 +144,11 @@ end
 ---------------------------------------------------------------------------
 -- Level range: two fields and a slider with two handles
 ---------------------------------------------------------------------------
-local function MaxLevel()
-    return GetMaxPlayerLevel and GetMaxPlayerLevel() or 60
-end
-
 local function ShowRange(from, to)
     -- A box being typed in keeps its digits: a count may come between two keys (review)
     if not panel.fromBox:HasFocus() then panel.fromBox:SetText(tostring(from)) end
     if not panel.toBox:HasFocus() then panel.toBox:SetText(tostring(to)) end
-    local span = math.max(1, MaxLevel() - 1)
+    local span = math.max(1, ns.MaxLevel() - 1)
     for i, v in ipairs({ from, to }) do
         local h = panel.slider.handles[i]
         h:ClearAllPoints()
@@ -174,7 +170,7 @@ end
 local function TypedLevel(box)
     local n = tonumber(box:GetText())
     if not n then return nil end
-    return math.max(1, math.min(MaxLevel(), math.floor(n)))
+    return math.max(1, math.min(ns.MaxLevel(), math.floor(n)))
 end
 
 local function LevelBox(parent, isFrom)
@@ -207,7 +203,7 @@ local function LevelAtCursor()
     if width <= 0 then width = TRACK end
     local f = (x - panel.slider:GetLeft()) / width
     f = math.max(0, math.min(1, f))
-    return 1 + math.floor(f * (MaxLevel() - 1) + 0.5)
+    return 1 + math.floor(f * (ns.MaxLevel() - 1) + 0.5)
 end
 
 local function Handle(slider, index)
@@ -239,14 +235,8 @@ end
 ---------------------------------------------------------------------------
 -- Priority rows
 ---------------------------------------------------------------------------
-local ROLE_TEXT = {
-    TANK = function() return ns.LocalName(TANK, "ROLE_TANK") end,
-    HEALER = function() return ns.LocalName(HEALER, "ROLE_HEALER") end,
-    DAMAGER = function() return ns.LocalName(DAMAGER, "ROLE_DAMAGE") end,
-}
-
 -- The slot index (1..n) under screen point x, y in a row, or nil outside it
-function ns.SlotAt(row, x, y)
+local function SlotAt(row, x, y)
     local n = #db.order[row.role]
     local lines = math.ceil(n / PER_LINE)
     local col = math.floor((x - row:GetLeft()) / SLOT)
@@ -326,7 +316,7 @@ local function Icon(row)
         self:SetFrameStrata(panel:GetFrameStrata())
         local scale = UIParent:GetEffectiveScale()
         local x, y = GetCursorPosition()
-        local to = ns.SlotAt(row, x / scale, y / scale)
+        local to = SlotAt(row, x / scale, y / scale)
         local order = db.order[row.role]
         if to and to ~= self.index then
             local class = table.remove(order, self.index)
@@ -359,7 +349,7 @@ local function RoleTooltip(hover)
     for i, entry in ipairs(ns.RolePlayers(hover.role)) do list[i] = entry end
     table.sort(list, ByLevelThenName)
     GameTooltip:SetOwner(hover, "ANCHOR_RIGHT")
-    GameTooltip:AddLine(ROLE_TEXT[hover.role]())
+    GameTooltip:AddLine(ns.RoleName(hover.role))
     for i = 1, math.min(#list, D.TIP_MAX_PLAYERS) do
         local entry = list[i]
         local colour = entry.class and RAID_CLASS_COLORS[entry.class]
@@ -374,7 +364,7 @@ end
 
 local function Row(parent, role, anchor, gap)
     local label = parent:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    ns.SetL(label, ROLE_TEXT[role])
+    ns.SetL(label, function() return ns.RoleName(role) end)
     label:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, gap)
     local row = CreateFrame("Frame", nil, parent)
     row.role = role
@@ -459,7 +449,6 @@ local function ToggleTab()
     end
     if tab.Icon then tab.Icon:SetTexture(D.TAB_ICON) end
     if tab.SetFillToInterior then tab:SetFillToInterior(true) end
-    tab.tooltipText = ns.ADDON_NAME
     local function Sync()
         if not InCombatLockdown() then panel:SetShown(db.panelShown) end
         if tab.SetChecked then tab:SetChecked(db.panelShown) end
@@ -491,7 +480,6 @@ end
 
 -- List Self's pointer: Blizzard's eye tab (the listing page) glows for a few seconds. SGF does
 -- not switch the page itself (see the side tab above).
-local GLOW_SECONDS = 5
 function ns.PointToListing()
     local target = LFGParentFrame.ListingTab
     if not target then return end
@@ -525,7 +513,7 @@ function ns.PointToListing()
     glow.anim:Play()
     glow.token = (glow.token or 0) + 1
     local token = glow.token
-    C_Timer.After(GLOW_SECONDS, function()
+    C_Timer.After(D.GLOW_SECONDS, function()
         if glow.token == token then glow:Hide() end
     end)
 end
@@ -628,7 +616,7 @@ local function Create()
         Dock()
         ns.Recount()
     end)
-    ns.OnListFiltered(function() RefreshAll() end)
+    ns.OnCounted(function() RefreshAll() end)
     ns.OnLanguageChanged(function() UpdateCount(ns.Counts()) end)
     Dock()
     RefreshAll()

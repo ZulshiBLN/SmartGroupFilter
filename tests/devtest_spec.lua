@@ -30,4 +30,17 @@ describe("the development test", function()
         SlashCmdList.SMARTGROUPFILTER("test")
         assert.truthy(chat():find("Unknown command", 1, true) or chat():find("unknown", 1, true))
     end)
+
+    -- Inside an instance the results list is secret (ruleset plan 2026-11-15-pre-release-cleanup)
+    it("runs with a secret results list and errors nowhere", function()
+        addon.load("enUS")
+        FIRE("PLAYER_LOGIN")
+        STATE.activities[800] = { minLevelSuggestion = 20, maxLevelSuggestion = 30, fullName = "Shadowfang Keep" }
+        STATE.activeEntry = { activityIDs = { 800 } }
+        LFGBrowseFrame.searching = false
+        FIRE("LFG_LIST_SEARCH_RESULTS_RECEIVED")
+        C_LFGList.GetFilteredSearchResults = function() return 6, SECRET() end
+        assert.has_no.errors(function() SlashCmdList.SMARTGROUPFILTER("test") end)
+        assert.truthy(chat():find("Not chosen:", 1, true))
+    end)
 end)

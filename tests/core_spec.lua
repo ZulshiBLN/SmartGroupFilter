@@ -113,3 +113,25 @@ describe("/sgf", function()
         assert.is_false(said("Chat commands:"))
     end)
 end)
+
+-- One test for a secret value, shared by every file that reads the client: only issecretvalue's
+-- true counts (ruleset plan 2026-11-15-pre-release-cleanup)
+describe("secret values", function()
+    it("are told apart in one place, and only issecretvalue's true makes one secret", function()
+        local ns = login("enUS")
+        local real = issecretvalue
+        SETGLOBAL("issecretvalue", function(v)
+            if v == "odd" then return 1 end
+            return v == "hidden"
+        end)
+        local ok, err = pcall(function()
+            assert.is_true(ns.IsSecret("hidden"))
+            assert.is_false(ns.IsSecret("odd"))
+            assert.is_false(ns.IsSecret(nil))
+            assert.is_nil(ns.Clean("hidden"))
+            assert.are.equal("odd", ns.Clean("odd"))
+        end)
+        SETGLOBAL("issecretvalue", real)
+        assert(ok, err)
+    end)
+end)

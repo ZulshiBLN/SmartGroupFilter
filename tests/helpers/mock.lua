@@ -38,8 +38,8 @@ Widget.__index = Widget
 local function noop() end
 function Widget:SetAllPoints(rel) self.allPointsTo = rel end
 for _, m in ipairs({ "SetAutoFocus", "SetNumeric", "SetMaxLetters",
-    "RegisterForClicks", "RegisterForDrag", "SetFrameStrata", "SetPortraitShown", "SetTextColor",
-    "SetMotionScriptsWhileDisabled", "SetBlendMode", "SetHighlightTexture" }) do
+    "RegisterForClicks", "RegisterForDrag", "SetFrameStrata", "SetTextColor",
+    "SetMotionScriptsWhileDisabled", "SetHighlightTexture" }) do
     Widget[m] = noop
 end
 function Widget:GetFrameStrata() return "MEDIUM" end
@@ -68,7 +68,6 @@ function Widget:HookScript(name, fn)
 end
 function Widget:SetText(s) self.text = s end
 function Widget:GetText() return self.text end
-function Widget:SetFormattedText(fmt, ...) self.text = fmt:format(...) end
 function Widget:Show() self.shown = true end
 function Widget:Hide() self.shown = false end
 function Widget:SetShown(v) self.shown = v and true or false end
@@ -76,8 +75,6 @@ function Widget:IsShown() return self.shown end
 function Widget:SetChecked(v) self.checked = v and true or false end
 function Widget:GetChecked() return self.checked end
 function Widget:SetEnabled(v) self.enabled = v and true or false end
-function Widget:Enable() self.enabled = true end
-function Widget:Disable() self.enabled = false end
 function Widget:IsEnabled() return self.enabled ~= false end
 function Widget:SetPoint(...) self.points[#self.points + 1] = { ... } end
 function Widget:ClearAllPoints() self.points = {} end
@@ -108,8 +105,6 @@ function Widget:SetBackdrop(b)
     end
 end
 function Widget:SetDesaturated(v) self.desaturated = v and true or false end
-function Widget:SetNumber(n) self.text = tostring(n) end
-function Widget:GetNumber() return tonumber(self.text) or 0 end
 function Widget:CreateTexture(name, layer, _, sublevel)
     local t = NewWidget("Texture", name, self)
     t.drawLayer, t.sublevel = layer, sublevel
@@ -186,7 +181,7 @@ function CreateFrame(kind, name, parent, template)
         function f:GenerateMenu() self.generated = (self.generated or 0) + 1 end
         f.Text = NewWidget("FontString", nil, f)
     end
-    if template == "LargeSideTabButtonTemplate" or template == "LFGVanillaRightTabTemplate" then
+    if template == "LargeSideTabButtonTemplate" then
         f.Icon = NewWidget("Texture", nil, f)
         function f:SetCustomOnMouseUpHandler(fn) self.mouseUp = fn end
         f.HighlightTexture = NewWidget("Texture", nil, f)
@@ -420,12 +415,6 @@ function RUNTIMERS()
     for _, fn in ipairs(due) do fn() end
 end
 
--- Blizzard's switch to the Group Browser page (Blizzard_LFGVanilla_ParentFrame.lua)
-STATE.tab2Clicks = 0
-function LFGParentFrameTab2_OnClick()
-    STATE.tab2Clicks = STATE.tab2Clicks + 1
-    LFGBrowseFrame.shown = true
-end
 ERR_DECLINE_GROUP_S = "%s declines your group invitation."
 ERR_ALREADY_IN_GROUP_S = "%s is already in a group."
 

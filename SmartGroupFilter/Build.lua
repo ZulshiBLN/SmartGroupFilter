@@ -21,16 +21,12 @@ local target
 local declined = {} -- name -> true: an invite of this session ran out
 
 local ROLE_KEY = { TANK = "ROLE_TANK", HEALER = "ROLE_HEALER", DAMAGER = "ROLE_DAMAGE" }
-local ROLE_CLIENT = { TANK = "TANK", HEALER = "HEALER", DAMAGER = "DAMAGER" }
 
 function ns.RoleName(role)
-    return ns.LocalName(_G[ROLE_CLIENT[role]], ROLE_KEY[role])
+    return ns.LocalName(_G[role], ROLE_KEY[role])
 end
 
-local function Clean(v)
-    if v ~= nil and issecretvalue and issecretvalue(v) then return nil end
-    return v
-end
+local Clean = ns.Clean
 
 -- A unit's name as the Group Finder writes it. WoW Forever gave characters surnames:
 -- UnitName says "Testa", the Group Finder and whispers need "Testa Name", which
@@ -145,7 +141,7 @@ end
 -- members asked count; the player's own answer names no party unit, so it never does - his role
 -- comes from his listing. "NONE" makes a role unknown again.
 local function OnRoleChanged(changed, newRole)
-    if type(changed) ~= "string" or (issecretvalue and issecretvalue(changed)) then return end
+    if type(changed) ~= "string" or ns.IsSecret(changed) then return end
     local name = MemberNamed(changed)
     if not (name and asked and asked[name]) then return end
     memberRoles[name] = D.PLACES[newRole] and newRole or nil
@@ -401,9 +397,8 @@ local function BuildGroup()
 end
 
 -- A protected frame may be anchored to its parent, not to the panel's other controls ("Cannot
--- anchor protected frames to regions", Michel's test 2026-11-11): bottom left of the panel,
--- looking as far from the left and bottom edges as Reset Filter from the right one: 10, and
--- Centred above the panel's count (Panel.lua: 14 from the bottom edge, which is drawn wider)
+-- anchor protected frames to regions", in-game test of 2026-11-11): centred above the panel's
+-- count (Panel.lua: 14 from the bottom edge, which is drawn wider)
 function ns.CreateBuildButton(parent)
     button = CreateFrame("Button", "SmartGroupFilterBuildButton", parent,
         "SecureActionButtonTemplate, UIPanelButtonTemplate")
@@ -423,7 +418,7 @@ function ns.CreateBuildButton(parent)
             AskRoles()
             ns.UpdateBuildButton()
         else
-            if button.mode == "list" and ns.PointToListing then ns.PointToListing() end
+            if button.mode == "list" then ns.PointToListing() end
             ns.UpdateBuildButton()
         end
     end)
@@ -439,7 +434,7 @@ function ns.CreateBuildButton(parent)
         GameTooltip:Show()
     end)
     button:SetScript("OnLeave", function() GameTooltip:Hide() end)
-    ns.OnListFiltered(ns.UpdateBuildButton)
+    ns.OnCounted(ns.UpdateBuildButton)
     -- Invites run out and lists grow old without an event: look again every second while the
     -- button is shown (Michel saw it stay greyed after a player was already in a group)
     local since = 0
@@ -501,7 +496,7 @@ local function Pattern(format)
 end
 
 local function DeclinedName(msg)
-    if type(msg) ~= "string" or (issecretvalue and issecretvalue(msg)) then return nil end
+    if type(msg) ~= "string" or ns.IsSecret(msg) then return nil end
     declinePatterns = declinePatterns or { Pattern(ERR_DECLINE_GROUP_S), Pattern(ERR_ALREADY_IN_GROUP_S) }
     for _, pattern in pairs(declinePatterns) do
         local name = msg:match(pattern)

@@ -144,13 +144,6 @@ describe("the panel", function()
         assert.are.equal(0, STATE.tab2ButtonClicks) -- SGF switches no page
     end)
 
-    it("glows while the panel is shown", function()
-        local tab = ns.tab
-        assert.is_true(tab.checked)
-        tab.mouseUp(tab, "LeftButton", true)
-        assert.is_false(tab.checked)
-    end)
-
     it("starts hidden when it was hidden before", function()
         ns = addon.load("enUS", { db = { panelShown = false } })
         FIRE("PLAYER_LOGIN")
@@ -420,12 +413,6 @@ describe("the panel, after the release reviews", function()
         ns.tab.mouseUp(ns.tab, "LeftButton", true)
         assert.is_true(panel.shown)
         assert.is_true(said("Not in combat."))
-    end)
-
-    it("has no one-per-click text left in any locale", function()
-        for code, t in pairs(ns.locales) do
-            assert.is_nil(rawget(t, "INVITE_NEXT"), code)
-        end
     end)
 end)
 

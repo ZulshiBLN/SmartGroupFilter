@@ -12,7 +12,20 @@ ns.VERSION = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version") or "?"
 -- Chat output
 ---------------------------------------------------------------------------
 function ns.Print(msg)
-    print("|cff33ff99SmartGroupFilter|r: " .. msg)
+    print("|cff33ff99" .. ns.ADDON_NAME .. "|r: " .. msg)
+end
+
+---------------------------------------------------------------------------
+-- Secret values: unreadable, so they count as missing (ruleset code.md, "Secret values").
+-- Only issecretvalue's true makes a value secret.
+---------------------------------------------------------------------------
+function ns.IsSecret(v)
+    return v ~= nil and issecretvalue ~= nil and issecretvalue(v) == true
+end
+
+function ns.Clean(v)
+    if ns.IsSecret(v) then return nil end
+    return v
 end
 
 ---------------------------------------------------------------------------

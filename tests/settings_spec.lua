@@ -26,12 +26,11 @@ describe("the settings", function()
         local _, db = login({
             order = { TANK = { "DRUID", "PALADIN", "WARRIOR" } },
             excluded = { HEALER = { SHAMAN = true } },
-            allowDouble = true, filterOn = false, -- saved by earlier builds
+            allowDouble = true,
         })
         assert.are.equal("DRUID PALADIN WARRIOR", joined(db.order.TANK))
         assert.is_true(db.excluded.HEALER.SHAMAN)
         assert.is_true(db.allowDouble)
-        assert.is_nil(db.filterOn) -- Reset Filter's "off" is not kept across logins
     end)
 
     it("reset an order that misses, repeats or adds a class", function()

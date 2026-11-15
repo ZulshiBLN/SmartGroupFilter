@@ -258,7 +258,6 @@ function ns.CreateSettingsView(p)
     header:SetTextColor(1, 0.82, 0)
     ns.SetL(header, "SETTINGS")
     header:SetPoint("TOPLEFT", panel, "TOPLEFT", PAD, -70)
-    panel.settingsHeader = header
 
     local language = LanguageDropdown(view, header)
 

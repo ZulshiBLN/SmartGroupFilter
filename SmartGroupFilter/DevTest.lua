@@ -187,7 +187,7 @@ function ns.DryRun()
     print("  Not chosen:")
     local left = 0
     local _, ids = C_LFGList.GetFilteredSearchResults()
-    for _, id in ipairs(ids or {}) do
+    for _, id in ipairs(ns.Clean(ids) or {}) do
         local e = ns.ReadEntry(id) or {}
         if e.numMembers == 1 and not e.hasSelf then
             local reason = WhyNot(e, state, chosenNames, ownArmor, after)

@@ -6,7 +6,6 @@
 local _, ns = ...
 
 local D = ns.D
-local MAX_ENTRIES = 50
 local entries, first = {}, 1 -- a ring: entries[first] is the oldest
 -- The clock starts when the addon loads - after a /reload too, not only at login
 local loadAt, loadClock = GetTime(), time()
@@ -22,11 +21,11 @@ end
 function ns.Log(text)
     pcall(function()
         local e = { since = GetTime() - loadAt, clock = time(), text = text }
-        if #entries < MAX_ENTRIES then
+        if #entries < D.LOG_ENTRIES then
             entries[#entries + 1] = e
         else
             entries[first] = e
-            first = first % MAX_ENTRIES + 1
+            first = first % D.LOG_ENTRIES + 1
         end
     end)
 end
@@ -92,7 +91,7 @@ events:RegisterEvent("GROUP_ROSTER_UPDATE")
 events:SetScript("OnEvent", function(_, event)
     if event == "PLAYER_REGEN_DISABLED" then
         combats[#combats + 1] = { start = time() }
-        if #combats > MAX_ENTRIES then table.remove(combats, 1) end
+        if #combats > D.LOG_ENTRIES then table.remove(combats, 1) end
         ns.Log("combat start")
     elseif event == "PLAYER_REGEN_ENABLED" then
         local c = combats[#combats]
