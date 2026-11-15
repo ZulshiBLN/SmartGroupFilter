@@ -26,6 +26,11 @@ end
 -- (Privacy.lua), never prints them
 local seenNames = {}
 
+local function See(name)
+    name = Clean(name)
+    if type(name) == "string" then seenNames[name] = true end
+end
+
 function ns.SeenNames()
     return seenNames
 end
@@ -57,14 +62,15 @@ function ns.ReadEntry(id)
         isDelisted = info.isDelisted, age = Clean(info.age),
         activities = ns.ReadActivities(info.activityIDs),
     }
+    See(info.leaderName) -- the name Blizzard's row shows, a group's too
     if entry.numMembers == 1 then
-        local p = C_LFGList.GetSearchResultPlayerInfo(id, 1)
+        local p = Clean(C_LFGList.GetSearchResultPlayerInfo(id, 1))
         if p then
             entry.name = Clean(p.name)
-            if type(entry.name) == "string" then seenNames[entry.name] = true end
+            See(entry.name)
             entry.class = Clean(p.classFilename)
             entry.level = Clean(p.level)
-            local r = p.lfgRoles
+            local r = Clean(p.lfgRoles)
             if type(r) == "table" then
                 entry.roles = { tank = Clean(r.tank), healer = Clean(r.healer), dps = Clean(r.dps) }
             end
@@ -171,6 +177,17 @@ end
 
 local listSecret = false -- logged once per change, not at every update in an instance
 
+-- A group's members, as Blizzard's tooltip names them: read on a count, not by Build Group's plan
+-- each second
+local function SeeMembers(entry)
+    local n = entry and entry.numMembers
+    if type(n) ~= "number" or n < 2 or n > ns.D.TIP_MEMBERS_MAX then return end
+    for i = 1, n do
+        local p = Clean(C_LFGList.GetSearchResultPlayerInfo(entry.id, i))
+        if p then See(p.name) end
+    end
+end
+
 -- The client's results read anew, or nil while they are secret (in an instance)
 local function Count()
     local _, ids = C_LFGList.GetFilteredSearchResults()
@@ -181,6 +198,7 @@ local function Count()
         local entry, why = ns.ReadEntry(id)
         if why == "secret" then secret = true break end
         entries[i] = entry
+        SeeMembers(entry)
     end
     if secret then
         if not listSecret then ns.Log("list secret: counts kept") end

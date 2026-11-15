@@ -80,10 +80,13 @@ D.WHISPER_ROLE = "%s for %s?"
 D.WHISPER_DUNGEON = "You want to join for %s?"
 D.WHISPER_ROLE_NAMES = { TANK = "Tank", HEALER = "Healer", DAMAGER = "Damage" }
 
--- The panel's options and their defaults. panelShown: the side tab's switch.
 -- A role's tooltip lists at most this many players, then "and N more"
 D.TIP_MAX_PLAYERS = 15
+-- Blizzard's result tooltip names a group's members up to this size (Blizzard_LFGVanilla_Browse.lua);
+-- the bug report filters the names it showed
+D.TIP_MEMBERS_MAX = 10
 
+-- The panel's options and their defaults. panelShown: the side tab's switch.
 D.OPTION_DEFAULTS = { allowDouble = false, allowSameArmor = true, panelShown = true, hideMinimap = false }
 
 -- The minimap button's place on its circle, degrees; 225 = bottom left, as SimpleConjureBar

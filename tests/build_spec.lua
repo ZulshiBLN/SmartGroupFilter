@@ -49,6 +49,16 @@ before_each(function()
 end)
 
 describe("Build Group", function()
+    -- Filter.lua already reads a secret results list as empty; the button's plan, each second,
+    -- must too
+    it("plans with no candidate while the results list is secret, and errors nowhere", function()
+        C_LFGList.GetFilteredSearchResults = function() return 6, SECRET() end
+        assert.has_no.errors(ns.UpdateBuildButton)
+        assert.has_no.errors(function() RUNSCRIPT(button, "OnUpdate", 1) end)
+        click()
+        assert.are.equal(0, #STATE.invites)
+    end)
+
     it("invites a tank, a healer and two damage dealers around a damage dealer in one click", function()
         assert.is_true(button:IsEnabled())
         click()

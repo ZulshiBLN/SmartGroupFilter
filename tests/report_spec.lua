@@ -459,6 +459,20 @@ describe("the report's privacy", function()
         assert.is_truthy(text:find("Unseenguy is hidden", 1, true), text)
     end)
 
+    it("removes the names of a group listing's leader and members, as Blizzard's row and tooltip show them", function()
+        local ns = login()
+        STATE.results[6] = {
+            info = { numMembers = 3, leaderName = "Groupboss", isDelisted = false, hasSelf = false, age = 0,
+                activityIDs = { 800 } },
+            members = { { name = "Groupboss" }, { name = "Memberone" }, { name = "Membertwo" } },
+        }
+        STATE.order[#STATE.order + 1] = 6
+        listed()
+        local text = report(ns, "FILTER", "Groupboss and Memberone are hidden", "Membertwo too")
+        assert.is_truthy(text:find("**Description:** <name> and <name> are hidden", 1, true), text)
+        assert.is_truthy(text:find("**Details:** <name> too", 1, true), text)
+    end)
+
     it("knows the names of the search results, the group and the invites", function()
         local ns = login()
         poison(ns)

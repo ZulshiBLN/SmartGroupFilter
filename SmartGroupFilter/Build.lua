@@ -211,7 +211,8 @@ end
 local function Candidates()
     local list = {}
     local _, ids = C_LFGList.GetFilteredSearchResults()
-    for _, id in ipairs(ids or {}) do
+    ids = Clean(ids) -- secret in an instance: no candidate
+    for _, id in ipairs(type(ids) == "table" and ids or {}) do
         local entry = ns.ReadEntry(id)
         if entry and not (entry.name and declined[entry.name]) then list[#list + 1] = entry end
     end

@@ -228,7 +228,8 @@ end
 ---------------------------------------------------------------------------
 -- Group Finder, as the Forever client (1.60.1) shows it: Michel's dumps of 2026-11-10 and
 -- Blizzard_LFGVanilla_Browse.lua. STATE.results: id -> { info = GetSearchResultInfo's table,
--- player = GetSearchResultPlayerInfo(id, 1)'s table }; STATE.order: the ids in list order.
+-- player = GetSearchResultPlayerInfo(id, 1)'s table, members = a group's player tables, 1 the
+-- leader }; STATE.order: the ids in list order.
 ---------------------------------------------------------------------------
 STATE.results = {}
 STATE.order = {}
@@ -269,6 +270,7 @@ C_LFGList = {
     end,
     GetSearchResultPlayerInfo = function(id, i)
         local r = STATE.results[id]
+        if r and r.members then return r.members[i] end
         return r and i == 1 and r.player or nil
     end,
     GetActiveEntryInfo = function() return STATE.activeEntry end,
