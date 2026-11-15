@@ -535,6 +535,7 @@ end
 function Widget:HighlightText(from, to)
     self.selection = (from == 0 and to == 0) and "none" or "all"
 end
+function Widget:SetClampedToScreen(on) self.clamped = on end
 function Widget:HasFocus() return self.focused == true end
 function Widget:ClearFocus() self.focused = false end
 function Widget:SetFocus()
