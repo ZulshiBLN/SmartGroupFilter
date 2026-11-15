@@ -45,8 +45,9 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and v
 - Not listed yet? The same button reads List Self and lights up Blizzard's eye tab, where you
   choose the dungeon, play style and role; once Blizzard has listed you it reads Build Group.
 - A minimap button with the logo: left-click opens or closes the Group Finder, as Blizzard's
-  button and key do; right-click opens SmartGroupFilter's settings; drag it around the minimap.
-  `/sgf minimap` hides and shows it. An entry in the AddOn menu opens the settings too.
+  button and key do; right-click opens SmartGroupFilter's settings (with the panel hidden, the
+  next time the player list shows); drag it around the minimap. `/sgf minimap` hides and shows
+  it. An entry in the AddOn menu opens the settings too.
 - A gear in the panel switches to the settings and back: the language - Automatic follows the
   client, or choose one of eleven, every text switches at once - the minimap button, and the
   window background: a slider from invisible to solid for the panel and the bug report.

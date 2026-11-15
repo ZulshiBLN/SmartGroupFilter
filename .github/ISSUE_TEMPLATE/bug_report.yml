@@ -14,7 +14,8 @@ body:
         copy the code with Ctrl+C. "Show content" in the window shows everything the code
         holds: the addon's version, settings and level range, your client's version, build and
         language, your class and level band, your listing's activity IDs, the list's counts,
-        the Build Group button's state, how many members answered Blizzard's role check,
+        the Build Group button's state, the dungeon it builds for and how many players
+        declined, how many members answered Blizzard's role check,
         invited players as role, class and level, group size,
         combat and panel state, the area you chose, this addon's Lua errors with stack and
         local values, its last actions, and what you type. It is filtered for your character,
@@ -25,10 +26,6 @@ body:
         read it.
         See [privacy](https://github.com/ZulshiBLN/SmartGroupFilter#privacy-and-security)
         and [data protection](https://github.com/ZulshiBLN/SmartGroupFilter#data-protection).
-
-        On an older version of the addon, without a code? Update first. If you cannot, open a
-        blank issue and remove the "Date:" line and any names from the old report before you
-        send it.
   - type: textarea
     id: code
     attributes:

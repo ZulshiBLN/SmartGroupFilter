@@ -12,7 +12,7 @@ tank, the healer and the damage dealers you are missing.
 ## ⚡ Build Group
 
 - **One click, a whole group:** one tank, one healer, three damage dealers around your own
-  role - only the places that are still free, only players listed for one of your dungeons.
+  role - only the places that are still free, only players listed for the dungeon it builds for.
 - **The most tanks and healers:** the places are filled so that the most tanks and healers come
   - a paladin listed as tank and healer heals when a warrior can only tank.
 - **Your priorities decide:** among equal fills, each place takes the class highest in your row,
@@ -26,8 +26,8 @@ tank, the healer and the damage dealers you are missing.
 - **One dungeon at a time:** listed for several, it builds for the one where it finds the most
   tanks and healers - they are rare - and names it in the chat.
 - **Clear invites:** a player listed for several roles or no role gets a short English whisper
-  with the invite - "Tank for Shadowfang Keep?"; one listed for several dungeons gets "You want
-  to join for Shadowfang Keep?".
+  with the invite - "Tank for Shadowfang Keep?"; one listed for one role but several dungeons
+  gets "You want to join for Shadowfang Keep?".
 - **Always a fresh list:** is the list older than 30 seconds, the button refreshes it first.
 - **Not listed yet?** The button reads List Self and lights up Blizzard's eye tab, where you
   choose the dungeon, play style and role.
@@ -35,8 +35,8 @@ tank, the healer and the damage dealers you are missing.
 ## 🎯 Filter the players you need
 
 - **Priorities:** one row of class icons per role - drag to reorder, right-click to exclude a
-  class from a role. Each row shows how many players fit it; hover it to see them with their
-  level, in class colour.
+  class from a role. Each row shows how many players who fit your filter signed up for it;
+  hover it to see them with their level, in class colour.
 - **Level range:** two fields and a slider, starting at the dungeon you are listed for.
 - **Double classes:** one player per class in your group, or up to two.
 - **Armor class:** leave out players who wear your armor - by class and level, as hunters,

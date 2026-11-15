@@ -51,8 +51,8 @@ your five-player group with one click.
     seconds it reads **Refresh List** first and clicks Blizzard's own refresh arrow. The chat
     names every invite; the tooltip says why the button is greyed out.
 - **Minimap button** - left-click opens or closes the Group Finder as Blizzard's button and key
-  do; right-click opens the settings; drag it around the minimap. The AddOn menu entry opens the
-  settings too.
+  do; right-click opens the settings (with the panel hidden, the next time the player list
+  shows); drag it around the minimap. The AddOn menu entry opens the settings too.
 - **Settings** - the gear left of Reset Filter switches the panel to the language, the minimap
   button, the window background - a slider from invisible to solid for the panel and the bug
   report - and the bug report, and back.
@@ -99,8 +99,9 @@ This is not legal advice; it says how bug reports are handled.
   vulnerability report on this repository (*Security > Report a vulnerability*).
 - **What it holds** - the addon's version, the client's version, build, interface and
   language, your class and level band, SmartGroupFilter's settings and level range, your
-  listing's activity IDs, the list's counts, the Build Group button's state, invited players as
-  role, class and level, how many members chose a role, whether you are in a group and its size,
+  listing's activity IDs, the list's counts, the Build Group button's state, the dungeon it
+  builds for and how many players declined, invited players as role, class and level, how many
+  members chose a role, whether you are in a group and its size,
   whether you are in combat, whether the panel is shown, the area you chose, SmartGroupFilter's
   Lua errors with their message, stack and local values (with BugGrabber), its last actions, and
   what you type. It removes your character, realm and guild, the names of your group and every
