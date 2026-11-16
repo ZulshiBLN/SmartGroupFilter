@@ -21,6 +21,14 @@ The panel docks beside the Group Finder's player list: set a level range, pick t
 
 Hover a role's header: its tooltip lists the players who fit, with their level and their name in class colour, highest level first.
 
+## 03-build-group.jpg
+
+**Title:** A whole group in one click
+
+**03 – Build Group**
+
+Click Build Group: the addon invites players who fit your filter for each open role, following your priorities, and names each invite in the chat with its role and level.
+
 ## 04-settings-and-languages.jpg
 
 **Title:** Eleven languages, your look
