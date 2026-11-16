@@ -22,20 +22,46 @@ SLASH_SMARTGROUPFILTER1 = D.SLASH
 -- In the order the help lists them
 local COMMANDS = {
     { cmd = "help", desc = "CMD_HELP" },
+    { cmd = "minimap", desc = "CMD_MINIMAP" },
+    { cmd = "test", desc = "CMD_TEST" },
+    { cmd = "bug", desc = "CMD_BUG" },
 }
+
+-- /sgf test exists in a development checkout only (DevTest.lua is never packaged)
+local function Available(c)
+    return c.cmd ~= "test" or ns.DryRun ~= nil
+end
 
 local function PrintHelp()
     ns.Print(L.HELP_HEADER)
     for _, c in ipairs(COMMANDS) do
-        print("   |cffffd100" .. D.SLASH .. " " .. c.cmd .. "|r - " .. L[c.desc])
+        if Available(c) then
+            print("   |cffffd100" .. D.SLASH .. " " .. c.cmd .. "|r - " .. L[c.desc])
+        end
     end
 end
 
 SlashCmdList.SMARTGROUPFILTER = function(msg)
     msg = (msg or ""):lower():match("^%s*(.-)%s*$")
+    -- the bug report's log names a known command only: the rest could be anything
+    local known = msg == "" and "help" or "other"
+    for _, c in ipairs(COMMANDS) do
+        if c.cmd == msg and Available(c) then known = msg end
+    end
+    ns.Log("command " .. known)
     if msg == "" or msg == "help" then
         PrintHelp()
+    elseif msg == "minimap" then
+        ns.ToggleMinimapButton()
+    elseif known == "test" then
+        ns.DryRun()
+    elseif msg == "bug" then
+        -- the report says in the chat what a button click shows elsewhere (Report.lua)
+        ns.fromCommand = true
+        ns.OpenBugReport()
+        ns.fromCommand = false
     else
         ns.Print(L.CMD_UNKNOWN:format("|cffffd100" .. D.SLASH .. " help|r"))
     end
+    ns.LogSettings()
 end

@@ -26,6 +26,20 @@ globals = {
 -- own entry may be written. A new API joins this list with the code that uses it.
 read_globals = {
     "C_AddOns", "CreateFrame", "GetLocale",
+    -- Group Finder (Blizzard_LFGVanilla_Browse.lua, Forever 1.60.1)
+    "C_LFGList", "LFGBrowseFrame",
+    "GetMaxPlayerLevel", "issecretvalue", "UnitClass", "UnitLevel", "C_Timer",
+    -- The panel
+    "LFGParentFrame", "UIParent", "GameTooltip", "GetCursorPosition", "PixelUtil", "CreateColor",
+
+    -- Build Group
+    "C_LFGListRoles", "C_PartyInfo", "C_ChatInfo", "SendChatMessage", "InitiateRolePoll", "UnitGroupRolesAssigned", "GetNumGroupMembers", "IsInGroup", "UnitIsGroupLeader",
+    "UnitIsGroupAssistant", "UnitName", "GetUnitName", "UnitFullName", "GetTime", "ERR_DECLINE_GROUP_S", "ERR_ALREADY_IN_GROUP_S",
+    "InCombatLockdown", "Minimap", "LFDMicroButton",
+    "LOCALIZED_CLASS_NAMES_MALE", "RAID_CLASS_COLORS", "TANK", "HEALER", "DAMAGER",
+    -- The bug report
+    "time", "GetBuildInfo", "GetRealmName", "GetNormalizedRealmName", "GetGuildInfo", "BugGrabber",
+    "UISpecialFrames",
     SlashCmdList = { fields = { SMARTGROUPFILTER = { read_only = false } } },
 }
 
@@ -41,7 +55,9 @@ files["tests/"] = {
     read_globals = {
         "io", "require", "loadfile", "dofile", "os",
         -- What tests/helpers/mock.lua provides to drive the mocked client
-        "FIRE", "CHAT", "RUNSCRIPT",
+        "FIRE", "CHAT", "RUNSCRIPT", "RUNTIMERS", "CLICK", "SETGLOBAL", "SECRET", "SECRET_TABLE",
+        -- Named frames the addon creates, read back by name
+        "SmartGroupFilterReport",
     },
 }
 

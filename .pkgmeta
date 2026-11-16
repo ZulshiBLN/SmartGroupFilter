@@ -11,3 +11,5 @@ ignore:
   - tests
   # the bug report decoder runs on a developer's machine, not in the game
   - tools
+  # /sgf test is for development only; the TOC loads it between #@do-not-package@ markers
+  - SmartGroupFilter/DevTest.lua

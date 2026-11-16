@@ -1,0 +1,46 @@
+# Store gallery
+
+The images in `.previews/`, in this order: for each, the title `tools/preview-title.py` puts on
+it, and the caption it gets in the CurseForge and Wago galleries (CurseForge allows at most 256
+characters). Upload the images and paste the captions by hand on both sites with each release
+whose previews change. This is the 1.0.0 set of ruleset plan 2026-11-15-store-screenshots.
+
+## 01-panel-at-work.jpg
+
+**Title:** Find the players you need
+
+**01 – The panel at work**
+
+The panel docks beside the Group Finder's player list: set a level range, pick the classes you want for each role, and the count at the bottom shows how many listed players fit your filter.
+
+## 02-who-fits.jpg
+
+**Title:** Who fits, at a glance
+
+**02 – Who fits**
+
+Hover a role's header: its tooltip lists the players who fit, with their level and their name in class colour, highest level first.
+
+## 03-build-group.jpg
+
+**Title:** A whole group in one click
+
+**03 – Build Group**
+
+Click Build Group: the addon invites players who fit your filter for each open role, following your priorities, and names each invite in the chat with its role and level.
+
+## 04-settings-and-languages.jpg
+
+**Title:** Eleven languages, your look
+
+**04 – Settings and languages**
+
+The gear opens the settings: let the addon follow your client's language or pick one of eleven, and set how dark the window background is.
+
+## 05-bug-report.jpg
+
+**Title:** Report a bug in one click
+
+**05 – Bug report**
+
+Type /sgf bug or click Bug report in the settings: describe what happened, copy the prepared report and paste it into the GitHub form the link opens. Your character, realm and guild are filtered out; check the content before you send it.

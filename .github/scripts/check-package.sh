@@ -27,6 +27,10 @@ for file in README.md LICENSE CHANGELOG.md; do
     [ -f "$dir/$file" ] || fail "$file is missing"
 done
 
+# The development test never ships (DevTest.lua, 2026-11-11)
+[ ! -e "$dir/DevTest.lua" ] || fail "DevTest.lua is in the zip; it is for development only"
+! grep -q "DevTest" "$toc" || fail "the packaged TOC still loads DevTest.lua"
+
 # Every file the TOC loads
 while IFS= read -r line; do
     line="${line%$'\r'}"
@@ -46,6 +50,9 @@ trap 'rm -rf "$work" "$lists"' EXIT
         case "$line" in ''|'#'*) continue ;; esac
         echo "${line//\\//}"
     done < "$toc"
+    # SGF's own textures - the logo - which Lua loads by path, not the TOC (plan
+    # 2026-11-10-panel-filter-build): only .tga files, only in Media/
+    (cd "$dir" && find Media -maxdepth 1 -type f -name '*.tga' 2>/dev/null)
 } | sort -u > "$lists/files"
 # every folder above a listed file: libs/X/X.lua allows libs/X and libs
 awk -F/ '{ p = ""; for (i = 1; i < NF; i++) { p = p (i > 1 ? "/" : "") $i; print p } }' "$lists/files" | sort -u > "$lists/folders"

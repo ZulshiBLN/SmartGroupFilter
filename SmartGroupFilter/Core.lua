@@ -12,7 +12,20 @@ ns.VERSION = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version") or "?"
 -- Chat output
 ---------------------------------------------------------------------------
 function ns.Print(msg)
-    print("|cff33ff99SmartGroupFilter|r: " .. msg)
+    print("|cff33ff99" .. ns.ADDON_NAME .. "|r: " .. msg)
+end
+
+---------------------------------------------------------------------------
+-- Secret values: unreadable, so they count as missing (ruleset code.md, "Secret values").
+-- Only issecretvalue's true makes a value secret.
+---------------------------------------------------------------------------
+function ns.IsSecret(v)
+    return v ~= nil and issecretvalue ~= nil and issecretvalue(v) == true
+end
+
+function ns.Clean(v)
+    if ns.IsSecret(v) then return nil end
+    return v
 end
 
 ---------------------------------------------------------------------------
@@ -70,6 +83,34 @@ function ns.OnDBReady(fn)
     if db then fn(db) end
 end
 
+-- A row's saved order: exactly the role's classes, each once - anything else is the default
+local function ValidOrder(order, role)
+    local classes = D.ROLE_CLASSES[role]
+    if type(order) == "table" and #order == #D.DEFAULT_ORDER[role] then
+        local seen, ok = {}, true
+        for i = 1, #order do
+            local class = order[i]
+            if not classes[class] or seen[class] then ok = false break end
+            seen[class] = true
+        end
+        if ok then return order end
+    end
+    local copy = {}
+    for i, class in ipairs(D.DEFAULT_ORDER[role]) do copy[i] = class end
+    return copy
+end
+
+-- A row's exclusions: only classes the role can take, only the value true
+local function ValidExcluded(excluded, role)
+    local clean = {}
+    if type(excluded) == "table" then
+        for class, value in pairs(excluded) do
+            if value == true and D.ROLE_CLASSES[role][class] then clean[class] = true end
+        end
+    end
+    return clean
+end
+
 -- Reads both saved tables as the client hands them over. Whatever they hold, the addon must
 -- start: a damaged value is dropped, never trusted (ruleset project.md, "Data").
 function ns.InitDB()
@@ -82,6 +123,29 @@ function ns.InitDB()
     if type(SmartGroupFilterDB) ~= "table" then SmartGroupFilterDB = {} end
     db = SmartGroupFilterDB
     db.dbVersion = D.DB_VERSION
+
+    for key, default in pairs(D.OPTION_DEFAULTS) do
+        if type(db[key]) ~= "boolean" then db[key] = default end
+    end
+    local angle = db.minimapAngle
+    if type(angle) ~= "number" or angle ~= angle or angle < 0 or angle > 360 then
+        db.minimapAngle = D.MINIMAP_ANGLE
+    end
+    local opacity = db.windowOpacity
+    if type(opacity) ~= "number" or opacity ~= opacity or opacity < 0 or opacity > 100 then
+        db.windowOpacity = D.WINDOW_OPACITY_TODAY
+    else
+        db.windowOpacity = math.floor(opacity + 0.5)
+    end
+    if type(db.order) ~= "table" then db.order = {} end
+    if type(db.excluded) ~= "table" then db.excluded = {} end
+    for key in pairs(db.excluded) do
+        if not D.ROLE_CLASSES[key] then db.excluded[key] = nil end -- unknown role
+    end
+    for _, role in ipairs(D.ROLES) do
+        db.order[role] = ValidOrder(db.order[role], role)
+        db.excluded[role] = ValidExcluded(db.excluded[role], role)
+    end
 
     for _, fn in ipairs(dbCallbacks) do fn(db) end
 end
