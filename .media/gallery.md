@@ -28,3 +28,11 @@ Hover a role's header: its tooltip lists the players who fit, with their level a
 **04 – Settings and languages**
 
 The gear opens the settings: let the addon follow your client's language or pick one of eleven, and set how dark the window background is.
+
+## 05-bug-report.jpg
+
+**Title:** Report a bug in one click
+
+**05 – Bug report**
+
+Type /sgf bug or click Bug report in the settings: describe what happened, copy the prepared report and paste it into the GitHub form the link opens. Your character, realm and guild are filtered out; check the content before you send it.
