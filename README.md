@@ -4,6 +4,8 @@ A helper for the Group Finder in World of Warcraft: Forever. It docks a panel be
 own Looking For Group window, finds the single players you need in the player list, and builds
 your five-player group with one click.
 
+![The panel beside the Group Finder's player list: level range, priorities and the count](.previews/01-panel-at-work.jpg)
+
 **Status: released** - version 1.0.0, for WoW Forever.
 
 ## How it works
@@ -130,4 +132,6 @@ leaves out (`#@do-not-package@` in the TOC, `ignore` in `.pkgmeta`). Specs: `bus
 
 ## License
 
-[MIT](LICENSE), by ZulshiBLN.
+[MIT](LICENSE), by ZulshiBLN. World of Warcraft screenshots and game art are (c) Blizzard
+Entertainment and not covered by the MIT license. The font of the screenshots' titles, Cinzel,
+is under the SIL Open Font License ([tools/fonts/OFL.txt](tools/fonts/OFL.txt)).

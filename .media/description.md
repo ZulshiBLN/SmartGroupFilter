@@ -7,6 +7,8 @@ SmartGroupFilter docks a panel beside Blizzard's own Group Finder window. It fin
 players in the list who fit your group - and with one click on **Build Group** it invites the
 tank, the healer and the damage dealers you are missing.
 
+![The panel beside the Group Finder's player list](https://raw.githubusercontent.com/ZulshiBLN/SmartGroupFilter/main/.previews/01-panel-at-work.jpg)
+
 ---
 
 ## ⚡ Build Group
